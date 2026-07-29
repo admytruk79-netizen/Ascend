@@ -1351,6 +1351,216 @@
       "grounded_where": "A conversation or decision you're putting off because the comfortable option is easier.",
       "tested_quality": "Discipline vs. Comfort-Seeking",
       "grounded_where_v2": "This is testing whether you'll take the harder, more honest step instead of the safe, familiar one sitting right there."
+    },
+    {
+      "num": 88,
+      "title": "The Solar Fountain",
+      "phase": 5,
+      "phrase": "The golden source overflows into creation",
+      "breathing": "8-0-8 count",
+      "meditation": "Envision the sun pouring its luminous streams downward, filling you with radiant vitality. Feel yourself as both vessel and channel",
+      "interpretation": "Divine abundance flows endlessly; when you align, you become the fountain through which light nourishes the world. Divine Glory streams as cosmic radiant power.",
+      "flagged": false
+    },
+    {
+      "num": 89,
+      "title": "The Crown of Absoluteness",
+      "phase": 5,
+      "phrase": "Order and harmony shine in sacred design",
+      "breathing": "7-1-7 count (the breath of alignment)",
+      "meditation": "Gaze inward at the crystalline star of light, its geometry unfolding with each breath. Rest within its perfect symmetry",
+      "interpretation": "True balance arises when your inner design resonates with cosmic order. You are a living mandala. The infinite crown emanates all from the Absolute beyond duality.",
+      "flagged": false
+    },
+    {
+      "num": 90,
+      "title": "The Mind Unbound",
+      "phase": 5,
+      "phrase": "Infinite streams weave the path of ascent",
+      "breathing": "Continuous circular breath (no pause)",
+      "meditation": "Imagine flowing currents of radiant light weaving upward through your being, reconnecting you with the greater cosmic flow",
+      "interpretation": "Life is a stream of eternal energy; when you surrender to the current, you rise effortlessly. Good Mind serves truth in liberated thought.",
+      "flagged": false
+    },
+    {
+      "num": 91,
+      "title": "The Living Book",
+      "phase": 5,
+      "phrase": "Each page reveals the hidden flame",
+      "breathing": "3-6-3 count",
+      "meditation": "Visualize a cosmic book opening before you. Each translucent page reveals a deeper flame, the record of your soul's wisdom",
+      "interpretation": "Your path is written in light; every step unfolds the next chapter in divine order. The living scripture of truth is carried within all creation.",
+      "flagged": false
+    },
+    {
+      "num": 92,
+      "title": "The Golden Thread",
+      "phase": 5,
+      "phrase": "The thread of eternity weaves through the void",
+      "breathing": "11-0-11 count",
+      "meditation": "See a golden filament stretching across the cosmos, connecting all worlds. Feel yourself woven into its eternal pattern",
+      "interpretation": "The golden thread binds all existence; follow it, and you return to the source. The indestructible kernel planted by the Holy Immortals connects all.",
+      "flagged": false
+    },
+    {
+      "num": 93,
+      "title": "The Radiant Sphere",
+      "phase": 5,
+      "phrase": "Within the radiant sphere, the flower awakens",
+      "breathing": "10-2-10 count",
+      "meditation": "Envision a radiant globe of light, with a golden flower blooming inside. Breathe with it, opening petal by petal into infinite brilliance",
+      "interpretation": "The heart of creation blossoms eternally; you are both the flower and the radiance that sustains it. All creation is gathered back into the One.",
+      "flagged": false
+    },
+    {
+      "num": 94,
+      "title": "The Hidden Expanse",
+      "phase": 5,
+      "phrase": "The web of stars reveals the hidden order",
+      "breathing": "6-6-6 count",
+      "meditation": "Envision a radiant grid of golden lines stretching across the universe. Feel yourself both inside and beyond it, woven into the geometry of creation",
+      "interpretation": "Behind all appearances is a divine order. Trust the patterns that hold you; they are the language of the cosmos. Endless light unfolds beyond perception.",
+      "flagged": false
+    },
+    {
+      "num": 95,
+      "title": "The Heart of Light",
+      "phase": 5,
+      "phrase": "From the depths of being, love ascends as flame",
+      "breathing": "5-7-5 count",
+      "meditation": "Visualize a golden heart glowing at the center of the Earth. With each breath, let its warmth rise through you, filling your chest with radiant love",
+      "interpretation": "The truest light emerges from love; it is the fountain from which all life is blessed. Holy devotion is the radiant heart where love, humility, and sacred light converge.",
+      "flagged": false
+    },
+    {
+      "num": 96,
+      "title": "The Divine Descent",
+      "phase": 5,
+      "phrase": "Heaven's light seeks the prepared vessel",
+      "breathing": "9-1-9 count",
+      "meditation": "Stand open as radiant beams of wisdom pour through you, transforming darkness into luminous understanding",
+      "interpretation": "When you align with higher purpose, divine light naturally flows through you to illuminate the world. Divine order manifests in flame through embodiment.",
+      "flagged": false
+    },
+    {
+      "num": 97,
+      "title": "The Spiral Ascent",
+      "phase": 5,
+      "phrase": "The golden stair rises through worlds of light",
+      "breathing": "4-4-8 count",
+      "meditation": "See yourself walking a spiral staircase of luminous gold. Each step lifts you toward spheres of greater brilliance, with no end in sight",
+      "interpretation": "The path is endless, each step a new revelation. The journey itself is the initiation. The soul's passage beyond death leads through the luminous threshold.",
+      "flagged": false
+    },
+    {
+      "num": 98,
+      "title": "The Veils of Passage",
+      "phase": 5,
+      "phrase": "Between veils, the path of choice appears",
+      "breathing": "7-0-7 count",
+      "meditation": "Stand before two radiant gateways, one golden and one shadowed. Allow your soul to know which path is yours without forcing the mind to choose",
+      "interpretation": "Choice is sacred. Every doorway leads further, but the one aligned with your essence opens into truth. The duality presents path of light or path of darkness.",
+      "flagged": false
+    },
+    {
+      "num": 99,
+      "title": "The Flower of Forms",
+      "phase": 5,
+      "phrase": "The living geometry blossoms from unity",
+      "breathing": "9-3-9 count",
+      "meditation": "Imagine a radiant flower blooming upward, surrounded by crystalline polyhedra. Each form is a living principle born of the one light",
+      "interpretation": "Creation unfolds as form and beauty, each petal and shape an echo of the same source. The higher soul achieves eternal liberation.",
+      "flagged": false
+    },
+    {
+      "num": 100,
+      "title": "The Triune Light",
+      "phase": 5,
+      "phrase": "The One radiates as triangle and cube",
+      "breathing": "3-9-3 count",
+      "meditation": "Focus on the golden triangle of light before you. In its center, see the cube of pure being. Hold yourself within its balance of spirit, mind, and matter",
+      "interpretation": "All forms are but reflections of the eternal triad. Within it, unity holds diversity. The triple essence of creation manifests through divine wisdom, holy spirit, and cosmic order.",
+      "flagged": false
+    },
+    {
+      "num": 101,
+      "title": "The Twin Suns",
+      "phase": 5,
+      "phrase": "The greater light awakens the lesser flame",
+      "breathing": "6-2-6 count",
+      "meditation": "Visualize a great sun shining above, radiating waves into a smaller sun below. Feel yourself as the bridge where the higher ignites the lower",
+      "interpretation": "The greater always seeks to awaken the lesser. As above shines upon below, your inner flame is kindled. The cosmic crossing leads beyond the sea of stars.",
+      "flagged": false
+    },
+    {
+      "num": 102,
+      "title": "The Black Sun Of Revelation",
+      "phase": 5,
+      "phrase": "In the eclipse, hidden fire is unveiled",
+      "breathing": "9-0-9 count",
+      "meditation": "Envision the black sun blazing with radiant beams behind it. Rest in the still point where shadow guards the secret light",
+      "interpretation": "The black sun is the womb of revelation\u2014its darkness births the most radiant truth. The deceptive shadow cast by the Destructive Spirit conceals deeper illumination.",
+      "flagged": false
+    },
+    {
+      "num": 103,
+      "title": "Pyramid of the Radiant Flower",
+      "phase": 5,
+      "phrase": "From foundation to crown, geometry blossoms",
+      "breathing": "5-10-5 count",
+      "meditation": "See a pyramid rising toward a sphere of light that blooms like a flower above it. Let its rays crown your being",
+      "interpretation": "The pyramid anchors, the flower crowns; in their union, the soul finds perfect harmony. The unending solar source is the symbol of supreme divinity.",
+      "flagged": false
+    },
+    {
+      "num": 104,
+      "title": "Sacred Fire Rising",
+      "phase": 5,
+      "phrase": "What breaks becomes the seed of design",
+      "breathing": "4-8-4 count",
+      "meditation": "Visualize shards of starlight dissolving into streams that form a lattice of sacred geometry. From chaos, a new order emerges",
+      "interpretation": "Fragments are never wasted; even the broken finds its place in the eternal pattern. The eternal flame rises as the core of sacred temples.",
+      "flagged": false
+    },
+    {
+      "num": 105,
+      "title": "Pillar of Fire at Dawn",
+      "phase": 5,
+      "phrase": "The horizon burns into ascent",
+      "breathing": "6-6-12 count",
+      "meditation": "Envision the fiery column erupting from the earth into the sky. Let its heat rise within your spine, carrying you upward",
+      "interpretation": "Dawn is not gentle but fierce\u2014the fire that rises is the same flame within you. Dawn shines as the revelation of truth and cosmic order.",
+      "flagged": false
+    },
+    {
+      "num": 106,
+      "title": "The Citadel",
+      "phase": 5,
+      "phrase": "The spire of eternity pierces the heavens",
+      "breathing": "7-7-7 count",
+      "meditation": "See a vast cathedral of light ascending into infinity, its spires aligned with the stars. Enter and feel yourself become its structure",
+      "interpretation": "The soul is both pilgrim and temple; its cathedral is built of radiant ascent. Good Mind creates a stronghold of pure thought protecting the soul.",
+      "flagged": false
+    },
+    {
+      "num": 107,
+      "title": "Salvation",
+      "phase": 5,
+      "phrase": "The celestial bow bends across the night",
+      "breathing": "5-5-10 count",
+      "meditation": "Envision the rainbow arc stretching over a golden horizon, linking earth and cosmos. Breathe in its spectrum of living fire",
+      "interpretation": "The rainbow is a covenant between worlds, a reminder that light always bends back to embrace life. The future savior ushers in final renewal where death and evil are overcome.",
+      "flagged": false
+    },
+    {
+      "num": 108,
+      "title": "The Temple",
+      "phase": 5,
+      "phrase": "Circles within circles weave the eternal hymn",
+      "breathing": "Continuous flowing breath (no pause)",
+      "meditation": "Visualize infinite interlocking circles of light spiraling outward. Hear their resonance as a silent mandala-song of the cosmos",
+      "interpretation": "Creation is a mandala in motion; by entering it, you become one with its endless symphony. The sacred fire temple is the gateway between human devotion and divine presence.",
+      "flagged": false
     }
   ]
 }
