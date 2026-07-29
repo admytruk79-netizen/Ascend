@@ -26,12 +26,16 @@ Always edit files under `www/`, then run `npm run sync` to copy them into
 the native Android project — never edit `android/app/src/main/assets/public`
 directly, it gets overwritten on every sync.
 
-## Known gap: card data is incomplete
+## Card data
 
-`www/ascend_cards.json` currently has **46 of 108 cards** (phases 1–3 in
-full; phases 4 and 5 are missing). The remaining cards need to be appended
-to the `cards` array before shipping — the app will otherwise only draw
-from cards 1–46 (manual entry is capped to that range automatically).
+`www/ascend_cards.json` has all 108 cards across the 5 phases. Cards 1–87
+carry a `grounded_supported` / `grounded_resisted` / `tested_quality` /
+`grounded_where_v2` set (the psychological "Grounded" reading); cards
+88–108 (most of Phase 5) only have `phrase` / `breathing` / `meditation` /
+`interpretation` since that's what the source material provided. The UI
+already handles this — the "Grounded" section only renders when those
+fields are present, so no code changes are needed if that data is filled
+in later.
 
 ## First-time setup
 
