@@ -1360,7 +1360,12 @@
       "breathing": "8-0-8 count",
       "meditation": "Envision the sun pouring its luminous streams downward, filling you with radiant vitality. Feel yourself as both vessel and channel",
       "interpretation": "Divine abundance flows endlessly; when you align, you become the fountain through which light nourishes the world. Divine Glory streams as cosmic radiant power.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Generosity from you comes back around, sometimes from a completely different direction than you gave it.",
+      "grounded_resisted": "Giving from a place of depletion, running yourself dry trying to be generous without refilling first.",
+      "grounded_where": "A pattern of giving (time, money, energy) faster than it's being replenished.",
+      "tested_quality": "Discipline vs. Comfort-Seeking",
+      "grounded_where_v2": "This is testing whether you're refilling yourself enough to keep giving, instead of giving from a place that's already dry."
     },
     {
       "num": 89,
@@ -1370,7 +1375,12 @@
       "breathing": "7-1-7 count (the breath of alignment)",
       "meditation": "Gaze inward at the crystalline star of light, its geometry unfolding with each breath. Rest within its perfect symmetry",
       "interpretation": "True balance arises when your inner design resonates with cosmic order. You are a living mandala. The infinite crown emanates all from the Absolute beyond duality.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Your outer life (schedule, environment, commitments) actually starts to match your internal values, instead of contradicting them.",
+      "grounded_resisted": "Living in a way that doesn't reflect what you actually care about, and feeling the friction of that gap.",
+      "grounded_where": "A mismatch between your stated priorities and how your actual time gets spent.",
+      "tested_quality": "Reverence for the Process",
+      "grounded_where_v2": "This is testing whether your actual daily life reflects what you say you value, or quietly contradicts it."
     },
     {
       "num": 90,
@@ -1380,7 +1390,12 @@
       "breathing": "Continuous circular breath (no pause)",
       "meditation": "Imagine flowing currents of radiant light weaving upward through your being, reconnecting you with the greater cosmic flow",
       "interpretation": "Life is a stream of eternal energy; when you surrender to the current, you rise effortlessly. Good Mind serves truth in liberated thought.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Letting go of controlling every detail actually gets you where you're going faster than gripping tighter would.",
+      "grounded_resisted": "Micromanaging a process that would move better if you trusted it more and controlled it less.",
+      "grounded_where": "A project or plan you're over-managing instead of letting develop with less interference.",
+      "tested_quality": "Trust vs. Control",
+      "grounded_where_v2": "This is testing whether you can trust a process enough to control it less, even though that feels riskier."
     },
     {
       "num": 91,
@@ -1390,7 +1405,12 @@
       "breathing": "3-6-3 count",
       "meditation": "Visualize a cosmic book opening before you. Each translucent page reveals a deeper flame, the record of your soul's wisdom",
       "interpretation": "Your path is written in light; every step unfolds the next chapter in divine order. The living scripture of truth is carried within all creation.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "You don't need the whole plan mapped out \u2014 the next right step is visible, and that's enough for now.",
+      "grounded_resisted": "Refusing to move until you can see the entire path, stuck because step three isn't clear yet.",
+      "grounded_where": "A long-term goal you haven't started because you can't see the whole route yet.",
+      "tested_quality": "Patience",
+      "grounded_where_v2": "This is testing whether you can take the next visible step without needing the entire path mapped out first."
     },
     {
       "num": 92,
@@ -1400,7 +1420,12 @@
       "breathing": "11-0-11 count",
       "meditation": "See a golden filament stretching across the cosmos, connecting all worlds. Feel yourself woven into its eternal pattern",
       "interpretation": "The golden thread binds all existence; follow it, and you return to the source. The indestructible kernel planted by the Holy Immortals connects all.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "A thread connects things that seemed separate \u2014 this relationship, that decision from years ago, this current situation \u2014 and following it clarifies things.",
+      "grounded_resisted": "Treating each life event as isolated, missing the pattern that would actually help you understand the current one.",
+      "grounded_where": "A current situation that echoes an old one you haven't connected the dots on yet.",
+      "tested_quality": "Seeing the Underlying Pattern",
+      "grounded_where_v2": "This is testing whether you can see the thread connecting this situation to an older one you haven't yet related it to."
     },
     {
       "num": 93,
@@ -1410,7 +1435,12 @@
       "breathing": "10-2-10 count",
       "meditation": "Envision a radiant globe of light, with a golden flower blooming inside. Breathe with it, opening petal by petal into infinite brilliance",
       "interpretation": "The heart of creation blossoms eternally; you are both the flower and the radiance that sustains it. All creation is gathered back into the One.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Something you've been tending quietly (a relationship, a skill, a habit) is actually flowering now \u2014 the tending worked.",
+      "grounded_resisted": "Missing or dismissing quiet growth because it wasn't dramatic or fast.",
+      "grounded_where": "Slow progress you haven't given yourself credit for because it wasn't sudden.",
+      "tested_quality": "Patience",
+      "grounded_where_v2": "This is testing whether you'll credit slow, quiet growth as real progress instead of dismissing it for not being dramatic."
     },
     {
       "num": 94,
@@ -1420,7 +1450,12 @@
       "breathing": "6-6-6 count",
       "meditation": "Envision a radiant grid of golden lines stretching across the universe. Feel yourself both inside and beyond it, woven into the geometry of creation",
       "interpretation": "Behind all appearances is a divine order. Trust the patterns that hold you; they are the language of the cosmos. Endless light unfolds beyond perception.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "A pattern you couldn't see up close becomes obvious with a little distance \u2014 the order was there, you just needed the wider view.",
+      "grounded_resisted": "Judging a situation entirely from inside it, missing the larger pattern a step back would reveal.",
+      "grounded_where": "A confusing situation you haven't yet stepped back far enough from to see clearly.",
+      "tested_quality": "Seeing the Underlying Pattern",
+      "grounded_where_v2": "This is testing whether stepping back would reveal a pattern you can't see while you're still standing inside it."
     },
     {
       "num": 95,
@@ -1430,7 +1465,12 @@
       "breathing": "5-7-5 count",
       "meditation": "Visualize a golden heart glowing at the center of the Earth. With each breath, let its warmth rise through you, filling your chest with radiant love",
       "interpretation": "The truest light emerges from love; it is the fountain from which all life is blessed. Holy devotion is the radiant heart where love, humility, and sacred light converge.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Genuine care for someone (or something) turns out to be the actual source of your strength, not a distraction from it.",
+      "grounded_resisted": "Treating love or care as soft or secondary, sidelining it in favor of what looks more like 'real' priorities.",
+      "grounded_where": "A relationship or cause you love that you've deprioritized in favor of more 'serious' obligations.",
+      "tested_quality": "Reverence for the Process",
+      "grounded_where_v2": "This is testing whether you'll treat genuine care as central, not something secondary to what looks more serious."
     },
     {
       "num": 96,
@@ -1440,7 +1480,12 @@
       "breathing": "9-1-9 count",
       "meditation": "Stand open as radiant beams of wisdom pour through you, transforming darkness into luminous understanding",
       "interpretation": "When you align with higher purpose, divine light naturally flows through you to illuminate the world. Divine order manifests in flame through embodiment.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "You're ready to be the one who carries something for others \u2014 the capacity you built earlier is now needed by someone else.",
+      "grounded_resisted": "Avoiding a leadership or support role you're actually ready for, out of old self-doubt.",
+      "grounded_where": "A responsibility or role you've been offered (or could step into) that you're underselling your readiness for.",
+      "tested_quality": "Self-Competition Only",
+      "grounded_where_v2": "This is testing whether you'll actually step into a role or responsibility you're ready for, instead of underselling your readiness."
     },
     {
       "num": 97,
@@ -1450,7 +1495,12 @@
       "breathing": "4-4-8 count",
       "meditation": "See yourself walking a spiral staircase of luminous gold. Each step lifts you toward spheres of greater brilliance, with no end in sight",
       "interpretation": "The path is endless, each step a new revelation. The journey itself is the initiation. The soul's passage beyond death leads through the luminous threshold.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "You stop needing an endpoint to feel like the effort is worth it \u2014 each stage of a long process has its own value.",
+      "grounded_resisted": "Devaluing the current stage of a long journey because it isn't the final one.",
+      "grounded_where": "A multi-stage goal where you're discounting real progress because you're not 'there' yet.",
+      "tested_quality": "Patience",
+      "grounded_where_v2": "This is testing whether you can value the current stage of a long process instead of discounting it for not being the last one."
     },
     {
       "num": 98,
@@ -1460,7 +1510,12 @@
       "breathing": "7-0-7 count",
       "meditation": "Stand before two radiant gateways, one golden and one shadowed. Allow your soul to know which path is yours without forcing the mind to choose",
       "interpretation": "Choice is sacred. Every doorway leads further, but the one aligned with your essence opens into truth. The duality presents path of light or path of darkness.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "You make a real choice \u2014 not the default, not the easiest, the one that's actually aligned \u2014 even though another option was right there.",
+      "grounded_resisted": "Letting inertia or convenience choose for you instead of making an active, considered decision.",
+      "grounded_where": "A decision you've been letting happen by default instead of actually choosing.",
+      "tested_quality": "Discipline vs. Comfort-Seeking",
+      "grounded_where_v2": "This is testing whether you'll make an active, considered choice instead of letting the default option choose for you."
     },
     {
       "num": 99,
@@ -1470,7 +1525,12 @@
       "breathing": "9-3-9 count",
       "meditation": "Imagine a radiant flower blooming upward, surrounded by crystalline polyhedra. Each form is a living principle born of the one light",
       "interpretation": "Creation unfolds as form and beauty, each petal and shape an echo of the same source. The higher soul achieves eternal liberation.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Something you've been working toward finally takes a shape you can see and share, not just something you privately believe in.",
+      "grounded_resisted": "Keeping potential permanently theoretical, never letting it take a concrete, visible form.",
+      "grounded_where": "A long-held idea or goal that's still entirely private and unformed.",
+      "tested_quality": "Discipline vs. Comfort-Seeking",
+      "grounded_where_v2": "This is testing whether you'll let a long-held idea take a real, visible form instead of keeping it permanently private."
     },
     {
       "num": 100,
@@ -1480,7 +1540,12 @@
       "breathing": "3-9-3 count",
       "meditation": "Focus on the golden triangle of light before you. In its center, see the cube of pure being. Hold yourself within its balance of spirit, mind, and matter",
       "interpretation": "All forms are but reflections of the eternal triad. Within it, unity holds diversity. The triple essence of creation manifests through divine wisdom, holy spirit, and cosmic order.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Three things you've been juggling \u2014 logic, feeling, and action \u2014 finally move together instead of pulling against each other.",
+      "grounded_resisted": "Letting one dimension (usually the loudest \u2014 logic, or emotion, or urgency) override the other two.",
+      "grounded_where": "A decision where your head, your gut, and your calendar are giving you three different answers.",
+      "tested_quality": "Multi-Dimensional Decision-Making",
+      "grounded_where_v2": "This is testing whether you'll let logic, feeling, and practical reality all inform a decision instead of just the loudest one."
     },
     {
       "num": 101,
@@ -1490,7 +1555,12 @@
       "breathing": "6-2-6 count",
       "meditation": "Visualize a great sun shining above, radiating waves into a smaller sun below. Feel yourself as the bridge where the higher ignites the lower",
       "interpretation": "The greater always seeks to awaken the lesser. As above shines upon below, your inner flame is kindled. The cosmic crossing leads beyond the sea of stars.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Someone further along than you (a mentor, an example) helps activate something in you just by their presence, not by teaching you directly.",
+      "grounded_resisted": "Waiting passively for inspiration or guidance instead of putting yourself near the people or situations that would spark it.",
+      "grounded_where": "A mentor, community, or influence you haven't sought out yet that could genuinely move you.",
+      "tested_quality": "Self-Competition Only",
+      "grounded_where_v2": "This is testing whether you'll actively seek out a mentor or influence that could move you, instead of waiting passively for inspiration."
     },
     {
       "num": 102,
@@ -1500,7 +1570,12 @@
       "breathing": "9-0-9 count",
       "meditation": "Envision the black sun blazing with radiant beams behind it. Rest in the still point where shadow guards the secret light",
       "interpretation": "The black sun is the womb of revelation\u2014its darkness births the most radiant truth. The deceptive shadow cast by the Destructive Spirit conceals deeper illumination.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Something uncomfortable coming to light turns out to be the thing that actually resolves a longer-running problem.",
+      "grounded_resisted": "Avoiding an uncomfortable truth because the temporary relief of not-knowing feels safer than the clarity would.",
+      "grounded_where": "A hard truth you sense but haven't let yourself fully look at yet.",
+      "tested_quality": "Willingness to See Clearly",
+      "grounded_where_v2": "This is testing whether you'll look directly at an uncomfortable truth instead of staying in the relief of not-knowing."
     },
     {
       "num": 103,
@@ -1510,7 +1585,12 @@
       "breathing": "5-10-5 count",
       "meditation": "See a pyramid rising toward a sphere of light that blooms like a flower above it. Let its rays crown your being",
       "interpretation": "The pyramid anchors, the flower crowns; in their union, the soul finds perfect harmony. The unending solar source is the symbol of supreme divinity.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "A solid foundation (routine, boundary, financial base) makes the more exciting, expressive parts of your life possible \u2014 not the other way around.",
+      "grounded_resisted": "Chasing the exciting parts of a goal while skipping the unglamorous foundation that would actually make them sustainable.",
+      "grounded_where": "An ambitious goal missing the boring groundwork it actually depends on.",
+      "tested_quality": "Reverence for the Process",
+      "grounded_where_v2": "This is testing whether you'll build the unglamorous foundation a goal actually needs, not just chase its exciting parts."
     },
     {
       "num": 104,
@@ -1520,7 +1600,12 @@
       "breathing": "4-8-4 count",
       "meditation": "Visualize shards of starlight dissolving into streams that form a lattice of sacred geometry. From chaos, a new order emerges",
       "interpretation": "Fragments are never wasted; even the broken finds its place in the eternal pattern. The eternal flame rises as the core of sacred temples.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Something that broke or fell apart turns out to be usable material for what comes next, not just a loss.",
+      "grounded_resisted": "Writing off a setback entirely as waste, without looking for what's still usable in it.",
+      "grounded_where": "A failed plan, ended relationship, or lost opportunity you haven't looked back at for what it left you with.",
+      "tested_quality": "Right Relationship to Difficulty",
+      "grounded_where_v2": "This is testing whether you can find what's still usable in a setback instead of writing the whole thing off as waste."
     },
     {
       "num": 105,
@@ -1530,7 +1615,12 @@
       "breathing": "6-6-12 count",
       "meditation": "Envision the fiery column erupting from the earth into the sky. Let its heat rise within your spine, carrying you upward",
       "interpretation": "Dawn is not gentle but fierce\u2014the fire that rises is the same flame within you. Dawn shines as the revelation of truth and cosmic order.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "A necessary confrontation or start is intense, not gentle \u2014 and that intensity is appropriate, not a sign something's wrong.",
+      "grounded_resisted": "Expecting a hard beginning to feel easy, and treating the difficulty as a reason to delay.",
+      "grounded_where": "A hard but necessary start (a conversation, a change) you're avoiding because it doesn't feel gentle enough.",
+      "tested_quality": "Right Relationship to Difficulty",
+      "grounded_where_v2": "This is testing whether you can let a necessary beginning be intense, instead of expecting it to feel easy first."
     },
     {
       "num": 106,
@@ -1540,7 +1630,12 @@
       "breathing": "7-7-7 count",
       "meditation": "See a vast cathedral of light ascending into infinity, its spires aligned with the stars. Enter and feel yourself become its structure",
       "interpretation": "The soul is both pilgrim and temple; its cathedral is built of radiant ascent. Good Mind creates a stronghold of pure thought protecting the soul.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "Clear thinking becomes an actual defense \u2014 a settled mind protects you better than reacting or over-explaining would.",
+      "grounded_resisted": "Getting pulled into defending yourself reactively instead of staying settled and letting clarity do the work.",
+      "grounded_where": "A situation where you're tempted to over-explain or argue instead of staying calmly clear.",
+      "tested_quality": "Self-Regulated Calm",
+      "grounded_where_v2": "This is testing whether a settled, clear mind can be your actual defense, instead of over-explaining or reacting."
     },
     {
       "num": 107,
@@ -1550,7 +1645,12 @@
       "breathing": "5-5-10 count",
       "meditation": "Envision the rainbow arc stretching over a golden horizon, linking earth and cosmos. Breathe in its spectrum of living fire",
       "interpretation": "The rainbow is a covenant between worlds, a reminder that light always bends back to embrace life. The future savior ushers in final renewal where death and evil are overcome.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "After a hard stretch, something genuinely eases \u2014 not everything is fixed, but the worst part has passed.",
+      "grounded_resisted": "Staying braced for more difficulty even after the situation has actually started to soften.",
+      "grounded_where": "A hard period that's actually improving, but you haven't let yourself register the relief yet.",
+      "tested_quality": "Right Relationship to Difficulty",
+      "grounded_where_v2": "This is testing whether you'll let yourself register real relief, instead of staying braced for difficulty that has already passed."
     },
     {
       "num": 108,
@@ -1560,7 +1660,12 @@
       "breathing": "Continuous flowing breath (no pause)",
       "meditation": "Visualize infinite interlocking circles of light spiraling outward. Hear their resonance as a silent mandala-song of the cosmos",
       "interpretation": "Creation is a mandala in motion; by entering it, you become one with its endless symphony. The sacred fire temple is the gateway between human devotion and divine presence.",
-      "flagged": false
+      "flagged": false,
+      "grounded_supported": "You feel part of something whole \u2014 a project, a community, a life \u2014 completing, rather than fragmenting further.",
+      "grounded_resisted": "Staying in analysis or preparation mode past the point where you could actually step into what you've built.",
+      "grounded_where": "Something you've been building that's actually ready for you to fully step into, not just keep refining.",
+      "tested_quality": "Discipline vs. Comfort-Seeking",
+      "grounded_where_v2": "This is testing whether you'll actually step into what you've built, instead of staying in preparation past the point it's needed."
     }
   ]
 }
