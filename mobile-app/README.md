@@ -70,6 +70,19 @@ testing). It will not work on a plain emulator without Play services, and
 `billing.js` will report itself as unavailable outside that context — the
 app still works, just without purchasing.
 
+## CI builds (no local Android Studio needed)
+
+`.github/workflows/android-build.yml` builds the app on GitHub's runners:
+
+- **`debug` job** runs automatically on every push touching `mobile-app/**`.
+  It runs `npx cap sync android` + `./gradlew assembleDebug` and uploads the
+  resulting debug APK as a workflow artifact (Actions tab → the run → Artifacts).
+  Sideload that APK on any Android phone (enable "install unknown apps") to
+  try the app without installing anything locally.
+- **`release` job** builds a signed `.aab` for Play Console. It only runs when
+  triggered manually (Actions tab → "Android build" → "Run workflow"), and
+  needs four repo secrets set first — see below.
+
 ## Publishing to Google Play
 
 1. **Pick a real package name.** `com.ascend.keys` in `capacitor.config.json`
@@ -94,13 +107,40 @@ app still works, just without purchasing.
    - Price: $11.99 (or your call — the price shown in the app is pulled
      live from what you configure here, not hardcoded)
 
-5. **Generate a signed release bundle.** Play requires Play App Signing;
-   easiest path is letting Android Studio's "Generate Signed Bundle" wizard
-   create and register your upload key, or:
+5. **Generate a signed release bundle.** Two ways to do this — pick one:
+
+   **A. Locally, via Android Studio.** Build → Generate Signed Bundle / APK →
+   Android App Bundle. It walks you through creating a new upload keystore
+   the first time. Save that `.jks`/`.keystore` file and its passwords
+   somewhere safe outside git — losing it means you can't update the app
+   under the same listing.
+
+   **B. Via CI, with no local Android Studio.** Generate a keystore once
+   with the JDK's `keytool` (or reuse one Android Studio already made you):
    ```bash
-   cd android && ./gradlew bundleRelease
+   keytool -genkeypair -v -keystore release.keystore -alias ascend-keys \
+     -keyalg RSA -keysize 2048 -validity 10000
    ```
-   producing `android/app/build/outputs/bundle/release/app-release.aab`.
+   Then add four **repo secrets** (Settings → Secrets and variables → Actions
+   → New repository secret):
+   - `ANDROID_KEYSTORE_BASE64` — the keystore file, base64-encoded:
+     `base64 -w0 release.keystore` (macOS: drop `-w0`, use `base64 -i` output as-is)
+   - `ANDROID_KEYSTORE_PASSWORD` — the keystore password
+   - `ANDROID_KEY_ALIAS` — the alias you used (`ascend-keys` above)
+   - `ANDROID_KEY_PASSWORD` — the key password (often same as keystore password)
+
+   Then trigger the build: Actions tab → **Android build** workflow → **Run
+   workflow** (on this branch). It produces `ascend-keys-release-aab` as a
+   downloadable artifact — `android/app/build/outputs/bundle/release/app-release.aab`.
+
+   Keep that keystore file and its passwords somewhere safe outside git
+   either way — the CI job only holds it in memory for the duration of the
+   run and deletes it afterward, it's never committed.
+
+   Either path uses the same `android/app/build.gradle` signing setup: it
+   looks for `android/keystore.properties` (gitignored, never committed) and
+   signs `bundleRelease`/`assembleRelease` with it when present. CI writes
+   that file from the secrets above right before building.
 
 6. **Upload to an Internal testing track first.** Add yourself as a license
    tester (Setup → License testing) so you can complete a real purchase
