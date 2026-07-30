@@ -23,6 +23,59 @@ function stripTestingPrefix(str) {
   return s.charAt(0).toLowerCase() + s.slice(1);
 }
 
+// ── AI "Weave It In" personalize backend (Cloudflare Worker) ───────────────
+// Must be an absolute URL: the app runs from a different origin than the
+// Worker (capacitor://localhost, not the Worker's domain), so a relative
+// "/api/personalize" path won't reach it. Replace with your deployed
+// Worker's URL — see mobile-app/README.md.
+const PERSONALIZE_API_URL = "https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev/api/personalize";
+
+function renderPersonalizeBox(card, containerId) {
+  const box = document.createElement('div');
+  box.className = 'personalize-box';
+  box.innerHTML = `
+    <div class="synth-label">Weave In Your Situation <span class="optional-tag">(optional)</span></div>
+    <textarea class="personalize-input" placeholder="What's actually going on?" rows="3"></textarea>
+    <button class="personalize-btn">Weave It In</button>
+    <div class="personalize-result"></div>
+  `;
+  document.getElementById(containerId).appendChild(box);
+
+  box.querySelector('.personalize-btn').addEventListener('click', async () => {
+    if (!isSubscribed()) { openPaywall(); return; }
+    const text = box.querySelector('.personalize-input').value.trim();
+    const resultEl = box.querySelector('.personalize-result');
+    if (!text) { resultEl.textContent = 'Add a bit about your situation first.'; return; }
+    const btn = box.querySelector('.personalize-btn');
+    const original = btn.textContent;
+    btn.textContent = 'Weaving…';
+    btn.disabled = true;
+    resultEl.textContent = '';
+    try {
+      const res = await fetch(PERSONALIZE_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: card.title,
+          tested_quality: card.tested_quality,
+          grounded_supported: card.grounded_supported,
+          grounded_resisted: card.grounded_resisted,
+          grounded_where: card.grounded_where_v2 || card.grounded_where,
+          situation: text
+        })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      resultEl.textContent = data.text || 'No response.';
+    } catch (e) {
+      resultEl.textContent = "Couldn't connect right now — try again in a moment.";
+      console.error(e);
+    }
+    btn.textContent = original;
+    btn.disabled = false;
+  });
+}
+
 let CARDS = [];
 let PHASES = [];
 
@@ -258,6 +311,7 @@ function buildSynthesis(drawnCards) {
         </div>
       </div>
     `;
+    renderPersonalizeBox(card, 'synthesisArea');
     area.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
@@ -436,6 +490,7 @@ function buildLadderSynthesis(card) {
       </div>
     </div>
   `;
+  renderPersonalizeBox(card, 'synthesisArea');
   area.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 

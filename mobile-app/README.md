@@ -28,14 +28,12 @@ directly, it gets overwritten on every sync.
 
 ## Card data
 
-`www/ascend_cards.json` has all 108 cards across the 5 phases. Cards 1–87
-carry a `grounded_supported` / `grounded_resisted` / `tested_quality` /
-`grounded_where_v2` set (the psychological "Grounded" reading); cards
-88–108 (most of Phase 5) only have `phrase` / `breathing` / `meditation` /
-`interpretation` since that's what the source material provided. The UI
-already handles this — the "Grounded" section only renders when those
-fields are present, so no code changes are needed if that data is filled
-in later.
+`www/ascend_cards.json` has all 108 cards across the 5 phases, each with
+the full field set: `phrase` / `breathing` / `meditation` / `interpretation`
+plus the psychological "Grounded" reading (`grounded_supported` /
+`grounded_resisted` / `tested_quality` / `grounded_where_v2`). The UI only
+renders the "Grounded" section when those fields are present on a card, so
+the app degrades gracefully if any are ever missing.
 
 ## First-time setup
 
@@ -166,3 +164,27 @@ app still works, just without purchasing.
   Play Billing Library dependency are wired in automatically by
   `cordova-plugin-purchase` during `npx cap sync` — no manual manifest
   edits needed.
+
+## "Weave It In" (AI personalize) wiring
+
+Single-card and Where You Stand readings show a "Weave In Your Situation"
+box (member-only, same paywall gate as the multi-card spreads) that sends
+the card's grounded reading plus a few sentences of free text the user
+types to a small backend, which returns a short response connecting their
+situation to that specific card.
+
+That backend is a Cloudflare Worker (kept outside this repo/deploy target —
+it's a separate `wrangler`-deployed project, not part of the Android build)
+exposing `POST /api/personalize`. `www/app.js` calls it via the
+`PERSONALIZE_API_URL` constant near the top of the file — **update that to
+your deployed Worker's URL** (e.g. `https://your-worker.workers.dev/api/personalize`)
+before shipping; it must be the full absolute URL since the app runs from a
+different origin than the Worker (`capacitor://localhost`, not the Worker's
+domain), so a relative path won't reach it. The Worker also needs an
+`ANTHROPIC_API_KEY` secret set (`wrangler secret put ANTHROPIC_API_KEY`) for
+this endpoint to work.
+
+If `PERSONALIZE_API_URL` is left as the placeholder or the Worker is
+unreachable, the box still renders — it just shows "Couldn't connect right
+now" when used, same as any other network failure. It doesn't block the
+rest of the app.

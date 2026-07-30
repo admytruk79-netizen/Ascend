@@ -222,6 +222,29 @@
   .synth-text { font-size: 17px; line-height: 1.75; color: var(--text); }
   .synth-text.chain { font-family:'Cormorant Garamond',serif; font-style: italic; font-size: 19px; color: var(--gold); line-height: 1.7; }
 
+  /* ---------- PERSONALIZE (AI weave-in) ---------- */
+  .personalize-box {
+    margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--gold-line);
+    max-width: 760px; margin-left: auto; margin-right: auto;
+  }
+  .optional-tag { text-transform: none; letter-spacing: 0; color: var(--text-faint); font-family: 'Cormorant Garamond', serif; font-size: 13px; }
+  .personalize-input {
+    width: 100%; background: rgba(10,14,28,0.6); border: 1px solid var(--gold-line); border-radius: 3px;
+    color: var(--text); font-family: 'Cormorant Garamond', serif; font-size: 16px; padding: 12px 14px;
+    resize: vertical; margin-bottom: 12px; box-sizing: border-box;
+  }
+  .personalize-input::placeholder { color: var(--text-faint); }
+  .personalize-btn {
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+    background: transparent; border: 1px solid var(--gold); color: var(--gold);
+    padding: 11px 22px; cursor: pointer; border-radius: 2px;
+  }
+  .personalize-btn:disabled { opacity: 0.5; cursor: default; }
+  .personalize-result {
+    margin-top: 18px; font-size: 16.5px; line-height: 1.7; color: var(--text-dim);
+    font-style: italic;
+  }
+
   footer { text-align:center; margin-top: 90px; color: var(--text-faint); font-size: 12.5px; letter-spacing: 1px; }
   footer .fline { width: 40px; height:1px; background: var(--gold-line); margin: 0 auto 16px; }
 
