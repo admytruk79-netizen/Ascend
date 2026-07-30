@@ -195,3 +195,24 @@ If `PERSONALIZE_API_URL` is left as the placeholder or the Worker is
 unreachable, the box still renders — it just shows "Couldn't connect right
 now" when used, same as any other network failure. It doesn't block the
 rest of the app.
+
+## "The Direct Read" (AI aggregate spread synthesis)
+
+Multi-card spreads (Daily Practice, Past·Present·Future, The Full Mandala)
+build a templated synthesis client-side — Field / Thread / Throughline /
+What To Carry, assembled from string templates in `buildSynthesis()`. "The
+Direct Read" is a member-only add-on beneath that: it sends the drawn
+cards' fields plus the already-built synthesis text to an AI backend and
+shows back one more direct, plain-language read of what the spread means
+as a whole, instead of the templated language.
+
+Same pattern as personalize: **currently disabled** via
+`SPREAD_AI_ENABLED = false` in `www/app.js`, and needs its own backend
+route (`SPREAD_AI_API_URL`, expects `POST` with `{ spread, cards[], synthesis }`
+and a `{ text }` response) — this is a *different* endpoint from
+`/api/personalize`, since the payload shape is a whole spread, not one card
+plus free text. To turn it on: add a `/api/spread-synthesis` handler to
+the Worker (same shape as `handlePersonalize`, but the system prompt should
+reason across all the cards and the given synthesis text rather than a
+single card), set `SPREAD_AI_API_URL`, flip `SPREAD_AI_ENABLED` to `true`,
+then `npx cap sync android`.

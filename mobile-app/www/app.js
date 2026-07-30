@@ -36,6 +36,15 @@ const PERSONALIZE_ENABLED = false;
 // Worker's URL — see mobile-app/README.md.
 const PERSONALIZE_API_URL = "https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev/api/personalize";
 
+// ── AI "Direct Read" — aggregate synthesis for multi-card spreads ──────────
+// Takes the drawn cards plus the already-computed templated synthesis (Field/
+// Thread/Throughline/What To Carry) and asks the AI backend for one more
+// direct, plain-language read of what the spread means as a whole, cutting
+// past the templated language. Member-only, same as personalize. Off until
+// there's a real backend endpoint to call — see mobile-app/README.md.
+const SPREAD_AI_ENABLED = false;
+const SPREAD_AI_API_URL = "https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev/api/spread-synthesis";
+
 function renderPersonalizeBox(card, containerId) {
   if (!PERSONALIZE_ENABLED) return;
   const box = document.createElement('div');
@@ -69,6 +78,55 @@ function renderPersonalizeBox(card, containerId) {
           grounded_resisted: card.grounded_resisted,
           grounded_where: card.grounded_where_v2 || card.grounded_where,
           situation: text
+        })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      resultEl.textContent = data.text || 'No response.';
+    } catch (e) {
+      resultEl.textContent = "Couldn't connect right now — try again in a moment.";
+      console.error(e);
+    }
+    btn.textContent = original;
+    btn.disabled = false;
+  });
+}
+
+function renderAggregateBox(drawnCards, positions, synthesisParts, containerId) {
+  if (!SPREAD_AI_ENABLED) return;
+  const box = document.createElement('div');
+  box.className = 'personalize-box';
+  box.innerHTML = `
+    <div class="synth-label">The Direct Read <span class="optional-tag">(member AI synthesis)</span></div>
+    <button class="personalize-btn">Reveal It</button>
+    <div class="personalize-result"></div>
+  `;
+  document.getElementById(containerId).appendChild(box);
+
+  box.querySelector('.personalize-btn').addEventListener('click', async () => {
+    if (!isSubscribed()) { openPaywall(); return; }
+    const resultEl = box.querySelector('.personalize-result');
+    const btn = box.querySelector('.personalize-btn');
+    const original = btn.textContent;
+    btn.textContent = 'Reading…';
+    btn.disabled = true;
+    resultEl.textContent = '';
+    try {
+      const res = await fetch(SPREAD_AI_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          spread: SPREADS[currentSpread].label,
+          cards: drawnCards.map((c, i) => ({
+            position: positions ? positions[i].label : `Card ${i + 1}`,
+            title: c.title,
+            phase: c.phase,
+            tested_quality: c.tested_quality,
+            grounded_supported: c.grounded_supported,
+            grounded_resisted: c.grounded_resisted,
+            grounded_where: c.grounded_where_v2 || c.grounded_where
+          })),
+          synthesis: synthesisParts
         })
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -405,6 +463,7 @@ function buildSynthesis(drawnCards) {
       </div>
     </div>
   `;
+  renderAggregateBox(drawnCards, positions, { field: fieldText, thread: chainText, throughline: throughlineText, carry: carryText }, 'synthesisArea');
   area.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
