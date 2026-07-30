@@ -97,6 +97,22 @@ jobs:
           keyPassword=$KEY_PASSWORD
           EOF
 
+      - name: Verify signing secrets decode correctly (no secret values printed)
+        working-directory: mobile-app/android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "decoded keystore size (bytes): $(wc -c < release.keystore)"
+          echo "decoded keystore sha256: $(sha256sum release.keystore | cut -d' ' -f1)"
+          echo "ANDROID_KEYSTORE_PASSWORD length: ${#KEYSTORE_PASSWORD}"
+          echo "ANDROID_KEY_PASSWORD length: ${#KEY_PASSWORD}"
+          echo "ANDROID_KEY_ALIAS value length: ${#KEY_ALIAS}"
+          keytool -list -keystore release.keystore -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" \
+            && echo "KEYTOOL CHECK: password and alias are valid for this keystore" \
+            || echo "KEYTOOL CHECK: FAILED - password/alias do not match this keystore"
+
       - name: Build signed release bundle
         working-directory: mobile-app/android
         run: ./gradlew bundleRelease --stacktrace
