@@ -12,10 +12,10 @@ if (keystorePropertiesFile.exists()) {
 def hasReleaseSigning = keystoreProperties.getProperty('storeFile') != null
 
 android {
-    namespace = "com.ascend.keys"
+    namespace = "com.ascend.keys26"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.ascend.keys"
+        applicationId "com.ascend.keys26"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

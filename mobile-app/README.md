@@ -83,11 +83,10 @@ app still works, just without purchasing.
 
 ## Publishing to Google Play
 
-1. **Pick a real package name.** `com.ascend.keys` in `capacitor.config.json`
-   (and mirrored in `android/app/build.gradle` as `applicationId` /
-   `namespace`) is a placeholder — the package name is permanent once
-   published, so change it to something you own before your first upload,
-   then re-run `npx cap sync android`.
+1. ~~Pick a real package name~~ — done: `com.ascend.keys26` (set in
+   `capacitor.config.json` and mirrored in `android/app/build.gradle` as
+   `applicationId` / `namespace`). This is permanent once published to Play
+   Console, so don't change it again after the first upload.
 
 2. **App icon & splash screen.** Capacitor ships default placeholder icons
    in `android/app/src/main/res`. Replace them (Android Studio's Image Asset

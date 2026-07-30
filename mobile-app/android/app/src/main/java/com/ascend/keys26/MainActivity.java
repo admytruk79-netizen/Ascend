@@ -1,4 +1,4 @@
-package com.ascend.keys;
+package com.ascend.keys26;
 
 import com.getcapacitor.BridgeActivity;
 
