@@ -167,11 +167,18 @@ app still works, just without purchasing.
 
 ## "Weave It In" (AI personalize) wiring
 
-Single-card and Where You Stand readings show a "Weave In Your Situation"
+Single-card and Where You Stand readings can show a "Weave In Your Situation"
 box (member-only, same paywall gate as the multi-card spreads) that sends
 the card's grounded reading plus a few sentences of free text the user
 types to a small backend, which returns a short response connecting their
 situation to that specific card.
+
+**Currently disabled** — `PERSONALIZE_ENABLED = false` near the top of
+`www/app.js` hides the box entirely until there's a real backend to call.
+The feature is fully built, just switched off, so it doesn't ship a button
+that fails for every user. To turn it on: deploy the backend below, set
+`PERSONALIZE_API_URL` to its real URL, flip `PERSONALIZE_ENABLED` to `true`,
+then `npx cap sync android`.
 
 That backend is a Cloudflare Worker (kept outside this repo/deploy target —
 it's a separate `wrangler`-deployed project, not part of the Android build)

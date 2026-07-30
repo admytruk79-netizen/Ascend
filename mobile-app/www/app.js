@@ -24,6 +24,12 @@ function stripTestingPrefix(str) {
 }
 
 // ── AI "Weave It In" personalize backend (Cloudflare Worker) ───────────────
+// Off until there's a real, working backend to call — flip this on once
+// PERSONALIZE_API_URL points at a deployed Worker with the /api/personalize
+// route. Until then the feature stays fully built but hidden, rather than
+// shipping a button that just fails.
+const PERSONALIZE_ENABLED = false;
+
 // Must be an absolute URL: the app runs from a different origin than the
 // Worker (capacitor://localhost, not the Worker's domain), so a relative
 // "/api/personalize" path won't reach it. Replace with your deployed
@@ -31,6 +37,7 @@ function stripTestingPrefix(str) {
 const PERSONALIZE_API_URL = "https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev/api/personalize";
 
 function renderPersonalizeBox(card, containerId) {
+  if (!PERSONALIZE_ENABLED) return;
   const box = document.createElement('div');
   box.className = 'personalize-box';
   box.innerHTML = `
