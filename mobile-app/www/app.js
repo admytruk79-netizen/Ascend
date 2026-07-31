@@ -5,8 +5,7 @@
 // though it worked instantly in a desktop browser. A <script> tag uses the
 // browser's normal resource-loading pipeline instead of the Fetch API, and
 // that path is proven to work on-device since app.js/billing.js load the
-// same way. This is the very first thing this script does, before
-// anything else gets a chance to run and throw.
+// same way.
 let CARDS = [];
 let PHASES = [];
 try {
@@ -20,607 +19,279 @@ try {
   console.error('Card data load failed:', e);
 }
 
-// ── SUBSCRIPTION STATE (backed by Google Play Billing via billing.js) ──────
-const PREMIUM_SPREADS = new Set([3, 5, 9, "ladder"]);
+// ── SPREADS — "One Card" is always free (no daily limit). Everything ───────
+// else requires membership.
+const SPREADS = [
+  { key: 'one', count: 1, label: 'One Card', sub: 'A single key, drawn plain.', free: true },
+  { key: 'stand', count: 1, label: 'Where You Stand', sub: 'A focused single-card check-in.', free: false },
+  { key: 'three', count: 3, label: 'Three Card Draw', sub: 'Grounded in / moving through / opening toward', free: false },
+  { key: 'five', count: 5, label: 'Five Card Draw', sub: 'A fuller arc across the phases.', free: false },
+  { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false },
+];
+const POSITIONS = {
+  three: ['Grounded In', 'Moving Through', 'Opening Toward'],
+  five: ['Foundation', 'Friction', 'Turning Point', 'Integration', 'Emerging Direction'],
+};
+const HUES = { 1: 238, 2: 266, 3: 294, 4: 322, 5: 38 };
 
+function hueFor(phaseNum) { return HUES[phaseNum] ?? 264; }
+function colorFor(phaseNum) { return `oklch(0.65 0.1 ${hueFor(phaseNum)})`; }
+function phaseNameFor(phaseNum) { const p = PHASES.find(x => x.num === phaseNum); return p ? p.name : ''; }
+function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
+
+// ── STATE ────────────────────────────────────────────────────────────────
 let subscribed = false;
+let screen = 'home'; // home | drawing | paywall | reading | synthesis
+let spreadKey = null;
+let paywallSpread = null;
+let drawnCards = [];
+let cardIndex = 0;
+let activeTab = 'grounded';
 
-function isSubscribed() {
-  return subscribed;
+function isSubscribed() { return subscribed; }
+
+function goHome() {
+  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0;
+  render();
 }
 
-function renderSubStatus() {
-  document.getElementById("sub-status").textContent = isSubscribed() ? "✦ MEMBER — FULL SPREADS UNLOCKED" : "";
-}
-
-function openPaywall() {
-  const priceEl = document.getElementById("paywall-price");
-  if (priceEl) priceEl.textContent = window.AscendBilling.getPriceString();
-  document.getElementById("paywall-overlay").classList.add("active");
-}
-function closePaywall() { document.getElementById("paywall-overlay").classList.remove("active"); }
-
-function stripTestingPrefix(str) {
-  const s = (str || '').replace(/^This is testing\s*/i, '');
-  return s.charAt(0).toLowerCase() + s.slice(1);
-}
-
-// ── AI "Weave It In" personalize backend (Cloudflare Worker) ───────────────
-// Off until there's a real, working backend to call — flip this on once
-// PERSONALIZE_API_URL points at a deployed Worker with the /api/personalize
-// route. Until then the feature stays fully built but hidden, rather than
-// shipping a button that just fails.
-const PERSONALIZE_ENABLED = false;
-
-// Must be an absolute URL: the app runs from a different origin than the
-// Worker (capacitor://localhost, not the Worker's domain), so a relative
-// "/api/personalize" path won't reach it. Replace with your deployed
-// Worker's URL — see mobile-app/README.md.
-const PERSONALIZE_API_URL = "https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev/api/personalize";
-
-function renderPersonalizeBox(card, containerId) {
-  if (!PERSONALIZE_ENABLED) return;
-  const box = document.createElement('div');
-  box.className = 'personalize-box';
-  box.innerHTML = `
-    <div class="synth-label">Weave In Your Situation <span class="optional-tag">(optional)</span></div>
-    <textarea class="personalize-input" placeholder="What's actually going on?" rows="3"></textarea>
-    <button class="personalize-btn">Weave It In</button>
-    <div class="personalize-result"></div>
-  `;
-  document.getElementById(containerId).appendChild(box);
-
-  box.querySelector('.personalize-btn').addEventListener('click', async () => {
-    if (!isSubscribed()) { openPaywall(); return; }
-    const text = box.querySelector('.personalize-input').value.trim();
-    const resultEl = box.querySelector('.personalize-result');
-    if (!text) { resultEl.textContent = 'Add a bit about your situation first.'; return; }
-    const btn = box.querySelector('.personalize-btn');
-    const original = btn.textContent;
-    btn.textContent = 'Weaving…';
-    btn.disabled = true;
-    resultEl.textContent = '';
-    try {
-      const res = await fetch(PERSONALIZE_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: card.title,
-          tested_quality: card.tested_quality,
-          grounded_supported: card.grounded_supported,
-          grounded_resisted: card.grounded_resisted,
-          grounded_where: card.grounded_where_v2 || card.grounded_where,
-          situation: text
-        })
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      resultEl.textContent = data.text || 'No response.';
-    } catch (e) {
-      resultEl.textContent = "Couldn't connect right now — try again in a moment.";
-      console.error(e);
-    }
-    btn.textContent = original;
-    btn.disabled = false;
-  });
-}
-
-const SPREADS = {
-  1: {
-    label: "Single Card",
-    desc: "One card to glimpse what wants your attention right now.",
-    positions: [
-      { label: "The Card", meaning: "" }
-    ]
-  },
-  3: {
-    label: "Daily Practice",
-    desc: "The classic three-card draw: what today holds, what you can shape, and what lies beyond your control.",
-    positions: [
-      { label: "General Overview", meaning: "A general overview of the day or situation ahead." },
-      { label: "Action Available", meaning: "What action you can take to alter the path." },
-      { label: "Beyond Your Control", meaning: "What is beyond your control in this moment." }
-    ]
-  },
-  5: {
-    label: "Past · Present · Future",
-    desc: "Understanding the pattern behind a situation, and what can and cannot be changed.",
-    positions: [
-      { label: "Current Situation", meaning: "The current situation in a snapshot." },
-      { label: "Root Cause", meaning: "The causes behind the current situation." },
-      { label: "Likely Development", meaning: "The most likely way the situation develops if unchanged." },
-      { label: "Available Action", meaning: "What action, if any, can change the most likely future." },
-      { label: "Fixed Factor", meaning: "A factor that cannot be altered." }
-    ]
-  },
-  9: {
-    label: "The Full Mandala",
-    desc: "A nine-position situational analysis crossing three domains of being across past, present, and future.",
-    positions: [
-      { label: "Body — Past", meaning: "What the body has carried from before." },
-      { label: "Mind — Past", meaning: "What patterns of thought have shaped this." },
-      { label: "Spirit — Past", meaning: "What deeper current set this in motion." },
-      { label: "Body — Present", meaning: "What the body holds right now." },
-      { label: "Mind — Present", meaning: "What the mind is currently working through." },
-      { label: "Spirit — Present", meaning: "What deeper truth is active right now." },
-      { label: "Body — Emerging", meaning: "How the body is being called to move forward." },
-      { label: "Mind — Emerging", meaning: "What new understanding is arriving." },
-      { label: "Spirit — Emerging", meaning: "What the situation is ultimately moving you toward." }
-    ]
-  },
-  ladder: {
-    label: "Where You Stand",
-    desc: "A single-card reading of where you currently sit on the five-phase evolutionary ladder — and what this rung is asking of you.",
-    isLadder: true
-  }
-};
-
-const PHASE_THEMES = {
-  1: "settling into safety and nervous-system coherence",
-  2: "activating and organizing subtle energy",
-  3: "integrating and harmonizing multiple forces",
-  4: "expanding into cosmic and archetypal pattern",
-  5: "embodying mastery and completion"
-};
-
-let currentSpread = 3;
-
-// Now that SPREADS/currentSpread above are initialized, actually render
-// the selector — CARDS/PHASES were already loaded synchronously at the
-// top of this file (or logged an error if that failed).
-if (CARDS.length > 0) {
-  initSelector();
-  updateDesc();
-  renderManualInputs();
-} else {
-  document.getElementById('spreadDesc').innerHTML =
-    '<span style="color:#e0a0a0;">Card data failed to load. Try reinstalling the app — ' +
-    'if it keeps happening, the deployed cards_data.js is likely missing or corrupted.</span>';
-}
-
-function initSelector() {
-  const sel = document.getElementById('selector');
-  sel.innerHTML = '';
-  Object.keys(SPREADS).forEach(k => {
-    const btn = document.createElement('button');
-    btn.className = 'spread-btn' + (k === String(currentSpread) ? ' active' : '');
-    const s = SPREADS[k];
-    const glyph = s.isLadder ? '<span class="n">☖</span>' : `<span class="n">${k}</span>`;
-    btn.innerHTML = `${glyph}${s.label}`;
-    btn.onclick = () => {
-      currentSpread = s.isLadder ? 'ladder' : Number(k);
-      initSelector();
-      updateDesc();
-      renderManualInputs();
-      document.getElementById('spreadArea').innerHTML = '';
-      document.getElementById('synthesisArea').style.display = 'none';
-      document.getElementById('synthesisArea').innerHTML = '';
-      document.getElementById('manualError').textContent = '';
-    };
-    sel.appendChild(btn);
-  });
-}
-
-function spreadCount() {
-  return currentSpread === 'ladder' ? 1 : currentSpread;
-}
-
-function renderManualInputs() {
-  const wrap = document.getElementById('manualInputs');
-  wrap.innerHTML = '';
-  const n = spreadCount();
-  const spread = SPREADS[currentSpread];
-  for (let i = 0; i < n; i++) {
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = 1;
-    input.max = CARDS.length || 108;
-    input.placeholder = (!spread.isLadder && spread.positions) ? String(i + 1) : '#';
-    input.title = (!spread.isLadder && spread.positions) ? spread.positions[i].label : 'Card number';
-    wrap.appendChild(input);
-  }
-}
-
-function readManualCards() {
-  const inputs = Array.from(document.querySelectorAll('#manualInputs input'));
-  const errorEl = document.getElementById('manualError');
-  errorEl.textContent = '';
-
-  const raw = inputs.map(inp => inp.value.trim());
-  if (raw.some(v => v === '')) {
-    errorEl.textContent = 'Enter a number in every box, or use Draw Randomly instead.';
-    return null;
-  }
-  const nums = raw.map(v => parseInt(v, 10));
-  const max = CARDS.length || 108;
-  if (nums.some(n => isNaN(n) || n < 1 || n > max)) {
-    errorEl.textContent = `Card numbers must be between 1 and ${max}.`;
-    return null;
-  }
-  if (new Set(nums).size !== nums.length) {
-    errorEl.textContent = 'Each card can only appear once in a spread.';
-    return null;
-  }
-  const cards = nums.map(n => CARDS.find(c => c.num === n));
-  if (cards.some(c => !c)) {
-    errorEl.textContent = 'One or more card numbers could not be found.';
-    return null;
-  }
-  return cards;
-}
-
-function updateDesc() {
-  document.getElementById('spreadDesc').textContent = SPREADS[currentSpread].desc;
-}
-
-function shuffleDraw(n) {
-  const pool = [...CARDS];
-  const drawn = [];
-  for (let i = 0; i < n; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    drawn.push(pool.splice(idx, 1)[0]);
-  }
-  return drawn;
-}
-
-function layoutClass(n) {
-  return { 1: 'n1', 3: 'n3', 5: 'n5', 9: 'n9' }[n];
-}
-
-function renderSpread(drawnCards) {
-  const spread = SPREADS[currentSpread];
-  const area = document.getElementById('spreadArea');
-  const grid = document.createElement('div');
-  grid.className = 'layout ' + layoutClass(currentSpread);
-
-  drawnCards.forEach((card, i) => {
-    const pos = spread.positions[i];
-    const slot = document.createElement('div');
-    slot.className = 'position-slot';
-
-    const label = document.createElement('div');
-    label.className = 'pos-label';
-    label.innerHTML = `${pos.label}${pos.meaning ? '<br><span style="opacity:.7;font-family:\'EB Garamond\',serif;text-transform:none;letter-spacing:0;font-size:12.5px;font-style:italic;">' + pos.meaning + '</span>' : ''}`;
-    slot.appendChild(label);
-
-    const c = document.createElement('div');
-    c.className = 'card';
-    c.style.animationDelay = (i * 0.08) + 's';
-    c.innerHTML = `
-      <span class="card-num">№ ${card.num}</span>
-      <div class="card-phase">Phase ${card.phase} — ${PHASES.find(p => p.num === card.phase).name}</div>
-      <div class="card-title">${card.title}</div>
-      <div class="card-phrase">${card.phrase}</div>
-      <div class="card-field">
-        <span class="flabel">Breathing</span>
-        <span class="fval">${card.breathing}</span>
-      </div>
-      ${card.grounded_supported ? `
-      <div class="card-grounded">
-        <div class="section-label">Grounded</div>
-        <div class="grounded-row"><span class="flabel gsupported">Supported</span><span class="fval">${card.grounded_supported}</span></div>
-        <div class="grounded-row"><span class="flabel gresisted">Resisted</span><span class="fval">${card.grounded_resisted}</span></div>
-        <div class="grounded-row"><span class="flabel gwhere">Tested Quality — ${card.tested_quality || ''}</span><span class="fval">${stripTestingPrefix(card.grounded_where_v2 || card.grounded_where)}</span></div>
-      </div>` : ''}
-      <div class="card-soul">
-        <div class="section-label">Spirit / Soul</div>
-        <div class="card-interp">
-          <span class="fval">${card.interpretation}</span>
-        </div>
-        <div class="card-field">
-          <span class="flabel">Meditation</span>
-          <span class="fval">${card.meditation}</span>
-        </div>
-      </div>
-    `;
-    slot.appendChild(c);
-    grid.appendChild(slot);
-  });
-
-  area.innerHTML = '';
-  area.appendChild(grid);
-}
-
-function buildSynthesis(drawnCards) {
-  const spread = SPREADS[currentSpread];
-  const positions = spread.positions;
-
-  if (drawnCards.length === 1) {
-    const card = drawnCards[0];
-    const phaseInfo = PHASES.find(p => p.num === card.phase);
-    const fieldTextSingle = `This card sits within Phase ${card.phase} — ${phaseInfo.name}. The whole situation is ${PHASE_THEMES[card.phase]}.`;
-    const meetText = `Supported looks like this: ${card.grounded_supported} Resisted looks like this: ${card.grounded_resisted}`;
-
-    const area = document.getElementById('synthesisArea');
-    area.style.display = 'block';
-    area.innerHTML = `
-      <div class="synth-header">
-        <div class="synth-diamond">✦</div>
-        <div class="synth-title">Reading</div>
-        <div class="synth-rule"></div>
-      </div>
-      <div class="synth-block">
-        <div class="synth-section">
-          <div class="synth-label">The Field</div>
-          <div class="synth-text">${fieldTextSingle}</div>
-        </div>
-        <div class="synth-section">
-          <div class="synth-label">How to Meet It</div>
-          <div class="synth-text">${meetText}</div>
-        </div>
-      </div>
-    `;
-    renderPersonalizeBox(card, 'synthesisArea');
-    area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function selectSpread(key) {
+  const s = spreadByKey(key);
+  if (isSubscribed() || s.free) {
+    screen = 'drawing'; spreadKey = key; drawnCards = []; cardIndex = 0; activeTab = 'grounded';
+    render();
     return;
   }
-
-  const phaseSeq = drawnCards.map(c => c.phase);
-  const phaseCounts = {};
-  drawnCards.forEach(c => { phaseCounts[c.phase] = (phaseCounts[c.phase] || 0) + 1; });
-  const dominant = Number(Object.entries(phaseCounts).sort((a, b) => b[1] - a[1])[0][0]);
-  const phaseList = Object.keys(phaseCounts).map(Number).sort((a, b) => a - b);
-
-  let directionNote = '';
-  if (phaseList.length > 1) {
-    const first = phaseSeq[0], last = phaseSeq[phaseSeq.length - 1];
-    if (last > first) directionNote = ` The sequence moves from Phase ${first} toward Phase ${last} — this reading is pulling you forward, into less familiar territory.`;
-    else if (last < first) directionNote = ` The sequence moves from Phase ${last} back toward Phase ${first} — this reading is pulling you back to something more foundational, not asking you to advance yet.`;
-    else directionNote = ` The phases here don't move in one direction so much as circle the same ground from different angles.`;
-  }
-
-  let fieldText;
-  if (phaseList.length === 1) {
-    fieldText = `Every card in this reading sits within Phase ${phaseList[0]} — ${PHASES.find(p => p.num == phaseList[0]).name}. Nothing here is asking you to look outside that: the whole situation is ${PHASE_THEMES[phaseList[0]]}.`;
-  } else {
-    fieldText = `This reading spans Phase${phaseList.length > 1 ? 's' : ''} ${phaseList.join(', ')}, weighted most toward Phase ${dominant} — ${PHASES.find(p => p.num == dominant).name}.${directionNote}`;
-  }
-
-  const qualityMap = {};
-  drawnCards.forEach((c, i) => {
-    const q = c.tested_quality;
-    if (!q) return;
-    if (!qualityMap[q]) qualityMap[q] = [];
-    qualityMap[q].push(i);
-  });
-  const sharedQualities = Object.entries(qualityMap).filter(([q, idxs]) => idxs.length > 1);
-
-  let throughlineText;
-  if (sharedQualities.length > 0) {
-    const [quality, idxs] = sharedQualities.sort((a, b) => b[1].length - a[1].length)[0];
-    const posNames = idxs.map(i => positions ? positions[i].label : `card ${i + 1}`);
-    throughlineText = `${posNames.join(' and ')} are both testing the same thing: ${quality}. That's not a coincidence — when the same quality shows up in more than one position, it's the actual center of the reading, not a side note.`;
-  } else {
-    const qualities = drawnCards.map(c => c.tested_quality).filter(Boolean);
-    throughlineText = `No single quality repeats across this spread — instead you're being asked to hold several different capacities at once: ${qualities.join(', ')}. The difficulty isn't any one of them, it's doing them simultaneously.`;
-  }
-
-  const transitions = ['To begin,', 'From there,', 'This leads into', 'Which opens into', 'And finally,'];
-  const chainParts = drawnCards.map((c, i) => {
-    const posLabel = positions ? positions[i].label.toLowerCase() : `position ${i + 1}`;
-    const lead = i === 0 ? `In ${posLabel},` : `${transitions[Math.min(i, transitions.length - 1)]} in ${posLabel},`;
-    const groundedLine = (c.grounded_where_v2 || c.grounded_where || '').replace(/^This is testing\s*/i, '');
-    return `${lead} ${c.title} is testing ${groundedLine.charAt(0).toLowerCase() + groundedLine.slice(1)}`;
-  });
-  const chainText = chainParts.join(' ');
-
-  const outcomeCard = drawnCards[drawnCards.length - 1];
-  const anchorCard = drawnCards[0];
-  const carryText = sharedQualities.length > 0
-    ? `The through-line here is ${sharedQualities[0][0]} — that's the one thing worth actually watching for as this plays out. If you lose the thread, come back to ${anchorCard.title}'s breath pattern (${anchorCard.breathing.split('(')[0].trim()}) to reset.`
-    : `Since this reading doesn't converge on one quality, treat ${outcomeCard.title} as the closing note: ${(outcomeCard.grounded_where_v2 || outcomeCard.grounded_where)} Let that be what you carry out, even while the rest stays in tension.`;
-
-  const area = document.getElementById('synthesisArea');
-  area.style.display = 'block';
-  area.innerHTML = `
-    <div class="synth-header">
-      <div class="synth-diamond">✦</div>
-      <div class="synth-title">Spread Synthesis</div>
-      <div class="synth-rule"></div>
-    </div>
-    <div class="synth-block">
-      <div class="synth-section">
-        <div class="synth-label">The Field</div>
-        <div class="synth-text">${fieldText}</div>
-      </div>
-      <div class="synth-section">
-        <div class="synth-label">The Thread</div>
-        <div class="synth-text">${chainText}</div>
-      </div>
-      <div class="synth-section">
-        <div class="synth-label">The Throughline</div>
-        <div class="synth-text">${throughlineText}</div>
-      </div>
-      <div class="synth-section">
-        <div class="synth-label">What To Carry</div>
-        <div class="synth-text">${carryText}</div>
-      </div>
-    </div>
-  `;
-  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  screen = 'paywall'; paywallSpread = key;
+  render();
 }
 
-function ladderPositionInPhase(card) {
-  const phase = PHASES.find(p => p.num === card.phase);
-  const [lo, hi] = phase.range;
-  const span = hi - lo;
-  const pos = card.num - lo;
-  const pct = span === 0 ? 0 : pos / span;
-  let stage, prep;
-  if (pct < 0.34) { stage = "the early stage of"; prep = "in"; }
-  else if (pct < 0.7) { stage = "the middle stretch of"; prep = "in"; }
-  else { stage = "the threshold of"; prep = "at"; }
-  return { phase, pct, stage, prep };
+function drawCards() {
+  if (CARDS.length === 0) return;
+  const s = spreadByKey(spreadKey);
+  const pool = [...CARDS];
+  const picked = [];
+  for (let i = 0; i < s.count && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    picked.push(pool.splice(idx, 1)[0]);
+  }
+  drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
+  render();
 }
 
-function renderLadder(card) {
-  const { phase, pct, stage } = ladderPositionInPhase(card);
-  const area = document.getElementById('spreadArea');
+function setTab(tab) { activeTab = tab; render(); }
 
-  const rungs = PHASES.map(p => {
-    const active = p.num === phase.num;
-    const passed = p.num < phase.num;
-    return `<div class="rung ${active ? 'rung-active' : ''} ${passed ? 'rung-passed' : ''}">
-      <div class="rung-num">${p.num}</div>
-      <div class="rung-name">${p.name}</div>
-      ${active ? `<div class="rung-marker" style="bottom:${(pct * 80 + 8)}%"></div>` : ''}
-    </div>`;
+function nextCard() {
+  if (cardIndex < drawnCards.length - 1) { cardIndex += 1; activeTab = 'grounded'; }
+  else { screen = 'synthesis'; }
+  render();
+}
+function prevCard() {
+  if (cardIndex > 0) { cardIndex -= 1; activeTab = 'grounded'; render(); }
+}
+
+function composeSynthesis(cards) {
+  if (!cards.length) return { headline: '', sub: null, takeaway: '' };
+  if (cards.length === 1) {
+    return { headline: `This card is testing: ${cards[0].tested_quality}.`, sub: null, takeaway: cards[0].grounded_where_v2 || cards[0].grounded_where };
+  }
+  const phaseNames = [...new Set(cards.map(c => phaseNameFor(c.phase)))];
+  const qualities = [...new Set(cards.map(c => c.tested_quality))];
+  const headline = qualities.length === 1
+    ? `Every card is testing the same thing: ${qualities[0]}.`
+    : `The thread running through this draw: ${qualities.join(', ')}.`;
+  const sub = phaseNames.length > 1 ? `This reading moves through ${phaseNames.join(' → ')}.` : `This reading stays within ${phaseNames[0]}.`;
+  const last = cards[cards.length - 1];
+  return { headline, sub, takeaway: last.grounded_where_v2 || last.grounded_where };
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────
+function render() {
+  document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
+  const root = document.getElementById('screen');
+  if (screen === 'home') return renderHome(root);
+  if (screen === 'drawing') return renderDrawing(root);
+  if (screen === 'paywall') return renderPaywall(root);
+  if (screen === 'reading') return renderReading(root);
+  if (screen === 'synthesis') return renderSynthesis(root);
+}
+
+function renderHome(root) {
+  const rows = SPREADS.map(s => {
+    const tag = s.free ? 'FREE' : (isSubscribed() ? 'INCLUDED' : 'MEMBERSHIP');
+    const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'rgba(196,168,74,.6)' : 'rgba(243,236,217,.35)');
+    const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
+    return `
+      <div class="spread-row" data-key="${s.key}">
+        <div class="spread-dots">${dots}</div>
+        <div class="spread-row-body">
+          <div class="spread-row-title">${s.label}</div>
+          <div class="spread-row-sub">${s.sub}</div>
+        </div>
+        <div class="spread-tag" style="color:${tagColor}">${tag}</div>
+      </div>`;
   }).join('');
 
-  const wrap = document.createElement('div');
-  wrap.className = 'ladder-wrap';
-  wrap.innerHTML = `
-    <div class="ladder">${rungs}</div>
-    <div class="ladder-card-col">
-      <div class="pos-label">Where You Stand</div>
-      <div class="card" style="animation-delay:.1s">
-        <span class="card-num">№ ${card.num}</span>
-        <div class="card-phase">Phase ${card.phase} — ${phase.name}</div>
-        <div class="card-title">${card.title}</div>
-        <div class="card-phrase">${card.phrase}</div>
-        <div class="card-field"><span class="flabel">Breathing</span><span class="fval">${card.breathing}</span></div>
-        ${card.grounded_supported ? `
-        <div class="card-grounded">
-          <div class="section-label">Grounded</div>
-          <div class="grounded-row"><span class="flabel gsupported">Supported</span><span class="fval">${card.grounded_supported}</span></div>
-          <div class="grounded-row"><span class="flabel gresisted">Resisted</span><span class="fval">${card.grounded_resisted}</span></div>
-          <div class="grounded-row"><span class="flabel gwhere">Tested Quality — ${card.tested_quality || ''}</span><span class="fval">${stripTestingPrefix(card.grounded_where_v2 || card.grounded_where)}</span></div>
-        </div>` : ''}
-        <div class="card-soul">
-          <div class="section-label">Spirit / Soul</div>
-          <div class="card-interp"><span class="fval">${card.interpretation}</span></div>
-          <div class="card-field"><span class="flabel">Meditation</span><span class="fval">${card.meditation}</span></div>
-        </div>
-      </div>
-    </div>
-  `;
-  area.innerHTML = '';
-  area.appendChild(wrap);
+  root.innerHTML = `
+    <div class="screen home">
+      <div class="tagline">Practice, not prediction.</div>
+      <div class="section-label">Choose a spread</div>
+      <div class="spread-list">${rows}</div>
+    </div>`;
+
+  root.querySelectorAll('.spread-row').forEach(el => {
+    el.addEventListener('click', () => selectSpread(el.getAttribute('data-key')));
+  });
 }
 
-function buildLadderSynthesis(card) {
-  const { phase, stage, prep } = ladderPositionInPhase(card);
-  const area = document.getElementById('synthesisArea');
-  area.style.display = 'block';
-  const standingText = `You are standing in Phase ${phase.num} — ${phase.name}, ${prep} ${stage} this phase. ${phase.desc}`;
-  const askText = `This rung is asking ${card.tested_quality ? 'you to work with ' + card.tested_quality.toLowerCase() : 'something specific of you'}: ${stripTestingPrefix(card.grounded_where_v2 || card.grounded_where)}`;
-  const nextText = phase.num < 5
-    ? `Phase ${phase.num + 1} — ${PHASES.find(p => p.num === phase.num + 1).name} — waits beyond this one, but it isn't yours to reach for yet. The work is here.`
-    : `There is no further phase beyond this one. The work at this rung is embodiment, not arrival.`;
-
-  area.innerHTML = `
-    <div class="synth-header">
-      <div class="synth-diamond">✦</div>
-      <div class="synth-title">Your Standing</div>
-      <div class="synth-rule"></div>
-    </div>
-    <div class="synth-block">
-      <div class="synth-section">
-        <div class="synth-label">The Rung</div>
-        <div class="synth-text">${standingText}</div>
+function renderDrawing(root) {
+  const s = spreadByKey(spreadKey);
+  const plural = s.count > 1 ? 'S' : '';
+  root.innerHTML = `
+    <div class="screen drawing">
+      <div class="card-back"><div class="card-back-mono">AK</div></div>
+      <div>
+        <div class="drawing-title">${s.label}</div>
+        <div class="drawing-sub">${s.sub}</div>
       </div>
-      <div class="synth-section">
-        <div class="synth-label">What It's Asking</div>
-        <div class="synth-text">${askText}</div>
-      </div>
-      <div class="synth-section">
-        <div class="synth-label">Beyond This Rung</div>
-        <div class="synth-text">${nextText}</div>
-      </div>
-    </div>
-  `;
-  renderPersonalizeBox(card, 'synthesisArea');
-  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      <button class="btn-gold" id="drawBtn" ${CARDS.length === 0 ? 'disabled' : ''}>DRAW ${s.count} CARD${plural}</button>
+      ${CARDS.length === 0 ? '<div class="drawing-sub" style="color:#e0a0a0;">Card data failed to load. Try reinstalling the app.</div>' : ''}
+      <button class="link-dim" id="backBtn">Back</button>
+    </div>`;
+  document.getElementById('drawBtn').addEventListener('click', drawCards);
+  document.getElementById('backBtn').addEventListener('click', goHome);
 }
 
-document.getElementById('drawBtn').addEventListener('click', () => {
-  document.getElementById('manualError').textContent = '';
-  if (CARDS.length === 0) {
-    document.getElementById('manualError').textContent = 'Card data is still loading — wait a moment and try again.';
-    return;
-  }
-  if (PREMIUM_SPREADS.has(currentSpread) && !isSubscribed()) {
-    openPaywall();
-    return;
-  }
-  if (currentSpread === 'ladder') {
-    const [card] = shuffleDraw(1);
-    renderLadder(card);
-    setTimeout(() => buildLadderSynthesis(card), 400);
-    return;
-  }
-  const n = currentSpread;
-  const drawn = shuffleDraw(n);
-  renderSpread(drawn);
-  setTimeout(() => buildSynthesis(drawn), n * 80 + 300);
-});
+function renderPaywall(root) {
+  const label = paywallSpread ? spreadByKey(paywallSpread).label : '';
+  const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
+  root.innerHTML = `
+    <div class="screen paywall">
+      <div class="paywall-glyph">&#128274;</div>
+      <div class="paywall-title">${label}</div>
+      <div class="paywall-body">Multi-card spreads and Where You Stand are part of ASCEND Keys membership. One card is always free.</div>
+      <div class="paywall-price">${price.split('/')[0].trim()}<small> / month</small></div>
+      <button class="btn-gold" id="unlockBtn">UNLOCK MEMBERSHIP</button>
+      <div class="paywall-fineprint">via Google Play Billing</div>
+      <button class="link-dim" id="restoreBtn">Already a member? Restore purchase</button>
+      <button class="link-dim" id="notNowBtn">Not now</button>
+    </div>`;
 
-document.getElementById('manualBtn').addEventListener('click', () => {
-  if (CARDS.length === 0) {
-    document.getElementById('manualError').textContent = 'Card data is still loading — wait a moment and try again.';
-    return;
-  }
-  if (PREMIUM_SPREADS.has(currentSpread) && !isSubscribed()) {
-    openPaywall();
-    return;
-  }
-  const cards = readManualCards();
-  if (!cards) return;
-  if (currentSpread === 'ladder') {
-    renderLadder(cards[0]);
-    setTimeout(() => buildLadderSynthesis(cards[0]), 300);
-    return;
-  }
-  renderSpread(cards);
-  setTimeout(() => buildSynthesis(cards), cards.length * 80 + 200);
-});
+  document.getElementById('unlockBtn').addEventListener('click', () => {
+    const btn = document.getElementById('unlockBtn');
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Processing…';
+    window.AscendBilling.subscribe()
+      .catch(err => { alert(err && err.message ? err.message : 'Purchase could not be started. Please try again.'); })
+      .finally(() => { btn.disabled = false; btn.textContent = original; });
+  });
+  document.getElementById('restoreBtn').addEventListener('click', () => {
+    const btn = document.getElementById('restoreBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Checking…'; btn.disabled = true;
+    window.AscendBilling.restore()
+      .then(() => { if (!isSubscribed()) alert('No active subscription found for this Google account.'); })
+      .catch(err => { alert(err && err.message ? err.message : 'Could not restore purchases.'); })
+      .finally(() => { btn.textContent = original; btn.disabled = false; });
+  });
+  document.getElementById('notNowBtn').addEventListener('click', goHome);
+}
+
+function renderReading(root) {
+  const current = drawnCards[cardIndex];
+  const positions = POSITIONS[spreadKey];
+  const position = positions ? positions[cardIndex] : null;
+  const showThread = drawnCards.length > 1;
+
+  const threadDots = showThread ? drawnCards.map((c, i) => {
+    const opacity = i <= cardIndex ? 1 : 0.3;
+    return `<span style="background:${colorFor(c.phase)};opacity:${opacity}"></span>`;
+  }).join('') : '';
+
+  const isLast = cardIndex === drawnCards.length - 1;
+  const nextLabel = isLast ? 'SEE SYNTHESIS' : 'NEXT CARD';
+
+  root.innerHTML = `
+    <div class="screen reading">
+      ${showThread ? `<div class="thread-row">${threadDots}</div>` : ''}
+      <div class="reading-meta">
+        ${position ? `<div class="reading-position">${position}</div>` : ''}
+        <div class="reading-num">№ ${current.num} &middot; ${phaseNameFor(current.phase)}</div>
+        <div class="reading-title">${current.title}</div>
+      </div>
+      <div class="breathe-strip">
+        <div class="breathe-label">BREATHE</div>
+        <div class="breathe-text">${current.breathing}</div>
+      </div>
+      <div class="tab-switch">
+        <button class="tab-btn ${activeTab === 'grounded' ? 'active' : ''}" id="tabGrounded">GROUNDED</button>
+        <button class="tab-btn ${activeTab === 'spirit' ? 'active' : ''}" id="tabSpirit">SPIRIT</button>
+      </div>
+      ${activeTab === 'grounded' ? `
+        <div class="grounded-panel">
+          <div class="grounded-quality">${current.tested_quality || ''}</div>
+          <div class="grounded-where">${current.grounded_where || ''}</div>
+          <div class="grounded-sublabel grounded-supported-label">When it's supported</div>
+          <div class="grounded-subtext">${current.grounded_supported || ''}</div>
+          <div class="grounded-sublabel grounded-resisted-label">When it's resisted</div>
+          <div class="grounded-subtext" style="margin-bottom:0;">${current.grounded_resisted || ''}</div>
+        </div>` : `
+        <div class="spirit-panel">
+          <div class="spirit-phrase">"${current.phrase}"</div>
+          <div class="spirit-interp">${current.interpretation}</div>
+          <div class="spirit-med-label">Meditation</div>
+          <div class="spirit-med-text">${current.meditation}</div>
+        </div>`}
+      <div class="reading-nav">
+        ${cardIndex > 0 ? '<button class="btn-outline" id="backCardBtn">BACK</button>' : ''}
+        <button class="btn-next" id="nextCardBtn">${nextLabel}</button>
+      </div>
+    </div>`;
+
+  document.getElementById('tabGrounded').addEventListener('click', () => setTab('grounded'));
+  document.getElementById('tabSpirit').addEventListener('click', () => setTab('spirit'));
+  document.getElementById('nextCardBtn').addEventListener('click', nextCard);
+  const backCardBtn = document.getElementById('backCardBtn');
+  if (backCardBtn) backCardBtn.addEventListener('click', prevCard);
+}
+
+function renderSynthesis(root) {
+  const synth = composeSynthesis(drawnCards);
+  const dots = drawnCards.map(c => `<span class="dot" style="background:${colorFor(c.phase)}"></span><span class="line"></span>`).join('');
+
+  root.innerHTML = `
+    <div class="screen synthesis">
+      <div class="synth-label-top">The synthesis</div>
+      <div class="synth-thread">${dots}</div>
+      <div class="synth-headline">${synth.headline}</div>
+      ${synth.sub ? `<div class="synth-sub">${synth.sub}</div>` : ''}
+      <div class="synth-takeaway">${synth.takeaway || ''}</div>
+      <button class="btn-outline-gold" id="newReadingBtn">NEW READING</button>
+    </div>`;
+  document.getElementById('newReadingBtn').addEventListener('click', goHome);
+}
 
 // ── Google Play Billing wiring ──────────────────────────────────────────
-document.getElementById('paywall-subscribe').addEventListener('click', () => {
-  const btn = document.getElementById('paywall-subscribe');
-  const original = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Processing…';
-  window.AscendBilling.subscribe()
-    .catch(err => {
-      alert(err && err.message ? err.message : 'Purchase could not be started. Please try again.');
-    })
-    .finally(() => {
-      btn.disabled = false;
-      btn.textContent = original;
-    });
-});
-document.getElementById('paywall-cancel').addEventListener('click', closePaywall);
-document.getElementById('paywall-restore').addEventListener('click', () => {
-  const btn = document.getElementById('paywall-restore');
-  const original = btn.textContent;
-  btn.textContent = 'Checking…';
-  btn.disabled = true;
-  window.AscendBilling.restore()
-    .then(() => {
-      if (isSubscribed()) closePaywall();
-      else alert("No active subscription found for this Google account.");
-    })
-    .catch(err => {
-      alert(err && err.message ? err.message : 'Could not restore purchases.');
-    })
-    .finally(() => {
-      btn.textContent = original;
-      btn.disabled = false;
-    });
-});
-
 // Wired up last and fully isolated: if window.AscendBilling is missing or
 // throws for any reason (plugin bridge not ready, script load failure),
-// it must never block the card-data fetch above.
+// it must never block card data or rendering above.
 try {
   window.AscendBilling.onStatusChange(val => {
+    const wasSubscribed = subscribed;
     subscribed = val;
-    renderSubStatus();
-    if (val) closePaywall();
+    if (val && !wasSubscribed) {
+      // A purchase just completed (or was restored) — resume into the
+      // spread the user was trying to unlock, if any. Never flip this
+      // optimistically on button click; only on the verified callback.
+      if (screen === 'paywall' && paywallSpread) {
+        screen = 'drawing'; spreadKey = paywallSpread; drawnCards = []; cardIndex = 0; activeTab = 'grounded';
+      }
+    }
+    render();
   });
   window.AscendBilling.init();
 } catch (e) {
   console.error('AscendBilling setup failed:', e);
 }
-renderSubStatus();
+
+render();
