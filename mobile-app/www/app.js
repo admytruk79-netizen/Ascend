@@ -583,7 +583,11 @@ window.AscendBilling.onStatusChange(val => {
   renderSubStatus();
   if (val) closePaywall();
 });
-window.AscendBilling.init();
+try {
+  window.AscendBilling.init();
+} catch (e) {
+  console.error('AscendBilling.init() failed:', e);
+}
 renderSubStatus();
 
 fetch('ascend_cards.json')
