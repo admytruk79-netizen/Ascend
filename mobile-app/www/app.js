@@ -1,3 +1,35 @@
+// ── CARD DATA — the very first thing this script does, before anything ────
+// else gets a chance to run and throw. Everything this needs (CARDS,
+// PHASES, initSelector, updateDesc, renderManualInputs) is declared further
+// down with `let`/`function`, but that's fine: this fetch only resolves
+// later, on the microtask queue, by which point the rest of the file has
+// already finished running once synchronously.
+try {
+  fetch('ascend_cards.json')
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(data => {
+      if (!data || !Array.isArray(data.cards) || data.cards.length === 0) {
+        throw new Error('Card data came back empty or malformed');
+      }
+      CARDS = data.cards;
+      PHASES = data.phases;
+      initSelector();
+      updateDesc();
+      renderManualInputs();
+    })
+    .catch(err => {
+      document.getElementById('spreadDesc').innerHTML =
+        '<span style="color:#e0a0a0;">Card data failed to load (' + err.message + '). ' +
+        'Try refreshing — if it keeps happening, the deployed ascend_cards.json is likely missing or corrupted.</span>';
+      console.error('Card data load failed:', err);
+    });
+} catch (e) {
+  console.error('Card data fetch could not even start:', e);
+}
+
 // ── SUBSCRIPTION STATE (backed by Google Play Billing via billing.js) ──────
 const PREMIUM_SPREADS = new Set([3, 5, 9, "ladder"]);
 
@@ -577,28 +609,6 @@ document.getElementById('paywall-restore').addEventListener('click', () => {
       btn.disabled = false;
     });
 });
-
-fetch('ascend_cards.json')
-  .then(r => {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  })
-  .then(data => {
-    if (!data || !Array.isArray(data.cards) || data.cards.length === 0) {
-      throw new Error('Card data came back empty or malformed');
-    }
-    CARDS = data.cards;
-    PHASES = data.phases;
-    initSelector();
-    updateDesc();
-    renderManualInputs();
-  })
-  .catch(err => {
-    document.getElementById('spreadDesc').innerHTML =
-      '<span style="color:#e0a0a0;">Card data failed to load (' + err.message + '). ' +
-      'Try refreshing — if it keeps happening, the deployed ascend_cards.json is likely missing or corrupted.</span>';
-    console.error('Card data load failed:', err);
-  });
 
 // Wired up last and fully isolated: if window.AscendBilling is missing or
 // throws for any reason (plugin bridge not ready, script load failure),
