@@ -1,33 +1,23 @@
-// ── CARD DATA — the very first thing this script does, before anything ────
-// else gets a chance to run and throw. Everything this needs (CARDS,
-// PHASES, initSelector, updateDesc, renderManualInputs) is declared further
-// down with `let`/`function`, but that's fine: this fetch only resolves
-// later, on the microtask queue, by which point the rest of the file has
-// already finished running once synchronously.
+// ── CARD DATA — loaded synchronously from cards_data.js (a plain <script> ──
+// tag, see index.html), NOT fetch(). fetch() to the bundled JSON was
+// observed to hang indefinitely in some on-device WebViews (never
+// resolving, never rejecting — no error, just permanently stuck), even
+// though it worked instantly in a desktop browser. A <script> tag uses the
+// browser's normal resource-loading pipeline instead of the Fetch API, and
+// that path is proven to work on-device since app.js/billing.js load the
+// same way. This is the very first thing this script does, before
+// anything else gets a chance to run and throw.
+let CARDS = [];
+let PHASES = [];
 try {
-  fetch('ascend_cards.json')
-    .then(r => {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    })
-    .then(data => {
-      if (!data || !Array.isArray(data.cards) || data.cards.length === 0) {
-        throw new Error('Card data came back empty or malformed');
-      }
-      CARDS = data.cards;
-      PHASES = data.phases;
-      initSelector();
-      updateDesc();
-      renderManualInputs();
-    })
-    .catch(err => {
-      document.getElementById('spreadDesc').innerHTML =
-        '<span style="color:#e0a0a0;">Card data failed to load (' + err.message + '). ' +
-        'Try refreshing — if it keeps happening, the deployed ascend_cards.json is likely missing or corrupted.</span>';
-      console.error('Card data load failed:', err);
-    });
+  const data = window.ASCEND_CARDS_DATA;
+  if (!data || !Array.isArray(data.cards) || data.cards.length === 0) {
+    throw new Error('Card data missing or malformed');
+  }
+  CARDS = data.cards;
+  PHASES = data.phases;
 } catch (e) {
-  console.error('Card data fetch could not even start:', e);
+  console.error('Card data load failed:', e);
 }
 
 // ── SUBSCRIPTION STATE (backed by Google Play Billing via billing.js) ──────
@@ -115,9 +105,6 @@ function renderPersonalizeBox(card, containerId) {
   });
 }
 
-let CARDS = [];
-let PHASES = [];
-
 const SPREADS = {
   1: {
     label: "Single Card",
@@ -177,6 +164,19 @@ const PHASE_THEMES = {
 };
 
 let currentSpread = 3;
+
+// Now that SPREADS/currentSpread above are initialized, actually render
+// the selector — CARDS/PHASES were already loaded synchronously at the
+// top of this file (or logged an error if that failed).
+if (CARDS.length > 0) {
+  initSelector();
+  updateDesc();
+  renderManualInputs();
+} else {
+  document.getElementById('spreadDesc').innerHTML =
+    '<span style="color:#e0a0a0;">Card data failed to load. Try reinstalling the app — ' +
+    'if it keeps happening, the deployed cards_data.js is likely missing or corrupted.</span>';
+}
 
 function initSelector() {
   const sel = document.getElementById('selector');
