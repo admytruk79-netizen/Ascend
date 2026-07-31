@@ -49,9 +49,10 @@ function markIntroSeen() {
 }
 
 let subscribed = false;
-let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | drawing | paywall | reading | synthesis
+let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | reading | synthesis
+let expandedKey = null; // which spread row is expanded inline on Home
+let pendingUnlockKey = null; // spread waiting on a verified purchase before drawing
 let spreadKey = null;
-let paywallSpread = null;
 let drawnCards = [];
 let cardIndex = 0;
 let activeTab = 'grounded';
@@ -59,7 +60,7 @@ let activeTab = 'grounded';
 function isSubscribed() { return subscribed; }
 
 function goHome() {
-  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0;
+  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null;
   render();
 }
 
@@ -68,28 +69,42 @@ function beginFromIntro() {
   goHome();
 }
 
-function selectSpread(key) {
-  const s = spreadByKey(key);
-  if (isSubscribed() || s.free) {
-    screen = 'drawing'; spreadKey = key; drawnCards = []; cardIndex = 0; activeTab = 'grounded';
-    render();
-    return;
-  }
-  screen = 'paywall'; paywallSpread = key;
+function toggleSpread(key) {
+  expandedKey = expandedKey === key ? null : key;
   render();
 }
 
-function drawCards() {
+function drawFor(key) {
   if (CARDS.length === 0) return;
-  const s = spreadByKey(spreadKey);
+  const s = spreadByKey(key);
   const pool = [...CARDS];
   const picked = [];
   for (let i = 0; i < s.count && pool.length; i++) {
     const idx = Math.floor(Math.random() * pool.length);
     picked.push(pool.splice(idx, 1)[0]);
   }
-  drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
+  spreadKey = key; drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded'; expandedKey = null;
   render();
+}
+
+// Unlocking is a single membership covering every spread, not a per-spread
+// purchase. Never flip `subscribed` optimistically on tap — only the
+// verified onStatusChange(true) callback below does that, then this resumes
+// straight into the spread the user was trying to unlock.
+function requestUnlock(key) {
+  pendingUnlockKey = key;
+  const btn = document.getElementById('unlockBtn-' + key);
+  const original = btn ? btn.textContent : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
+  window.AscendBilling.subscribe()
+    .catch(err => {
+      pendingUnlockKey = null;
+      alert(err && err.message ? err.message : 'Purchase could not be started. Please try again.');
+    })
+    .finally(() => {
+      const b = document.getElementById('unlockBtn-' + key);
+      if (b && original) { b.disabled = false; b.textContent = original; }
+    });
 }
 
 function setTab(tab) { activeTab = tab; render(); }
@@ -124,8 +139,6 @@ function render() {
   const root = document.getElementById('screen');
   if (screen === 'intro') return renderIntro(root);
   if (screen === 'home') return renderHome(root);
-  if (screen === 'drawing') return renderDrawing(root);
-  if (screen === 'paywall') return renderPaywall(root);
   if (screen === 'reading') return renderReading(root);
   if (screen === 'synthesis') return renderSynthesis(root);
 }
@@ -133,27 +146,55 @@ function render() {
 function renderIntro(root) {
   root.innerHTML = `
     <div class="screen intro">
+      <div class="intro-logo"><img src="ascend-logo.png" alt=""></div>
       <div class="intro-mark">ASCEND KEYS</div>
-      <div class="intro-tagline">Practice, not prediction.</div>
-      <div class="intro-body">A structured reading tool: draw one or more cards, read a grounded (practical) and a spirit (symbolic) layer for each, then a short synthesis ties the draw together. Nothing here predicts your future — it's a prompt to reflect.</div>
+      <div class="intro-tagline">A structured practice of self-reflection, built from 108 keys across five phases of growth.</div>
+      <div class="intro-body">Practice, not prediction. Each reading pairs a grounded, plain-language reflection with an optional symbolic layer.</div>
       <button class="btn-gold" id="beginBtn">BEGIN</button>
     </div>`;
   document.getElementById('beginBtn').addEventListener('click', beginFromIntro);
 }
 
 function renderHome(root) {
+  const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
+  const priceAmount = price.split('/')[0].trim();
+
   const rows = SPREADS.map(s => {
+    const locked = !s.free && !isSubscribed();
+    const expanded = expandedKey === s.key;
     const tag = s.free ? 'FREE' : (isSubscribed() ? 'INCLUDED' : 'MEMBERSHIP');
     const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'rgba(196,168,74,.6)' : 'rgba(243,236,217,.35)');
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
+    const plural = s.count > 1 ? 'S' : '';
+
+    const expandContent = locked ? `
+        <div class="spread-expand-content locked">
+          <div class="spread-expand-rule"></div>
+          <div class="locked-glyph">&#128274;</div>
+          <div class="locked-body">Part of ASCEND Keys membership.</div>
+          <div class="locked-price">${priceAmount}<small> / month, unlocks everything</small></div>
+          <button class="btn-gold-block" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK MEMBERSHIP</button>
+          <div class="locked-fineprint">via Google Play Billing</div>
+        </div>` : `
+        <div class="spread-expand-content">
+          <div class="spread-expand-rule"></div>
+          <button class="btn-gold-block" id="drawBtn-${s.key}" data-key="${s.key}" ${CARDS.length === 0 ? 'disabled' : ''}>DRAW ${s.count} CARD${plural}</button>
+          ${CARDS.length === 0 ? '<div class="locked-fineprint" style="color:#e0a0a0;margin-top:8px;">Card data failed to load.</div>' : ''}
+        </div>`;
+
     return `
-      <div class="spread-row" data-key="${s.key}">
-        <div class="spread-dots">${dots}</div>
-        <div class="spread-row-body">
-          <div class="spread-row-title">${s.label}</div>
-          <div class="spread-row-sub">${s.sub}</div>
+      <div class="spread-card ${expanded ? 'expanded' : ''}" data-key="${s.key}">
+        <div class="spread-row" data-toggle="${s.key}">
+          <div class="spread-dots">${dots}</div>
+          <div class="spread-row-body">
+            <div class="spread-row-title">${s.label}</div>
+            <div class="spread-row-sub">${s.sub}</div>
+          </div>
+          <div class="spread-tag" style="color:${tagColor}">${tag}</div>
         </div>
-        <div class="spread-tag" style="color:${tagColor}">${tag}</div>
+        <div class="spread-expand ${expanded ? 'open' : ''}">
+          <div class="spread-expand-inner">${expandContent}</div>
+        </div>
       </div>`;
   }).join('');
 
@@ -162,64 +203,29 @@ function renderHome(root) {
       <div class="tagline">Practice, not prediction.</div>
       <div class="section-label">Choose a spread</div>
       <div class="spread-list">${rows}</div>
+      ${!isSubscribed() ? '<div style="text-align:center;margin-top:22px;"><button class="link-dim" id="restoreBtn">Already a member? Restore purchase</button></div>' : ''}
     </div>`;
 
-  root.querySelectorAll('.spread-row').forEach(el => {
-    el.addEventListener('click', () => selectSpread(el.getAttribute('data-key')));
+  root.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => toggleSpread(el.getAttribute('data-toggle')));
   });
-}
-
-function renderDrawing(root) {
-  const s = spreadByKey(spreadKey);
-  const plural = s.count > 1 ? 'S' : '';
-  root.innerHTML = `
-    <div class="screen drawing">
-      <div class="card-back"><div class="card-back-mono">AK</div></div>
-      <div>
-        <div class="drawing-title">${s.label}</div>
-        <div class="drawing-sub">${s.sub}</div>
-      </div>
-      <button class="btn-gold" id="drawBtn" ${CARDS.length === 0 ? 'disabled' : ''}>DRAW ${s.count} CARD${plural}</button>
-      ${CARDS.length === 0 ? '<div class="drawing-sub" style="color:#e0a0a0;">Card data failed to load. Try reinstalling the app.</div>' : ''}
-      <button class="link-dim" id="backBtn">Back</button>
-    </div>`;
-  document.getElementById('drawBtn').addEventListener('click', drawCards);
-  document.getElementById('backBtn').addEventListener('click', goHome);
-}
-
-function renderPaywall(root) {
-  const label = paywallSpread ? spreadByKey(paywallSpread).label : '';
-  const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
-  root.innerHTML = `
-    <div class="screen paywall">
-      <div class="paywall-glyph">&#128274;</div>
-      <div class="paywall-title">${label}</div>
-      <div class="paywall-body">Multi-card spreads and Where You Stand are part of ASCEND Keys membership. One card is always free.</div>
-      <div class="paywall-price">${price.split('/')[0].trim()}<small> / month</small></div>
-      <button class="btn-gold" id="unlockBtn">UNLOCK MEMBERSHIP</button>
-      <div class="paywall-fineprint">via Google Play Billing</div>
-      <button class="link-dim" id="restoreBtn">Already a member? Restore purchase</button>
-      <button class="link-dim" id="notNowBtn">Not now</button>
-    </div>`;
-
-  document.getElementById('unlockBtn').addEventListener('click', () => {
-    const btn = document.getElementById('unlockBtn');
-    const original = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Processing…';
-    window.AscendBilling.subscribe()
-      .catch(err => { alert(err && err.message ? err.message : 'Purchase could not be started. Please try again.'); })
-      .finally(() => { btn.disabled = false; btn.textContent = original; });
+  root.querySelectorAll('[id^="drawBtn-"]').forEach(el => {
+    el.addEventListener('click', (e) => { e.stopPropagation(); drawFor(el.getAttribute('data-key')); });
   });
-  document.getElementById('restoreBtn').addEventListener('click', () => {
-    const btn = document.getElementById('restoreBtn');
-    const original = btn.textContent;
-    btn.textContent = 'Checking…'; btn.disabled = true;
-    window.AscendBilling.restore()
-      .then(() => { if (!isSubscribed()) alert('No active subscription found for this Google account.'); })
-      .catch(err => { alert(err && err.message ? err.message : 'Could not restore purchases.'); })
-      .finally(() => { btn.textContent = original; btn.disabled = false; });
+  root.querySelectorAll('[id^="unlockBtn-"]').forEach(el => {
+    el.addEventListener('click', (e) => { e.stopPropagation(); requestUnlock(el.getAttribute('data-key')); });
   });
-  document.getElementById('notNowBtn').addEventListener('click', goHome);
+  const restoreBtn = document.getElementById('restoreBtn');
+  if (restoreBtn) {
+    restoreBtn.addEventListener('click', () => {
+      const original = restoreBtn.textContent;
+      restoreBtn.textContent = 'Checking…'; restoreBtn.disabled = true;
+      window.AscendBilling.restore()
+        .then(() => { if (!isSubscribed()) alert('No active subscription found for this Google account.'); })
+        .catch(err => { alert(err && err.message ? err.message : 'Could not restore purchases.'); })
+        .finally(() => { restoreBtn.textContent = original; restoreBtn.disabled = false; });
+    });
+  }
 }
 
 function renderReading(root) {
@@ -236,15 +242,22 @@ function renderReading(root) {
   const isLast = cardIndex === drawnCards.length - 1;
   const nextLabel = isLast ? 'SEE SYNTHESIS' : 'NEXT CARD';
 
+  const phaseColor = colorFor(current.phase);
+
   root.innerHTML = `
     <div class="screen reading">
       ${showThread ? `<div class="thread-row">${threadDots}</div>` : ''}
       <div class="reading-meta">
         ${position ? `<div class="reading-position">${position}</div>` : ''}
-        <div class="reading-num">№ ${current.num} &middot; ${phaseNameFor(current.phase)}</div>
+        <div class="reading-num-row">
+          <span class="reading-num-dot" style="background:${phaseColor}"></span>
+          <div class="reading-num">№ ${current.num} &middot; ${phaseNameFor(current.phase)}</div>
+        </div>
         <div class="reading-title">${current.title}</div>
+        <div class="reading-title-rule"></div>
       </div>
       <div class="breathe-strip">
+        <span class="breathe-dot"></span>
         <div class="breathe-label">BREATHE</div>
         <div class="breathe-text">${current.breathing}</div>
       </div>
@@ -254,16 +267,20 @@ function renderReading(root) {
       </div>
       ${activeTab === 'grounded' ? `
         <div class="grounded-panel">
+          <div class="grounded-phase-edge" style="background:${phaseColor}"></div>
           <div class="grounded-quality">${current.tested_quality || ''}</div>
           <div class="grounded-where">${current.grounded_where || ''}</div>
-          <div class="grounded-sublabel grounded-supported-label">When it's supported</div>
+          <div class="grounded-rule"></div>
+          <div class="grounded-sublabel grounded-supported-label">&#10003; When it's supported</div>
           <div class="grounded-subtext">${current.grounded_supported || ''}</div>
-          <div class="grounded-sublabel grounded-resisted-label">When it's resisted</div>
+          <div class="grounded-sublabel grounded-resisted-label">&#10005; When it's resisted</div>
           <div class="grounded-subtext" style="margin-bottom:0;">${current.grounded_resisted || ''}</div>
         </div>` : `
         <div class="spirit-panel">
+          <div class="spirit-glyph">&#10018;</div>
           <div class="spirit-phrase">"${current.phrase}"</div>
           <div class="spirit-interp">${current.interpretation}</div>
+          <div class="spirit-rule"></div>
           <div class="spirit-med-label">Meditation</div>
           <div class="spirit-med-text">${current.meditation}</div>
         </div>`}
@@ -304,13 +321,14 @@ try {
   window.AscendBilling.onStatusChange(val => {
     const wasSubscribed = subscribed;
     subscribed = val;
-    if (val && !wasSubscribed) {
-      // A purchase just completed (or was restored) — resume into the
-      // spread the user was trying to unlock, if any. Never flip this
-      // optimistically on button click; only on the verified callback.
-      if (screen === 'paywall' && paywallSpread) {
-        screen = 'drawing'; spreadKey = paywallSpread; drawnCards = []; cardIndex = 0; activeTab = 'grounded';
-      }
+    if (val && !wasSubscribed && pendingUnlockKey) {
+      // A purchase just completed (or was restored) — resume straight into
+      // the spread the user was trying to unlock. Never flip `subscribed`
+      // optimistically on button tap; only this verified callback does.
+      const key = pendingUnlockKey;
+      pendingUnlockKey = null;
+      drawFor(key);
+      return;
     }
     render();
   });
