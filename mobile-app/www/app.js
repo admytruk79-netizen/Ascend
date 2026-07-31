@@ -578,18 +578,6 @@ document.getElementById('paywall-restore').addEventListener('click', () => {
     });
 });
 
-window.AscendBilling.onStatusChange(val => {
-  subscribed = val;
-  renderSubStatus();
-  if (val) closePaywall();
-});
-try {
-  window.AscendBilling.init();
-} catch (e) {
-  console.error('AscendBilling.init() failed:', e);
-}
-renderSubStatus();
-
 fetch('ascend_cards.json')
   .then(r => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -611,3 +599,18 @@ fetch('ascend_cards.json')
       'Try refreshing — if it keeps happening, the deployed ascend_cards.json is likely missing or corrupted.</span>';
     console.error('Card data load failed:', err);
   });
+
+// Wired up last and fully isolated: if window.AscendBilling is missing or
+// throws for any reason (plugin bridge not ready, script load failure),
+// it must never block the card-data fetch above.
+try {
+  window.AscendBilling.onStatusChange(val => {
+    subscribed = val;
+    renderSubStatus();
+    if (val) closePaywall();
+  });
+  window.AscendBilling.init();
+} catch (e) {
+  console.error('AscendBilling setup failed:', e);
+}
+renderSubStatus();
