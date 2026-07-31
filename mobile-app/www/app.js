@@ -40,8 +40,16 @@ function phaseNameFor(phaseNum) { const p = PHASES.find(x => x.num === phaseNum)
 function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 
 // ── STATE ────────────────────────────────────────────────────────────────
+const INTRO_SEEN_KEY = 'ascend_intro_seen';
+function introAlreadySeen() {
+  try { return localStorage.getItem(INTRO_SEEN_KEY) === 'true'; } catch (e) { return false; }
+}
+function markIntroSeen() {
+  try { localStorage.setItem(INTRO_SEEN_KEY, 'true'); } catch (e) {}
+}
+
 let subscribed = false;
-let screen = 'home'; // home | drawing | paywall | reading | synthesis
+let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | drawing | paywall | reading | synthesis
 let spreadKey = null;
 let paywallSpread = null;
 let drawnCards = [];
@@ -53,6 +61,11 @@ function isSubscribed() { return subscribed; }
 function goHome() {
   screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0;
   render();
+}
+
+function beginFromIntro() {
+  markIntroSeen();
+  goHome();
 }
 
 function selectSpread(key) {
@@ -109,11 +122,23 @@ function composeSynthesis(cards) {
 function render() {
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
   const root = document.getElementById('screen');
+  if (screen === 'intro') return renderIntro(root);
   if (screen === 'home') return renderHome(root);
   if (screen === 'drawing') return renderDrawing(root);
   if (screen === 'paywall') return renderPaywall(root);
   if (screen === 'reading') return renderReading(root);
   if (screen === 'synthesis') return renderSynthesis(root);
+}
+
+function renderIntro(root) {
+  root.innerHTML = `
+    <div class="screen intro">
+      <div class="intro-mark">ASCEND KEYS</div>
+      <div class="intro-tagline">Practice, not prediction.</div>
+      <div class="intro-body">A structured reading tool: draw one or more cards, read a grounded (practical) and a spirit (symbolic) layer for each, then a short synthesis ties the draw together. Nothing here predicts your future — it's a prompt to reflect.</div>
+      <button class="btn-gold" id="beginBtn">BEGIN</button>
+    </div>`;
+  document.getElementById('beginBtn').addEventListener('click', beginFromIntro);
 }
 
 function renderHome(root) {

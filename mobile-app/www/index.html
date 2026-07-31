@@ -39,7 +39,21 @@
     border: 1px solid rgba(196,168,74,.4); padding: 5px 10px; border-radius: 10px;
   }
 
-  .screen { flex: 1; display: flex; flex-direction: column; }
+  @keyframes unfold {
+    from { opacity: 0; transform: scaleY(0.94) translateY(8px); }
+    to   { opacity: 1; transform: scaleY(1) translateY(0); }
+  }
+  .screen {
+    flex: 1; display: flex; flex-direction: column;
+    transform-origin: top center;
+    animation: unfold .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ---- INTRO ---- */
+  .intro { align-items: center; justify-content: center; gap: 22px; padding: 48px 32px; text-align: center; }
+  .intro-mark { font: 600 15px/1 'Cinzel', serif; letter-spacing: 4px; color: var(--gold); }
+  .intro-tagline { font: italic 500 20px/1.4 'Cormorant Garamond', serif; color: var(--cream); }
+  .intro-body { font: 14px/1.65 'Inter', sans-serif; color: rgba(243,236,217,.6); max-width: 320px; }
 
   /* ---- HOME ---- */
   .home { padding: 8px 24px 40px; }
