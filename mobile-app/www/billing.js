@@ -11,7 +11,7 @@
   let statusListeners = [];
   let ready = false;
   let available = typeof CdvPurchase !== 'undefined';
-  let priceString = '$11.99/month';
+  let priceString = '$5.99/month';
 
   function notify(subscribed) {
     try {
