@@ -65,9 +65,27 @@ function toggleSaved(num) {
   persistSavedCards();
 }
 
+// ── JOURNAL (Stage 4) ────────────────────────────────────────────────────
+const JOURNAL_KEY = 'ascend_journal_entries';
+function loadJournalEntries() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(JOURNAL_KEY) || '[]');
+    return Array.isArray(raw) ? raw : [];
+  } catch (e) { return []; }
+}
+function persistJournalEntries() {
+  try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries)); } catch (e) {}
+}
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+let journalEntries = loadJournalEntries();
+let currentJournalId = null; // ties Save-Entry on Synthesis to one entry per draw, not a new row per click
+
 let savedCardNums = loadSavedCards();
 let subscribed = false;
-let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | reading | synthesis | saved
+let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | reading | synthesis | saved | journal
 let expandedKey = null; // which spread row is expanded inline on Home
 let pendingUnlockKey = null; // spread waiting on a verified purchase before drawing
 let spreadKey = null;
@@ -81,6 +99,39 @@ function isSubscribed() { return subscribed; }
 function goHome() {
   screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false;
   render();
+}
+
+function goToJournalHistory() {
+  screen = 'journal';
+  render();
+}
+
+function saveJournalEntry() {
+  const textarea = document.getElementById('journalText');
+  const text = textarea.value.trim();
+  const statusEl = document.getElementById('journalStatus');
+  if (!text) {
+    if (statusEl) statusEl.textContent = 'Write something first.';
+    return;
+  }
+  if (currentJournalId) {
+    const entry = journalEntries.find(e => e.id === currentJournalId);
+    if (entry) { entry.text = text; entry.timestamp = Date.now(); }
+  } else {
+    const s = spreadByKey(spreadKey);
+    const entry = {
+      id: Date.now() + '-' + Math.random().toString(36).slice(2),
+      timestamp: Date.now(),
+      cardNums: drawnCards.map(c => c.num),
+      cardTitles: drawnCards.map(c => c.title),
+      spreadLabel: s ? s.label : '',
+      text,
+    };
+    journalEntries.unshift(entry);
+    currentJournalId = entry.id;
+  }
+  persistJournalEntries();
+  if (statusEl) statusEl.textContent = 'Saved ✓';
 }
 
 function goToSavedCards() {
@@ -116,6 +167,7 @@ function drawFor(key) {
     picked.push(pool.splice(idx, 1)[0]);
   }
   spreadKey = key; drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded'; expandedKey = null; readingPreviewOnly = false;
+  currentJournalId = null; // fresh draw — Save Entry on Synthesis should create a new entry, not edit the last one
   render();
 }
 
@@ -189,6 +241,7 @@ function render() {
   if (screen === 'reading') return renderReading(root);
   if (screen === 'synthesis') return renderSynthesis(root);
   if (screen === 'saved') return renderSavedCards(root);
+  if (screen === 'journal') return renderJournalHistory(root);
 }
 
 function renderIntro(root) {
@@ -250,7 +303,10 @@ function renderHome(root) {
     <div class="screen home">
       <div class="home-top-row">
         <div class="tagline">Practice, not prediction.</div>
-        <button class="saved-entry-btn" id="savedEntryBtn">&#9733; Saved${savedCardNums.size ? ' (' + savedCardNums.size + ')' : ''}</button>
+        <div class="home-quick-links">
+          <button class="saved-entry-btn" id="savedEntryBtn">&#9733; Saved${savedCardNums.size ? ' (' + savedCardNums.size + ')' : ''}</button>
+          <button class="saved-entry-btn" id="journalEntryBtn">&#9998; Journal${journalEntries.length ? ' (' + journalEntries.length + ')' : ''}</button>
+        </div>
       </div>
       <div class="section-label">Choose a spread</div>
       <div class="spread-list">${rows}</div>
@@ -258,6 +314,7 @@ function renderHome(root) {
     </div>`;
 
   document.getElementById('savedEntryBtn').addEventListener('click', goToSavedCards);
+  document.getElementById('journalEntryBtn').addEventListener('click', goToJournalHistory);
   root.querySelectorAll('[data-toggle]').forEach(el => {
     el.addEventListener('click', () => toggleSpread(el.getAttribute('data-toggle')));
   });
@@ -528,6 +585,8 @@ function renderSynthesis(root) {
   const synth = composeSynthesis(drawnCards);
   const dots = drawnCards.map(c => `<span class="dot" style="background:${colorFor(c.phase)}"></span><span class="line"></span>`).join('');
 
+  const existingEntry = currentJournalId ? journalEntries.find(e => e.id === currentJournalId) : null;
+
   root.innerHTML = `
     <div class="screen synthesis">
       <div class="synth-label-top">The synthesis</div>
@@ -535,9 +594,42 @@ function renderSynthesis(root) {
       <div class="synth-headline">${synth.headline}</div>
       ${synth.sub ? `<div class="synth-sub">${synth.sub}</div>` : ''}
       <div class="synth-takeaway">${synth.takeaway || ''}</div>
+      <div class="journal-box">
+        <div class="journal-label">Journal This Reading <span class="optional-tag">(optional)</span></div>
+        <textarea class="journal-input" id="journalText" placeholder="What's this bringing up for you?" rows="4">${existingEntry ? escapeHtml(existingEntry.text) : ''}</textarea>
+        <div class="journal-row">
+          <button class="btn-outline" id="journalSaveBtn">${existingEntry ? 'Update Entry' : 'Save Entry'}</button>
+          <span class="journal-status" id="journalStatus">${existingEntry ? 'Saved ✓' : ''}</span>
+        </div>
+        <div class="journal-disclaimer">Saved on this device only — lost if the app is uninstalled or you switch devices. No cloud backup.</div>
+      </div>
       <button class="btn-outline-gold" id="newReadingBtn">NEW READING</button>
     </div>`;
+  document.getElementById('journalSaveBtn').addEventListener('click', saveJournalEntry);
   document.getElementById('newReadingBtn').addEventListener('click', goHome);
+}
+
+function renderJournalHistory(root) {
+  const entries = [...journalEntries].sort((a, b) => b.timestamp - a.timestamp);
+  const rows = entries.map(e => {
+    const dateStr = new Date(e.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    return `
+      <div class="journal-item">
+        <div class="journal-item-meta">${dateStr} &middot; ${escapeHtml(e.spreadLabel)} &middot; ${escapeHtml(e.cardTitles.join(', '))}</div>
+        <div class="journal-item-text">${escapeHtml(e.text)}</div>
+      </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="screen journal-history">
+      <div class="section-label">Journal History</div>
+      ${entries.length === 0
+        ? '<div class="saved-empty">No journal entries yet — write something after a reading to save it here.</div>'
+        : `<div class="journal-list">${rows}</div>`}
+      <div class="journal-disclaimer" style="text-align:center;margin-top:18px;">Entries are saved on this device only — no cloud sync or backup.</div>
+      <button class="link-dim" id="journalBackBtn" style="margin-top:18px;align-self:center;">Back to spreads</button>
+    </div>`;
+  document.getElementById('journalBackBtn').addEventListener('click', goHome);
 }
 
 // ── About the Breathwork modal (Stage 1b) ────────────────────────────────
