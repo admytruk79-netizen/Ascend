@@ -385,6 +385,7 @@ function renderReading(root) {
         <div class="reading-title-rule"></div>
       </div>
       <div class="breath-timer">
+        <button class="breath-info-btn" id="breathInfoBtn" aria-label="About the breathwork">?</button>
         <div class="breath-circle-wrap"><div class="breath-circle" id="breathCircle"></div></div>
         <div class="breath-phase-label" id="breathPhaseLabel">BREATHE</div>
         <div class="breath-controls">
@@ -405,6 +406,7 @@ function renderReading(root) {
 
   document.getElementById('tabGrounded').addEventListener('click', () => switchTab('grounded'));
   document.getElementById('tabSpirit').addEventListener('click', () => switchTab('spirit'));
+  document.getElementById('breathInfoBtn').addEventListener('click', openBreathInfoModal);
   document.getElementById('nextCardBtn').addEventListener('click', nextCard);
   const backCardBtn = document.getElementById('backCardBtn');
   if (backCardBtn) backCardBtn.addEventListener('click', prevCard);
@@ -427,6 +429,11 @@ function renderSynthesis(root) {
     </div>`;
   document.getElementById('newReadingBtn').addEventListener('click', goHome);
 }
+
+// ── About the Breathwork modal (Stage 1b) ────────────────────────────────
+function openBreathInfoModal() { document.getElementById('breathInfoOverlay').classList.add('active'); }
+function closeBreathInfoModal() { document.getElementById('breathInfoOverlay').classList.remove('active'); }
+document.getElementById('breathInfoCloseBtn').addEventListener('click', closeBreathInfoModal);
 
 // ── Google Play Billing wiring ──────────────────────────────────────────
 // Wired up last and fully isolated: if window.AscendBilling is missing or
