@@ -48,19 +48,51 @@ function markIntroSeen() {
   try { localStorage.setItem(INTRO_SEEN_KEY, 'true'); } catch (e) {}
 }
 
+// ── SAVED CARDS (Stage 2) ───────────────────────────────────────────────
+const SAVED_CARDS_KEY = 'ascend_saved_cards';
+function loadSavedCards() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SAVED_CARDS_KEY) || '[]');
+    return new Set(Array.isArray(raw) ? raw : []);
+  } catch (e) { return new Set(); }
+}
+function persistSavedCards() {
+  try { localStorage.setItem(SAVED_CARDS_KEY, JSON.stringify([...savedCardNums])); } catch (e) {}
+}
+function isCardSaved(num) { return savedCardNums.has(num); }
+function toggleSaved(num) {
+  if (savedCardNums.has(num)) savedCardNums.delete(num); else savedCardNums.add(num);
+  persistSavedCards();
+}
+
+let savedCardNums = loadSavedCards();
 let subscribed = false;
-let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | reading | synthesis
+let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | reading | synthesis | saved
 let expandedKey = null; // which spread row is expanded inline on Home
 let pendingUnlockKey = null; // spread waiting on a verified purchase before drawing
 let spreadKey = null;
 let drawnCards = [];
 let cardIndex = 0;
 let activeTab = 'grounded';
+let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
 
 function isSubscribed() { return subscribed; }
 
 function goHome() {
-  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null;
+  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false;
+  render();
+}
+
+function goToSavedCards() {
+  screen = 'saved';
+  render();
+}
+
+function openSavedCard(num) {
+  const card = CARDS.find(c => c.num === num);
+  if (!card) return;
+  spreadKey = null; drawnCards = [card]; cardIndex = 0; activeTab = 'grounded'; readingPreviewOnly = true;
+  screen = 'reading';
   render();
 }
 
@@ -83,7 +115,7 @@ function drawFor(key) {
     const idx = Math.floor(Math.random() * pool.length);
     picked.push(pool.splice(idx, 1)[0]);
   }
-  spreadKey = key; drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded'; expandedKey = null;
+  spreadKey = key; drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded'; expandedKey = null; readingPreviewOnly = false;
   render();
 }
 
@@ -156,6 +188,7 @@ function render() {
   if (screen === 'home') return renderHome(root);
   if (screen === 'reading') return renderReading(root);
   if (screen === 'synthesis') return renderSynthesis(root);
+  if (screen === 'saved') return renderSavedCards(root);
 }
 
 function renderIntro(root) {
@@ -215,12 +248,16 @@ function renderHome(root) {
 
   root.innerHTML = `
     <div class="screen home">
-      <div class="tagline">Practice, not prediction.</div>
+      <div class="home-top-row">
+        <div class="tagline">Practice, not prediction.</div>
+        <button class="saved-entry-btn" id="savedEntryBtn">&#9733; Saved${savedCardNums.size ? ' (' + savedCardNums.size + ')' : ''}</button>
+      </div>
       <div class="section-label">Choose a spread</div>
       <div class="spread-list">${rows}</div>
       ${!isSubscribed() ? '<div style="text-align:center;margin-top:22px;"><button class="link-dim" id="restoreBtn">Already a member? Restore purchase</button></div>' : ''}
     </div>`;
 
+  document.getElementById('savedEntryBtn').addEventListener('click', goToSavedCards);
   root.querySelectorAll('[data-toggle]').forEach(el => {
     el.addEventListener('click', () => toggleSpread(el.getAttribute('data-toggle')));
   });
@@ -393,10 +430,13 @@ function renderReading(root) {
 
   const phaseColor = colorFor(current.phase);
 
+  const saved = isCardSaved(current.num);
+
   root.innerHTML = `
     <div class="screen reading">
       ${showThread ? `<div class="thread-row">${threadDots}</div>` : ''}
       <div class="reading-meta">
+        <button class="save-star-btn ${saved ? 'saved' : ''}" id="saveStarBtn" aria-label="Save card">${saved ? '&#9733;' : '&#9734;'}</button>
         ${position ? `<div class="reading-position">${position}</div>` : ''}
         <div class="reading-num-row">
           <span class="reading-num-dot" style="background:${phaseColor}"></span>
@@ -420,19 +460,68 @@ function renderReading(root) {
       </div>
       <div id="tabPanel">${activeTab === 'grounded' ? groundedPanelHtml(current) : spiritPanelHtml(current)}</div>
       <div class="reading-nav">
-        ${cardIndex > 0 ? '<button class="btn-outline" id="backCardBtn">BACK</button>' : ''}
-        <button class="btn-next" id="nextCardBtn">${nextLabel}</button>
+        ${readingPreviewOnly
+          ? '<button class="btn-next" id="doneBtn">DONE</button>'
+          : (cardIndex > 0 ? '<button class="btn-outline" id="backCardBtn">BACK</button>' : '') + `<button class="btn-next" id="nextCardBtn">${nextLabel}</button>`}
       </div>
     </div>`;
 
   document.getElementById('tabGrounded').addEventListener('click', () => switchTab('grounded'));
   document.getElementById('tabSpirit').addEventListener('click', () => switchTab('spirit'));
   document.getElementById('breathInfoBtn').addEventListener('click', openBreathInfoModal);
-  document.getElementById('nextCardBtn').addEventListener('click', nextCard);
-  const backCardBtn = document.getElementById('backCardBtn');
-  if (backCardBtn) backCardBtn.addEventListener('click', prevCard);
+  document.getElementById('saveStarBtn').addEventListener('click', () => {
+    toggleSaved(current.num);
+    const btn = document.getElementById('saveStarBtn');
+    const nowSaved = isCardSaved(current.num);
+    btn.innerHTML = nowSaved ? '&#9733;' : '&#9734;';
+    btn.classList.toggle('saved', nowSaved);
+  });
+  if (readingPreviewOnly) {
+    document.getElementById('doneBtn').addEventListener('click', goToSavedCards);
+  } else {
+    document.getElementById('nextCardBtn').addEventListener('click', nextCard);
+    const backCardBtn = document.getElementById('backCardBtn');
+    if (backCardBtn) backCardBtn.addEventListener('click', prevCard);
+  }
 
   startBreathTimer(current);
+}
+
+function renderSavedCards(root) {
+  const saved = CARDS.filter(c => savedCardNums.has(c.num)).sort((a, b) => a.num - b.num);
+  const rows = saved.map(c => `
+    <div class="saved-row" data-num="${c.num}">
+      <span class="saved-dot" style="background:${colorFor(c.phase)}"></span>
+      <div class="saved-row-body">
+        <div class="saved-row-title">${c.title}</div>
+        <div class="saved-row-sub">№ ${c.num} &middot; ${phaseNameFor(c.phase)}</div>
+      </div>
+      <button class="saved-unstar-btn" data-num="${c.num}" aria-label="Remove from saved">&#9733;</button>
+    </div>`).join('');
+
+  root.innerHTML = `
+    <div class="screen saved">
+      <div class="section-label">Saved Cards</div>
+      ${saved.length === 0
+        ? '<div class="saved-empty">No saved cards yet — tap the star on any card reading to save it here.</div>'
+        : `<div class="saved-list">${rows}</div>`}
+      <button class="link-dim" id="savedBackBtn" style="margin-top:22px;align-self:center;">Back to spreads</button>
+    </div>`;
+
+  root.querySelectorAll('.saved-row').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.saved-unstar-btn')) return;
+      openSavedCard(Number(el.getAttribute('data-num')));
+    });
+  });
+  root.querySelectorAll('.saved-unstar-btn').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSaved(Number(el.getAttribute('data-num')));
+      renderSavedCards(root);
+    });
+  });
+  document.getElementById('savedBackBtn').addEventListener('click', goHome);
 }
 
 function renderSynthesis(root) {

@@ -71,7 +71,13 @@
 
   /* ---- HOME ---- */
   .home { padding: 8px 24px 40px; }
-  .tagline { font: italic 400 15px/1.5 'Cormorant Garamond', serif; color: rgba(243,236,217,.6); margin-bottom: 28px; }
+  .home-top-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
+  .tagline { font: italic 400 15px/1.5 'Cormorant Garamond', serif; color: rgba(243,236,217,.6); }
+  .saved-entry-btn {
+    flex: none; font: 600 10.5px/1 'Inter', sans-serif; letter-spacing: .5px; color: var(--gold);
+    background: transparent; border: 1px solid rgba(196,168,74,.35); border-radius: 14px; padding: 7px 12px; cursor: pointer;
+    white-space: nowrap;
+  }
   .section-label {
     font: 600 10px/1 'Inter', sans-serif; letter-spacing: 2.5px; color: rgba(243,236,217,.4);
     text-transform: uppercase; margin-bottom: 14px;
@@ -118,7 +124,13 @@
   .reading { padding: 6px 24px 28px; }
   .thread-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
   .thread-row span { width: 8px; height: 8px; border-radius: 50%; }
-  .reading-meta { text-align: center; margin-bottom: 16px; }
+  .reading-meta { position: relative; text-align: center; margin-bottom: 16px; }
+  .save-star-btn {
+    position: absolute; top: -6px; right: 0; width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: transparent; color: rgba(243,236,217,.4); font-size: 19px; line-height: 30px;
+    cursor: pointer; padding: 0;
+  }
+  .save-star-btn.saved { color: var(--gold); }
   .reading-position { font: 600 10px/1 'Inter', sans-serif; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
   .reading-num-row { display: flex; align-items: center; justify-content: center; gap: 7px; margin-bottom: 10px; }
   .reading-num-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
@@ -242,6 +254,23 @@
   .btn-outline-gold {
     padding: 14px 20px; border-radius: 24px; border: 1px solid rgba(196,168,74,.5); background: transparent;
     color: var(--gold); font: 600 12px/1 'Inter', sans-serif; letter-spacing: 1.5px; cursor: pointer;
+  }
+
+  /* ---- SAVED CARDS ---- */
+  .saved { padding: 8px 24px 40px; }
+  .saved-empty { font: 13px/1.6 'Inter', sans-serif; color: rgba(243,236,217,.5); text-align: center; margin-top: 40px; }
+  .saved-list { display: flex; flex-direction: column; gap: 10px; }
+  .saved-row {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); cursor: pointer;
+  }
+  .saved-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .saved-row-body { flex: 1; }
+  .saved-row-title { font: 500 15px/1.2 'Cormorant Garamond', serif; color: var(--cream); }
+  .saved-row-sub { font: 11px/1.4 'Inter', sans-serif; color: rgba(243,236,217,.45); margin-top: 3px; }
+  .saved-unstar-btn {
+    flex: none; width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
+    color: var(--gold); font-size: 16px; cursor: pointer; padding: 0;
   }
 </style>
 </head>
