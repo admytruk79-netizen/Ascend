@@ -125,15 +125,29 @@
   .reading-num { font: 10px/1 'Inter', sans-serif; letter-spacing: 1.5px; color: rgba(243,236,217,.4); text-transform: uppercase; }
   .reading-title { font: 500 26px/1.25 'Cormorant Garamond', serif; text-shadow: 0 2px 20px rgba(196,168,74,.15); }
   .reading-title-rule { width: 36px; height: 1px; background: linear-gradient(90deg,transparent,rgba(196,168,74,.6),transparent); margin: 12px auto 0; }
-  .breathe-strip {
-    display: flex; align-items: center; gap: 10px; justify-content: center; padding: 11px 18px;
+  @keyframes naturalBreathPulse {
+    0%, 100% { transform: scale(0.85); opacity: .7; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+  .breath-timer {
+    display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 22px 18px 18px;
     border: 1px solid rgba(196,168,74,.3); border-radius: 14px;
     background: linear-gradient(160deg, rgba(196,168,74,.09), rgba(196,168,74,.03));
     box-shadow: 0 6px 18px rgba(0,0,0,.25); margin-bottom: 22px;
   }
-  .breathe-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex: none; animation: logoPulse 2.8s ease-in-out infinite; }
-  .breathe-label { font: 600 9px/1 'Inter', sans-serif; letter-spacing: 1.5px; color: var(--gold); white-space: nowrap; }
-  .breathe-text { font: 12px/1.4 'Inter', sans-serif; color: rgba(243,236,217,.7); }
+  .breath-circle-wrap { width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; }
+  .breath-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(196,168,74,.65), rgba(196,168,74,.18));
+    border: 1.5px solid rgba(196,168,74,.6); transform: scale(1);
+  }
+  .breath-circle.natural { animation: naturalBreathPulse 4s ease-in-out infinite; }
+  .breath-phase-label { font: 600 10px/1 'Inter', sans-serif; letter-spacing: 1.5px; color: var(--gold); white-space: nowrap; text-transform: uppercase; }
+  .breath-controls { display: flex; gap: 10px; }
+  .breath-ctrl-btn {
+    font: 600 10px/1 'Inter', sans-serif; letter-spacing: 1px; padding: 8px 16px; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.15); background: transparent; color: var(--cream); cursor: pointer;
+  }
   .tab-switch {
     display: flex; gap: 4px; margin-bottom: 16px; background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 4px;

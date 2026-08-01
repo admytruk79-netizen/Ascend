@@ -107,7 +107,16 @@ function requestUnlock(key) {
     });
 }
 
-function setTab(tab) { activeTab = tab; render(); }
+// Deliberately does NOT call render() — a full re-render would tear down
+// and restart the breath timer's DOM/animation every time the user just
+// switches tabs. Only the tab panel + button classes are touched.
+function switchTab(tab) {
+  activeTab = tab;
+  const current = drawnCards[cardIndex];
+  document.getElementById('tabGrounded').classList.toggle('active', tab === 'grounded');
+  document.getElementById('tabSpirit').classList.toggle('active', tab === 'spirit');
+  document.getElementById('tabPanel').innerHTML = tab === 'grounded' ? groundedPanelHtml(current) : spiritPanelHtml(current);
+}
 
 function nextCard() {
   if (cardIndex < drawnCards.length - 1) { cardIndex += 1; activeTab = 'grounded'; }
@@ -135,6 +144,12 @@ function composeSynthesis(cards) {
 
 // ── RENDER ───────────────────────────────────────────────────────────────
 function render() {
+  // A full re-render always tears down and rebuilds the current screen's
+  // DOM, including a running breath timer's circle element — stop it
+  // first so its setTimeout chain doesn't keep firing against detached
+  // nodes. renderReading() below starts a fresh one if the new screen is
+  // still 'reading' (e.g. moving to the next card).
+  stopBreathTimer();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
   const root = document.getElementById('screen');
   if (screen === 'intro') return renderIntro(root);
@@ -228,6 +243,119 @@ function renderHome(root) {
   }
 }
 
+function groundedPanelHtml(current) {
+  const phaseColor = colorFor(current.phase);
+  return `
+    <div class="grounded-panel">
+      <div class="grounded-phase-edge" style="background:${phaseColor}"></div>
+      <div class="grounded-quality">${current.tested_quality || ''}</div>
+      <div class="grounded-where">${current.grounded_where || ''}</div>
+      <div class="grounded-rule"></div>
+      <div class="grounded-sublabel grounded-supported-label">&#10003; When it's supported</div>
+      <div class="grounded-subtext">${current.grounded_supported || ''}</div>
+      <div class="grounded-sublabel grounded-resisted-label">&#10005; When it's resisted</div>
+      <div class="grounded-subtext" style="margin-bottom:0;">${current.grounded_resisted || ''}</div>
+    </div>`;
+}
+function spiritPanelHtml(current) {
+  return `
+    <div class="spirit-panel">
+      <div class="spirit-glyph">&#10018;</div>
+      <div class="spirit-phrase">"${current.phrase}"</div>
+      <div class="spirit-interp">${current.interpretation}</div>
+      <div class="spirit-rule"></div>
+      <div class="spirit-med-label">Meditation</div>
+      <div class="spirit-med-text">${current.meditation}</div>
+    </div>`;
+}
+
+// ── BREATH TIMER (Stage 1) ──────────────────────────────────────────────
+// Cards 36/77/79/83/90/108 describe breath in natural language, not counts
+// — they get a soft, unstructured pulse with no visible numbers instead.
+const NATURAL_BREATH_CARDS = new Set([36, 77, 79, 83, 90, 108]);
+const BREATH_AUTO_CYCLES = 3; // full cycles played automatically before settling into "replay"
+
+function parseBreathPhases(card) {
+  if (NATURAL_BREATH_CARDS.has(card.num)) return null;
+  const m = (card.breathing || '').match(/^([\d-]+)\s*count/i);
+  if (!m) return null;
+  const nums = m[1].split('-').map(n => parseInt(n, 10)).filter(n => !isNaN(n) && n > 0);
+  if (nums.length < 2) return null;
+  let names;
+  if (nums.length === 2) names = ['Inhale', 'Exhale'];
+  else if (nums.length === 3) names = ['Inhale', 'Hold', 'Exhale'];
+  else if (nums.length === 4) names = ['Inhale', 'Hold', 'Exhale', 'Hold'];
+  else names = nums.map((_, i) => (i === nums.length - 1 ? 'Exhale' : (i % 2 === 0 ? 'Inhale' : 'Hold')));
+  return nums.map((seconds, i) => ({ name: names[i] || 'Hold', seconds }));
+}
+
+let breathStopFn = null;
+function stopBreathTimer() {
+  if (breathStopFn) { breathStopFn(); breathStopFn = null; }
+}
+
+function startBreathTimer(card) {
+  const circle = document.getElementById('breathCircle');
+  const label = document.getElementById('breathPhaseLabel');
+  const skipBtn = document.getElementById('breathSkipBtn');
+  const replayBtn = document.getElementById('breathReplayBtn');
+  if (!circle) return;
+
+  function showPlayingState() {
+    if (skipBtn) skipBtn.style.display = '';
+    if (replayBtn) replayBtn.style.display = 'none';
+  }
+  function showStoppedState() {
+    if (skipBtn) skipBtn.style.display = 'none';
+    if (replayBtn) replayBtn.style.display = '';
+  }
+
+  const phases = parseBreathPhases(card);
+
+  if (!phases) {
+    circle.className = 'breath-circle natural';
+    circle.style.transition = ''; circle.style.transform = ''; circle.style.opacity = '';
+    if (label) label.textContent = 'BREATHE NATURALLY';
+    showPlayingState();
+    breathStopFn = () => { circle.className = 'breath-circle'; };
+    if (skipBtn) skipBtn.onclick = () => { stopBreathTimer(); showStoppedState(); };
+    if (replayBtn) replayBtn.onclick = () => startBreathTimer(card);
+    return;
+  }
+
+  circle.className = 'breath-circle';
+  let phaseIndex = 0, cycleCount = 0, stopped = false;
+
+  function step() {
+    if (stopped) return;
+    const phase = phases[phaseIndex];
+    if (label) label.textContent = phase.name.toUpperCase() + ' · ' + phase.seconds + 's';
+    circle.style.transition = `transform ${phase.seconds}s ease-in-out, opacity ${phase.seconds}s ease-in-out`;
+    if (phase.name === 'Inhale') { circle.style.transform = 'scale(1.55)'; circle.style.opacity = '1'; }
+    else if (phase.name === 'Exhale') { circle.style.transform = 'scale(0.72)'; circle.style.opacity = '.65'; }
+    // Hold: leave transform/opacity where they are, just wait out the duration.
+    setTimeout(() => {
+      if (stopped) return;
+      phaseIndex = (phaseIndex + 1) % phases.length;
+      if (phaseIndex === 0) {
+        cycleCount += 1;
+        if (cycleCount >= BREATH_AUTO_CYCLES) { stopped = true; showStoppedState(); return; }
+      }
+      step();
+    }, phase.seconds * 1000);
+  }
+
+  showPlayingState();
+  step();
+
+  breathStopFn = () => {
+    stopped = true;
+    circle.style.transition = ''; circle.style.transform = 'scale(1)'; circle.style.opacity = '1';
+  };
+  if (skipBtn) skipBtn.onclick = () => { stopBreathTimer(); showStoppedState(); };
+  if (replayBtn) replayBtn.onclick = () => startBreathTimer(card);
+}
+
 function renderReading(root) {
   const current = drawnCards[cardIndex];
   const positions = POSITIONS[spreadKey];
@@ -256,45 +384,32 @@ function renderReading(root) {
         <div class="reading-title">${current.title}</div>
         <div class="reading-title-rule"></div>
       </div>
-      <div class="breathe-strip">
-        <span class="breathe-dot"></span>
-        <div class="breathe-label">BREATHE</div>
-        <div class="breathe-text">${current.breathing}</div>
+      <div class="breath-timer">
+        <div class="breath-circle-wrap"><div class="breath-circle" id="breathCircle"></div></div>
+        <div class="breath-phase-label" id="breathPhaseLabel">BREATHE</div>
+        <div class="breath-controls">
+          <button class="breath-ctrl-btn" id="breathSkipBtn">Skip</button>
+          <button class="breath-ctrl-btn" id="breathReplayBtn" style="display:none;">Replay</button>
+        </div>
       </div>
       <div class="tab-switch">
         <button class="tab-btn ${activeTab === 'grounded' ? 'active' : ''}" id="tabGrounded">GROUNDED</button>
         <button class="tab-btn ${activeTab === 'spirit' ? 'active' : ''}" id="tabSpirit">SPIRIT</button>
       </div>
-      ${activeTab === 'grounded' ? `
-        <div class="grounded-panel">
-          <div class="grounded-phase-edge" style="background:${phaseColor}"></div>
-          <div class="grounded-quality">${current.tested_quality || ''}</div>
-          <div class="grounded-where">${current.grounded_where || ''}</div>
-          <div class="grounded-rule"></div>
-          <div class="grounded-sublabel grounded-supported-label">&#10003; When it's supported</div>
-          <div class="grounded-subtext">${current.grounded_supported || ''}</div>
-          <div class="grounded-sublabel grounded-resisted-label">&#10005; When it's resisted</div>
-          <div class="grounded-subtext" style="margin-bottom:0;">${current.grounded_resisted || ''}</div>
-        </div>` : `
-        <div class="spirit-panel">
-          <div class="spirit-glyph">&#10018;</div>
-          <div class="spirit-phrase">"${current.phrase}"</div>
-          <div class="spirit-interp">${current.interpretation}</div>
-          <div class="spirit-rule"></div>
-          <div class="spirit-med-label">Meditation</div>
-          <div class="spirit-med-text">${current.meditation}</div>
-        </div>`}
+      <div id="tabPanel">${activeTab === 'grounded' ? groundedPanelHtml(current) : spiritPanelHtml(current)}</div>
       <div class="reading-nav">
         ${cardIndex > 0 ? '<button class="btn-outline" id="backCardBtn">BACK</button>' : ''}
         <button class="btn-next" id="nextCardBtn">${nextLabel}</button>
       </div>
     </div>`;
 
-  document.getElementById('tabGrounded').addEventListener('click', () => setTab('grounded'));
-  document.getElementById('tabSpirit').addEventListener('click', () => setTab('spirit'));
+  document.getElementById('tabGrounded').addEventListener('click', () => switchTab('grounded'));
+  document.getElementById('tabSpirit').addEventListener('click', () => switchTab('spirit'));
   document.getElementById('nextCardBtn').addEventListener('click', nextCard);
   const backCardBtn = document.getElementById('backCardBtn');
   if (backCardBtn) backCardBtn.addEventListener('click', prevCard);
+
+  startBreathTimer(current);
 }
 
 function renderSynthesis(root) {
