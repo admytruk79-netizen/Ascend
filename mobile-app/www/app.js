@@ -289,6 +289,25 @@ function parseBreathPhases(card) {
   return nums.map((seconds, i) => ({ name: names[i] || 'Hold', seconds }));
 }
 
+// Stage 1b: subtle per-category tone/motion, derived straight from the
+// already-parsed phases — no new data needed. Balance (equal inhale/exhale,
+// e.g. box-breathing cards) intentionally stays the plain default look.
+const BREATH_CATEGORY_STYLE = {
+  expansive: { easing: 'cubic-bezier(.25,.85,.35,1)', inhaleScale: 1.65, exhaleScale: 0.78 },
+  grounding: { easing: 'cubic-bezier(.55,0,.25,1)', inhaleScale: 1.5, exhaleScale: 0.68 },
+  balance:   { easing: 'ease-in-out', inhaleScale: 1.55, exhaleScale: 0.72 },
+};
+function breathCategoryFor(phases) {
+  let inhale = 0, exhale = 0;
+  phases.forEach(p => {
+    if (p.name === 'Inhale') inhale += p.seconds;
+    else if (p.name === 'Exhale') exhale += p.seconds;
+  });
+  if (inhale > exhale) return 'expansive';
+  if (exhale > inhale) return 'grounding';
+  return 'balance';
+}
+
 let breathStopFn = null;
 function stopBreathTimer() {
   if (breathStopFn) { breathStopFn(); breathStopFn = null; }
@@ -323,16 +342,18 @@ function startBreathTimer(card) {
     return;
   }
 
-  circle.className = 'breath-circle';
+  const category = breathCategoryFor(phases);
+  const style = BREATH_CATEGORY_STYLE[category];
+  circle.className = 'breath-circle category-' + category;
   let phaseIndex = 0, cycleCount = 0, stopped = false;
 
   function step() {
     if (stopped) return;
     const phase = phases[phaseIndex];
     if (label) label.textContent = phase.name.toUpperCase() + ' · ' + phase.seconds + 's';
-    circle.style.transition = `transform ${phase.seconds}s ease-in-out, opacity ${phase.seconds}s ease-in-out`;
-    if (phase.name === 'Inhale') { circle.style.transform = 'scale(1.55)'; circle.style.opacity = '1'; }
-    else if (phase.name === 'Exhale') { circle.style.transform = 'scale(0.72)'; circle.style.opacity = '.65'; }
+    circle.style.transition = `transform ${phase.seconds}s ${style.easing}, opacity ${phase.seconds}s ${style.easing}`;
+    if (phase.name === 'Inhale') { circle.style.transform = `scale(${style.inhaleScale})`; circle.style.opacity = '1'; }
+    else if (phase.name === 'Exhale') { circle.style.transform = `scale(${style.exhaleScale})`; circle.style.opacity = '.65'; }
     // Hold: leave transform/opacity where they are, just wait out the duration.
     setTimeout(() => {
       if (stopped) return;
