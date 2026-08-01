@@ -27,12 +27,40 @@ const SPREADS = [
   { key: 'three', count: 3, label: 'Three Card Draw', sub: 'Grounded in / moving through / opening toward', free: false },
   { key: 'five', count: 5, label: 'Five Card Draw', sub: 'A fuller arc across the phases.', free: false },
   { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false },
+  { key: 'seasonal', count: 4, label: 'Seasonal Attunement', sub: 'A four-direction reading tuned to where you are in the yearly cycle.', free: false },
 ];
 const POSITIONS = {
   three: ['Grounded In', 'Moving Through', 'Opening Toward'],
   five: ['Foundation', 'Friction', 'Turning Point', 'Integration', 'Emerging Direction'],
 };
 const HUES = { 1: 238, 2: 266, 3: 294, 4: 322, 5: 38 };
+
+// ── SEASONAL ATTUNEMENT — position labels and closing synthesis are fixed ──
+// per season (not generated), position order is always East → South →
+// West → North. Season defaults from the device's calendar date but is
+// user-overridable on the Drawing step.
+const SEASONS = {
+  spring: { label: 'Spring – Awakening', positions: ['Dawn', 'Growth', 'Expansion', 'Foundation'] },
+  summer: { label: 'Summer – Radiance', positions: ['Peak Energy', 'Full Expression', 'Sharing Light', 'Grounded Power'] },
+  autumn: { label: 'Autumn – Harvest', positions: ['Wisdom Gathered', 'Balance Achieved', 'Letting Go', 'Deep Roots'] },
+  winter: { label: 'Winter – Contemplation', positions: ['Inner Light', 'Quiet Strength', 'Deep Rest', 'Hidden Wisdom'] },
+};
+const SEASON_SYNTHESIS = {
+  spring: "What's emerging (East) needs the growth you're already in motion with (South) to take real shape — but check it against what's actually beautiful/working right now (West), not just what's new. North tells you what's holding the whole thing up; if that foundation is shaky, slow the emergence down until it's solid.",
+  summer: "You're at peak output right now (East), and South shows what that peak looks like when fully expressed — not held back. West is where that energy is meant to go, who or what it's for. But North is the check: without that grounded power, the intensity burns out. Read North as your limit, not your fuel.",
+  autumn: "East shows what you've actually learned this cycle — not what you hoped to learn. South is whether things are in balance now, honestly. West is the hardest position: what has to be let go for the harvest to be worth anything. North is what survives the release — the root system that carries you into winter.",
+  winter: "East and South are internal — the quiet truth you're sitting with and the strength that's actually holding you, not performing strength. West says where you need real rest, not distraction. North is the one to watch: something is forming under the surface that isn't ready to be named yet. Don't force it into words too early.",
+};
+function currentSeasonKey() {
+  const month = new Date().getMonth() + 1; // 1-12
+  if (month >= 3 && month <= 5) return 'spring';
+  if (month >= 6 && month <= 8) return 'summer';
+  if (month >= 9 && month <= 11) return 'autumn';
+  return 'winter';
+}
+function seasonalSynthesisText() {
+  return { headline: SEASONS[selectedSeason].label, sub: null, takeaway: SEASON_SYNTHESIS[selectedSeason] };
+}
 
 function hueFor(phaseNum) { return HUES[phaseNum] ?? 264; }
 function colorFor(phaseNum) { return `oklch(0.65 0.1 ${hueFor(phaseNum)})`; }
@@ -93,6 +121,7 @@ let drawnCards = [];
 let cardIndex = 0;
 let activeTab = 'grounded';
 let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
+let selectedSeason = currentSeasonKey(); // Seasonal Attunement — user-overridable on the Drawing step
 
 function isSubscribed() { return subscribed; }
 
@@ -279,6 +308,13 @@ function renderHome(root) {
         </div>` : `
         <div class="spread-expand-content">
           <div class="spread-expand-rule"></div>
+          ${s.key === 'seasonal' ? `
+          <div class="season-select-row">
+            <label class="season-select-label" for="seasonSelect">Season</label>
+            <select class="season-select" id="seasonSelect">
+              ${Object.keys(SEASONS).map(k => `<option value="${k}" ${k === selectedSeason ? 'selected' : ''}>${SEASONS[k].label}</option>`).join('')}
+            </select>
+          </div>` : ''}
           <button class="btn-gold-block" id="drawBtn-${s.key}" data-key="${s.key}" ${CARDS.length === 0 ? 'disabled' : ''}>DRAW ${s.count} CARD${plural}</button>
           ${CARDS.length === 0 ? '<div class="locked-fineprint" style="color:#e0a0a0;margin-top:8px;">Card data failed to load.</div>' : ''}
         </div>`;
@@ -321,6 +357,11 @@ function renderHome(root) {
   root.querySelectorAll('[id^="drawBtn-"]').forEach(el => {
     el.addEventListener('click', (e) => { e.stopPropagation(); drawFor(el.getAttribute('data-key')); });
   });
+  const seasonSelect = document.getElementById('seasonSelect');
+  if (seasonSelect) {
+    seasonSelect.addEventListener('click', (e) => e.stopPropagation());
+    seasonSelect.addEventListener('change', (e) => { e.stopPropagation(); selectedSeason = seasonSelect.value; });
+  }
   root.querySelectorAll('[id^="unlockBtn-"]').forEach(el => {
     el.addEventListener('click', (e) => { e.stopPropagation(); requestUnlock(el.getAttribute('data-key')); });
   });
@@ -473,7 +514,7 @@ function startBreathTimer(card) {
 
 function renderReading(root) {
   const current = drawnCards[cardIndex];
-  const positions = POSITIONS[spreadKey];
+  const positions = spreadKey === 'seasonal' ? SEASONS[selectedSeason].positions : POSITIONS[spreadKey];
   const position = positions ? positions[cardIndex] : null;
   const showThread = drawnCards.length > 1;
 
@@ -582,7 +623,7 @@ function renderSavedCards(root) {
 }
 
 function renderSynthesis(root) {
-  const synth = composeSynthesis(drawnCards);
+  const synth = spreadKey === 'seasonal' ? seasonalSynthesisText() : composeSynthesis(drawnCards);
   const dots = drawnCards.map(c => `<span class="dot" style="background:${colorFor(c.phase)}"></span><span class="line"></span>`).join('');
 
   const existingEntry = currentJournalId ? journalEntries.find(e => e.id === currentJournalId) : null;
