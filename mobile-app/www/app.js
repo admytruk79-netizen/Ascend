@@ -481,12 +481,18 @@ function stopBreathTimer() {
   if (breathStopFn) { breathStopFn(); breathStopFn = null; }
 }
 
+let breathCountdownInterval = null;
+function clearBreathCountdown() {
+  if (breathCountdownInterval) { clearInterval(breathCountdownInterval); breathCountdownInterval = null; }
+}
+
 function startBreathTimer(card) {
   const circle = document.getElementById('breathCircle');
   const label = document.getElementById('breathPhaseLabel');
   const skipBtn = document.getElementById('breathSkipBtn');
   const replayBtn = document.getElementById('breathReplayBtn');
   if (!circle) return;
+  clearBreathCountdown();
 
   function showPlayingState() {
     if (skipBtn) skipBtn.style.display = '';
@@ -518,12 +524,20 @@ function startBreathTimer(card) {
   function step() {
     if (stopped) return;
     const phase = phases[phaseIndex];
-    if (label) label.textContent = phase.name.toUpperCase() + ' · ' + phase.seconds + 's';
+    let secondsLeft = phase.seconds;
+    if (label) label.textContent = phase.name.toUpperCase() + ' · ' + secondsLeft + 's';
+    clearBreathCountdown();
+    breathCountdownInterval = setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft <= 0) { clearBreathCountdown(); return; }
+      if (label) label.textContent = phase.name.toUpperCase() + ' · ' + secondsLeft + 's';
+    }, 1000);
     circle.style.transition = `transform ${phase.seconds}s ${style.easing}, opacity ${phase.seconds}s ${style.easing}`;
     if (phase.name === 'Inhale') { circle.style.transform = `scale(${style.inhaleScale})`; circle.style.opacity = '1'; }
     else if (phase.name === 'Exhale') { circle.style.transform = `scale(${style.exhaleScale})`; circle.style.opacity = '.65'; }
     // Hold: leave transform/opacity where they are, just wait out the duration.
     setTimeout(() => {
+      clearBreathCountdown();
       if (stopped) return;
       phaseIndex = (phaseIndex + 1) % phases.length;
       if (phaseIndex === 0) {
@@ -539,6 +553,7 @@ function startBreathTimer(card) {
 
   breathStopFn = () => {
     stopped = true;
+    clearBreathCountdown();
     circle.style.transition = ''; circle.style.transform = 'scale(1)'; circle.style.opacity = '1';
   };
   if (skipBtn) skipBtn.onclick = () => { stopBreathTimer(); showStoppedState(); };
