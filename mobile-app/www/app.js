@@ -68,13 +68,6 @@ function phaseNameFor(phaseNum) { const p = PHASES.find(x => x.num === phaseNum)
 function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 
 // ── STATE ────────────────────────────────────────────────────────────────
-const INTRO_SEEN_KEY = 'ascend_intro_seen';
-function introAlreadySeen() {
-  try { return localStorage.getItem(INTRO_SEEN_KEY) === 'true'; } catch (e) { return false; }
-}
-function markIntroSeen() {
-  try { localStorage.setItem(INTRO_SEEN_KEY, 'true'); } catch (e) {}
-}
 
 // ── SAVED CARDS (Stage 2) ───────────────────────────────────────────────
 const SAVED_CARDS_KEY = 'ascend_saved_cards';
@@ -113,7 +106,7 @@ let currentJournalId = null; // ties Save-Entry on Synthesis to one entry per dr
 
 let savedCardNums = loadSavedCards();
 let subscribed = false;
-let screen = introAlreadySeen() ? 'home' : 'intro'; // intro | home | reading | synthesis | saved | journal
+let screen = 'intro'; // intro | home | reading | synthesis | saved | journal — always opens on intro
 let expandedKey = null; // which spread row is expanded inline on Home
 let pendingUnlockKey = null; // spread waiting on a verified purchase before drawing
 let spreadKey = null;
@@ -209,7 +202,6 @@ function openSavedCard(num) {
 }
 
 function beginFromIntro() {
-  markIntroSeen();
   goHome();
 }
 
