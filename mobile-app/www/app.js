@@ -123,7 +123,39 @@ let activeTab = 'grounded';
 let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
 let selectedSeason = currentSeasonKey(); // Seasonal Attunement — user-overridable on the Drawing step
 
-function isSubscribed() { return subscribed; }
+// ── TESTER UNLOCK ────────────────────────────────────────────────────────
+// A hidden way for internal testers to access every spread without going
+// through a real Google Play purchase. Tap the "ASCEND KEYS" wordmark 5
+// times within 3 seconds to bring up a code prompt. Purely a local flag —
+// never touches AscendBilling/`subscribed`, so it can't be confused with a
+// real purchase.
+const TESTER_ACCESS_CODE = 'ASCEND2026';
+const TESTER_UNLOCK_KEY = 'ascend_tester_unlock';
+function loadTesterUnlock() {
+  try { return localStorage.getItem(TESTER_UNLOCK_KEY) === 'true'; } catch (e) { return false; }
+}
+let testerUnlocked = loadTesterUnlock();
+let wordmarkTapCount = 0;
+let wordmarkTapTimer = null;
+function handleWordmarkTap() {
+  wordmarkTapCount += 1;
+  clearTimeout(wordmarkTapTimer);
+  wordmarkTapTimer = setTimeout(() => { wordmarkTapCount = 0; }, 3000);
+  if (wordmarkTapCount >= 5) {
+    wordmarkTapCount = 0;
+    const entered = prompt('Tester access code:');
+    if (entered && entered.trim().toUpperCase() === TESTER_ACCESS_CODE) {
+      testerUnlocked = true;
+      try { localStorage.setItem(TESTER_UNLOCK_KEY, 'true'); } catch (e) {}
+      alert('Tester access unlocked — every spread is now free on this device.');
+      render();
+    } else if (entered !== null) {
+      alert('Not a valid code.');
+    }
+  }
+}
+
+function isSubscribed() { return subscribed || testerUnlocked; }
 
 function goHome() {
   screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false;
@@ -160,7 +192,7 @@ function saveJournalEntry() {
     currentJournalId = entry.id;
   }
   persistJournalEntries();
-  if (statusEl) statusEl.textContent = 'Saved ✓';
+  if (statusEl) statusEl.textContent = 'Saved';
 }
 
 function goToSavedCards() {
@@ -238,6 +270,7 @@ function nextCard() {
 }
 function prevCard() {
   if (cardIndex > 0) { cardIndex -= 1; activeTab = 'grounded'; render(); }
+  else { goHome(); } // BACK on the first card abandons the draw and returns to Home
 }
 
 function composeSynthesis(cards) {
@@ -386,9 +419,9 @@ function groundedPanelHtml(current) {
       <div class="grounded-quality">${current.tested_quality || ''}</div>
       <div class="grounded-where">${current.grounded_where || ''}</div>
       <div class="grounded-rule"></div>
-      <div class="grounded-sublabel grounded-supported-label">&#10003; When it's supported</div>
+      <div class="grounded-sublabel grounded-supported-label"><span class="marker-dot marker-dot-supported"></span>When it's supported</div>
       <div class="grounded-subtext">${current.grounded_supported || ''}</div>
-      <div class="grounded-sublabel grounded-resisted-label">&#10005; When it's resisted</div>
+      <div class="grounded-sublabel grounded-resisted-label"><span class="marker-dot marker-dot-resisted"></span>When it's resisted</div>
       <div class="grounded-subtext" style="margin-bottom:0;">${current.grounded_resisted || ''}</div>
     </div>`;
 }
@@ -560,7 +593,7 @@ function renderReading(root) {
       <div class="reading-nav">
         ${readingPreviewOnly
           ? '<button class="btn-next" id="doneBtn">DONE</button>'
-          : (cardIndex > 0 ? '<button class="btn-outline" id="backCardBtn">BACK</button>' : '') + `<button class="btn-next" id="nextCardBtn">${nextLabel}</button>`}
+          : '<button class="btn-outline" id="backCardBtn">BACK</button>' + `<button class="btn-next" id="nextCardBtn">${nextLabel}</button>`}
       </div>
     </div>`;
 
@@ -640,7 +673,7 @@ function renderSynthesis(root) {
         <textarea class="journal-input" id="journalText" placeholder="What's this bringing up for you?" rows="4">${existingEntry ? escapeHtml(existingEntry.text) : ''}</textarea>
         <div class="journal-row">
           <button class="btn-outline" id="journalSaveBtn">${existingEntry ? 'Update Entry' : 'Save Entry'}</button>
-          <span class="journal-status" id="journalStatus">${existingEntry ? 'Saved ✓' : ''}</span>
+          <span class="journal-status" id="journalStatus">${existingEntry ? 'Saved' : ''}</span>
         </div>
         <div class="journal-disclaimer">Saved on this device only — lost if the app is uninstalled or you switch devices. No cloud backup.</div>
       </div>
@@ -677,6 +710,7 @@ function renderJournalHistory(root) {
 function openBreathInfoModal() { document.getElementById('breathInfoOverlay').classList.add('active'); }
 function closeBreathInfoModal() { document.getElementById('breathInfoOverlay').classList.remove('active'); }
 document.getElementById('breathInfoCloseBtn').addEventListener('click', closeBreathInfoModal);
+document.getElementById('wordmark').addEventListener('click', handleWordmarkTap);
 
 // ── Google Play Billing wiring ──────────────────────────────────────────
 // Wired up last and fully isolated: if window.AscendBilling is missing or
@@ -700,6 +734,28 @@ try {
   window.AscendBilling.init();
 } catch (e) {
   console.error('AscendBilling setup failed:', e);
+}
+
+// ── Hardware/gesture back button (Android) ──────────────────────────────
+// Without this, Android's back gesture just exits the app from any screen,
+// since this is a single-page app with no browser history to step through.
+// Route it through the same in-app navigation a visible Back button would
+// use; only exit at the true top level (Home, nothing open over it).
+try {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+      if (document.getElementById('breathInfoOverlay').classList.contains('active')) {
+        closeBreathInfoModal();
+        return;
+      }
+      if (screen === 'reading') { readingPreviewOnly ? goToSavedCards() : prevCard(); return; }
+      if (screen === 'synthesis' || screen === 'saved' || screen === 'journal') { goHome(); return; }
+      if (screen === 'home') { window.Capacitor.Plugins.App.exitApp(); return; }
+      // 'intro' — no back target, let the hardware button do nothing.
+    });
+  }
+} catch (e) {
+  console.error('Back button wiring failed:', e);
 }
 
 render();

@@ -216,6 +216,9 @@
   .grounded-sublabel { font: 600 9px/1 'Inter', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 7px; }
   .grounded-supported-label { color: var(--supported); }
   .grounded-resisted-label { color: var(--resisted); }
+  .marker-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .marker-dot-supported { background: var(--supported); }
+  .marker-dot-resisted { background: var(--resisted); }
   .grounded-subtext { font: 13.5px/1.55 'Inter', sans-serif; margin-bottom: 16px; }
   .spirit-panel {
     position: relative; border: 1px solid rgba(196,168,74,.35); border-radius: 14px; padding: 26px 22px;
@@ -316,7 +319,7 @@
 
 <div id="app">
   <div class="header">
-    <div class="wordmark">ASCEND KEYS</div>
+    <div class="wordmark" id="wordmark">ASCEND KEYS</div>
     <div class="member-pill" id="memberPill" style="display:none;">MEMBER</div>
   </div>
   <div id="screen"></div>
