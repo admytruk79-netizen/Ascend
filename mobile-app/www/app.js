@@ -34,6 +34,101 @@ const POSITIONS = {
   five: ['Foundation', 'Friction', 'Turning Point', 'Integration', 'Emerging Direction'],
 };
 const HUES = { 1: 238, 2: 266, 3: 294, 4: 322, 5: 38 };
+const WILDCARD_HUE = 85; // distinct warm gold — not one of the 5 phase hues
+
+// ── BONUS / WILDCARD DECK (12 cards) ────────────────────────────────────
+// Unnumbered, outside the core 108 (num 1001+ is just an internal unique
+// key — never shown in the UI). Eligible in every spread's random draw,
+// since every spread here is a free-draw spread (no fixed-position
+// protocol referencing exact core-deck numbers exists in this app).
+// phase: null marks a card as a wildcard everywhere phase is checked
+// (hue/color, phase name, the "№ N ·" reading header).
+const WILDCARD_CARDS = [
+  { num: 1001, phase: null, isWildcard: true, title: 'The Digital Boundary', phrase: 'Presence is chosen, not defaulted into', breathing: '4-6 count (the rhythm of conscious withdrawal)',
+    tested_quality: 'Reclaiming Attention', grounded_where: 'Something pulling your focus in small, constant pieces rather than one big distraction.',
+    grounded_supported: 'You notice the pull before you act on it, and choose where your attention actually goes.',
+    grounded_resisted: 'Reaching for the phone/screen as a reflex to avoid an uncomfortable feeling underneath.',
+    spirit_title: 'The Quiet Channel', interpretation: "The noise you let in shapes the noise you generate. Silence is not empty — it's where signal becomes audible.",
+    spirit_supported: 'Real insight arriving in the gaps you left unfilled.', spirit_resisted: 'Mistaking constant stimulation for aliveness.' },
+
+  { num: 1002, phase: null, isWildcard: true, title: 'The Creative Threshold', phrase: 'The block is a door, not a wall', breathing: '6-6 count (the rhythm of even patience)',
+    tested_quality: 'Working Through Resistance', grounded_where: 'The gap between wanting to make something and actually starting.',
+    grounded_supported: 'Starting badly on purpose, letting the first attempt be rough so momentum can build.',
+    grounded_resisted: 'Waiting for the "right" moment or perfect idea before beginning anything.',
+    spirit_title: 'The Unmade Form', interpretation: "What wants to come through you isn't fully yours — you're a channel it moves through, not its sole author.",
+    spirit_supported: "Trusting the work before you can see where it's going.", spirit_resisted: 'Gripping the outcome so tightly nothing new can enter.' },
+
+  { num: 1003, phase: null, isWildcard: true, title: 'The Flow Of Resources', phrase: "Abundance circulates, it doesn't accumulate", breathing: '5-3 count (the rhythm of open hands)',
+    tested_quality: 'Financial Clarity', grounded_where: 'Your actual relationship to money right now — not what you wish it was.',
+    grounded_supported: 'Making a decision about money from clarity instead of fear or avoidance.',
+    grounded_resisted: 'Either hoarding out of scarcity or spending to numb anxiety about scarcity.',
+    spirit_title: 'The River, Not The Reservoir', interpretation: 'What you have is meant to move — held too tightly, even good fortune stagnates.',
+    spirit_supported: 'Giving or receiving without keeping score.', spirit_resisted: 'Equating your worth with your net worth.' },
+
+  { num: 1004, phase: null, isWildcard: true, title: 'The Unfinished Grief', phrase: 'What was loved leaves a shape that stays', breathing: '4-8 count (the rhythm of slow release)',
+    tested_quality: 'Sitting With Loss', grounded_where: "A loss — of a person, a phase, a version of yourself — that hasn't been fully felt yet.",
+    grounded_supported: 'Letting the grief move through you in its own time, without rushing to "get over it."',
+    grounded_resisted: 'Staying busy specifically to avoid the feeling underneath.',
+    spirit_title: 'The Sacred Wound', interpretation: "Grief is love with nowhere left to go — it doesn't need fixing, it needs witness.",
+    spirit_supported: 'Finding that the ache softens into tenderness rather than staying sharp.', spirit_resisted: "Believing that feeling better means the loss didn't matter." },
+
+  { num: 1005, phase: null, isWildcard: true, title: 'The Permission To Rest', phrase: 'Stillness is productive too', breathing: '4-4 count (the rhythm of simple rest)',
+    tested_quality: 'Rest as Resistance', grounded_where: "Your body or mind signaling a need to stop that you've been overriding.",
+    grounded_supported: 'Resting before exhaustion forces it, treating rest as maintenance, not reward.',
+    grounded_resisted: "Only allowing rest after collapse, or feeling guilty when you're not producing.",
+    spirit_title: 'The Fallow Field', interpretation: "Nothing grows in a field that's never left alone. Dormancy is part of the cycle, not a failure of it.",
+    spirit_supported: "Trusting that nothing is being lost while you're still.", spirit_resisted: "Confusing stillness with stagnation and forcing motion you're not ready for." },
+
+  { num: 1006, phase: null, isWildcard: true, title: 'The Unguarded Laugh', phrase: 'Lightness is not the opposite of depth', breathing: '3-3 count (the rhythm of easy breath)',
+    tested_quality: 'Joy Without Justification', grounded_where: "A moment of genuine lightness that doesn't need to be earned or explained.",
+    grounded_supported: 'Letting yourself enjoy something fully, without immediately looking for the catch.',
+    grounded_resisted: 'Treating seriousness as more spiritually valid than play.',
+    spirit_title: 'The Cosmic Joke', interpretation: 'Even the most sacred systems contain absurdity — the ability to laugh at yourself is a sign of real humility.',
+    spirit_supported: 'Holding your own process lightly enough to keep going.', spirit_resisted: 'Taking your own spiritual identity so seriously it becomes rigid.' },
+
+  { num: 1007, phase: null, isWildcard: true, title: 'The Slow Unfolding', phrase: 'Not everything ready is finished', breathing: '7-7 count (the rhythm of long patience)',
+    tested_quality: 'Patience With Timing', grounded_where: 'Something progressing slower than you want it to.',
+    grounded_supported: 'Continuing to show up for a process without demanding it speed up.',
+    grounded_resisted: 'Forcing a premature outcome because waiting feels unbearable.',
+    spirit_title: 'The Long Arc', interpretation: 'Some transformations are geological, not immediate — measured in seasons, not days.',
+    spirit_supported: "Feeling settled inside a timeline you don't fully control.", spirit_resisted: 'Interpreting slowness as a sign that something is wrong.' },
+
+  { num: 1008, phase: null, isWildcard: true, title: 'The Honest Voice', phrase: 'The unspoken word costs more than the spoken one', breathing: '5-5 count (the rhythm of steady courage)',
+    tested_quality: 'Saying the True Thing', grounded_where: "A truth you've been softening, delaying, or avoiding saying out loud.",
+    grounded_supported: "Speaking clearly and kindly, even when it's uncomfortable.",
+    grounded_resisted: 'Staying silent to keep the peace at the cost of honesty.',
+    spirit_title: 'The Word That Creates', interpretation: 'What you speak shapes what becomes real — silence around truth lets distortion take root.',
+    spirit_supported: 'Your words matching your actual internal state.', spirit_resisted: 'Performing agreement while privately resenting it.' },
+
+  { num: 1009, phase: null, isWildcard: true, title: 'The Release Of Blame', phrase: 'Forgiveness is a door you open from your own side', breathing: '6-4 count (the rhythm of letting down the guard)',
+    tested_quality: 'Self-Forgiveness', grounded_where: "A mistake or failure you're still punishing yourself for.",
+    grounded_supported: "Extending yourself the same understanding you'd give a friend in the same situation.",
+    grounded_resisted: 'Using self-criticism as a substitute for actual change.',
+    spirit_title: 'The Unclenched Fist', interpretation: 'Holding resentment — toward yourself or another — keeps you tied to the very thing you want to be free of.',
+    spirit_supported: 'Feeling the grip loosen, not because the event stopped mattering, but because it stopped controlling you.', spirit_resisted: 'Mistaking forgiveness for approval of what happened.' },
+
+  { num: 1010, phase: null, isWildcard: true, title: 'The Signal In The Noise', phrase: 'Clarity is subtraction, not addition', breathing: '4-4-4 count (the rhythm of centered stillness)',
+    tested_quality: 'Cutting Through Confusion', grounded_where: 'Too many inputs, opinions, or options making a simple decision feel complicated.',
+    grounded_supported: 'Removing options until only the true priority remains visible.',
+    grounded_resisted: 'Adding more research or advice instead of trusting what you already know.',
+    spirit_title: 'The Still Point', interpretation: 'Underneath every noisy question is a quiet, already-known answer.',
+    spirit_supported: 'Recognizing the answer that was there before you asked.', spirit_resisted: 'Drowning out your own knowing with outside noise.' },
+
+  { num: 1011, phase: null, isWildcard: true, title: 'The Generous Field', phrase: 'What circulates freely returns amplified', breathing: '5-7 count (the rhythm of expansive giving)',
+    tested_quality: 'Practical Abundance', grounded_where: 'An opportunity to give — time, resources, attention — without depleting yourself.',
+    grounded_supported: 'Giving from surplus and genuine want-to, not obligation.',
+    grounded_resisted: 'Over-giving to the point of resentment or burnout.',
+    spirit_title: 'The Overflowing Cup', interpretation: "True abundance isn't about having more — it's about the cup being full enough to spill.",
+    spirit_supported: 'Feeling that generosity costs you nothing real.', spirit_resisted: 'Giving as a way to earn worth or avoid guilt.' },
+
+  { num: 1012, phase: null, isWildcard: true, title: 'The Light Touch', phrase: 'Hold it loosely and it will hold together', breathing: '3-6 count (the rhythm of relaxed control)',
+    tested_quality: 'Loosening the Grip', grounded_where: 'Something you’ve been trying to control that would benefit from being held more loosely.',
+    grounded_supported: 'Doing your part fully, then releasing attachment to the exact outcome.',
+    grounded_resisted: 'Micromanaging a process or person out of fear of what happens if you let go.',
+    spirit_title: 'The Open Hand', interpretation: 'Grasping creates friction; open hands let things move as they need to.',
+    spirit_supported: 'Trusting a larger intelligence in the unfolding.', spirit_resisted: 'Equating control with safety.' },
+];
+function findCardByNum(num) { return CARDS.find(c => c.num === num) || WILDCARD_CARDS.find(c => c.num === num); }
 
 // ── SEASONAL ATTUNEMENT — position labels and closing synthesis are fixed ──
 // per season (not generated), position order is always East → South →
@@ -62,7 +157,7 @@ function seasonalSynthesisText() {
   return { headline: SEASONS[selectedSeason].label, sub: null, takeaway: SEASON_SYNTHESIS[selectedSeason] };
 }
 
-function hueFor(phaseNum) { return HUES[phaseNum] ?? 264; }
+function hueFor(phaseNum) { return phaseNum == null ? WILDCARD_HUE : (HUES[phaseNum] ?? 264); }
 function colorFor(phaseNum) { return `oklch(0.65 0.1 ${hueFor(phaseNum)})`; }
 
 // Design trend #1: phase-tinted ambient background. Reuses the same
@@ -82,7 +177,11 @@ function applyPhaseTint() {
   }
   document.documentElement.style.setProperty('--phase-tint', tint);
 }
-function phaseNameFor(phaseNum) { const p = PHASES.find(x => x.num === phaseNum); return p ? p.name : ''; }
+function phaseNameFor(phaseNum) {
+  if (phaseNum == null) return 'Wildcard';
+  const p = PHASES.find(x => x.num === phaseNum);
+  return p ? p.name : '';
+}
 function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 
 // ── STATE ────────────────────────────────────────────────────────────────
@@ -220,7 +319,7 @@ function goToSavedCards() {
 }
 
 function openSavedCard(num) {
-  const card = CARDS.find(c => c.num === num);
+  const card = findCardByNum(num);
   if (!card) return;
   spreadKey = null; drawnCards = [card]; cardIndex = 0; activeTab = 'grounded'; readingPreviewOnly = true;
   screen = 'reading';
@@ -239,7 +338,10 @@ function toggleSpread(key) {
 function drawFor(key) {
   if (CARDS.length === 0) return;
   const s = spreadByKey(key);
-  const pool = [...CARDS];
+  // Every spread here is a free-draw spread (no fixed-position protocol
+  // referencing exact core-deck numbers exists), so the 12 wildcards are
+  // eligible in every draw, mixed into the same pool as the core 108.
+  const pool = [...CARDS, ...WILDCARD_CARDS];
   const picked = [];
   for (let i = 0; i < s.count && pool.length; i++) {
     const idx = Math.floor(Math.random() * pool.length);
@@ -454,14 +556,26 @@ function groundedPanelHtml(current) {
     </div>`;
 }
 function spiritPanelHtml(current) {
+  // Core 108 cards end the Spirit tab with a Meditation line. The wildcard
+  // deck instead mirrors the Grounded tab's Supported/Resisted structure
+  // on the Spirit side too — different content shape, same visual pattern.
+  const wildcardSpirit = current.spirit_supported && current.spirit_resisted;
   return `
     <div class="spirit-panel">
       <div class="spirit-glyph">&#10018;</div>
+      ${current.spirit_title ? `<div class="spirit-title-label">${current.spirit_title}</div>` : ''}
       <div class="spirit-phrase">"${current.phrase}"</div>
       <div class="spirit-interp">${current.interpretation}</div>
       <div class="spirit-rule"></div>
-      <div class="spirit-med-label">Meditation</div>
-      <div class="spirit-med-text">${current.meditation}</div>
+      ${wildcardSpirit ? `
+        <div class="spirit-sublabel spirit-supported-label">When it's supported</div>
+        <div class="spirit-subtext">${current.spirit_supported}</div>
+        <div class="spirit-sublabel spirit-resisted-label">When it's resisted</div>
+        <div class="spirit-subtext" style="margin-bottom:0;">${current.spirit_resisted}</div>
+      ` : `
+        <div class="spirit-med-label">Meditation</div>
+        <div class="spirit-med-text">${current.meditation}</div>
+      `}
     </div>`;
 }
 
@@ -679,7 +793,7 @@ function renderReading(root) {
         ${position ? `<div class="reading-position">${position}</div>` : ''}
         <div class="reading-num-row">
           <span class="reading-num-dot" style="background:${phaseColor}"></span>
-          <div class="reading-num">№ ${current.num} &middot; ${phaseNameFor(current.phase)}</div>
+          <div class="reading-num">${current.isWildcard ? 'WILDCARD' : '№ ' + current.num + ' &middot; ' + phaseNameFor(current.phase)}</div>
         </div>
         <div class="reading-title">${current.title}</div>
         <div class="reading-title-rule"></div>
@@ -727,13 +841,13 @@ function renderReading(root) {
 }
 
 function renderSavedCards(root) {
-  const saved = CARDS.filter(c => savedCardNums.has(c.num)).sort((a, b) => a.num - b.num);
+  const saved = [...CARDS, ...WILDCARD_CARDS].filter(c => savedCardNums.has(c.num)).sort((a, b) => a.num - b.num);
   const rows = saved.map(c => `
     <div class="saved-row" data-num="${c.num}">
       <span class="saved-dot" style="background:${colorFor(c.phase)}"></span>
       <div class="saved-row-body">
         <div class="saved-row-title">${c.title}</div>
-        <div class="saved-row-sub">№ ${c.num} &middot; ${phaseNameFor(c.phase)}</div>
+        <div class="saved-row-sub">${c.isWildcard ? 'Wildcard' : '№ ' + c.num + ' &middot; ' + phaseNameFor(c.phase)}</div>
       </div>
       <button class="saved-unstar-btn" data-num="${c.num}" aria-label="Remove from saved">&#9733;</button>
     </div>`).join('');
