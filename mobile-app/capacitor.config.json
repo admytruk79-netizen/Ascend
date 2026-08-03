@@ -1,0 +1,8 @@
+{
+  "appId": "com.ascend.invisiblestrike",
+  "appName": "Invisible Strike",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}
