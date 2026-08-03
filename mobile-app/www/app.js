@@ -114,6 +114,14 @@ let drawnCards = [];
 let cardIndex = 0;
 let activeTab = 'grounded';
 let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
+let revealCard = null; // card pending a hold-to-reveal, single-card draws only
+const REVEAL_HOLD_MS = 2000;
+
+function beginReveal(card) {
+  revealCard = card;
+  screen = 'revealing';
+  render();
+}
 let selectedSeason = currentSeasonKey(); // Seasonal Attunement — user-overridable on the Drawing step
 
 // ── TESTER UNLOCK ────────────────────────────────────────────────────────
@@ -219,8 +227,16 @@ function drawFor(key) {
     const idx = Math.floor(Math.random() * pool.length);
     picked.push(pool.splice(idx, 1)[0]);
   }
-  spreadKey = key; drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded'; expandedKey = null; readingPreviewOnly = false;
+  spreadKey = key; expandedKey = null; readingPreviewOnly = false;
   currentJournalId = null; // fresh draw — Save Entry on Synthesis should create a new entry, not edit the last one
+  if (s.count === 1) {
+    // Single-card draws get the hold-to-reveal ritual; multi-card spreads
+    // stay instant — holding through 5-9 cards in a row would be pure
+    // friction, not ritual.
+    beginReveal(picked[0]);
+    return;
+  }
+  drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
   render();
 }
 
@@ -292,6 +308,7 @@ function render() {
   const root = document.getElementById('screen');
   if (screen === 'intro') return renderIntro(root);
   if (screen === 'home') return renderHome(root);
+  if (screen === 'revealing') return renderRevealing(root);
   if (screen === 'reading') return renderReading(root);
   if (screen === 'synthesis') return renderSynthesis(root);
   if (screen === 'saved') return renderSavedCards(root);
@@ -552,6 +569,71 @@ function startBreathTimer(card) {
   if (replayBtn) replayBtn.onclick = () => startBreathTimer(card);
 }
 
+function renderRevealing(root) {
+  const s = spreadByKey(spreadKey);
+  root.innerHTML = `
+    <div class="screen revealing">
+      <div class="reveal-circle-wrap" id="revealCircleWrap">
+        <svg class="reveal-ring" viewBox="0 0 120 120">
+          <circle class="reveal-ring-bg" cx="60" cy="60" r="54"></circle>
+          <circle class="reveal-ring-fg" id="revealRingFg" cx="60" cy="60" r="54"></circle>
+        </svg>
+        <div class="reveal-shimmer" id="revealShimmer"></div>
+        <div class="reveal-card-back" id="revealCardBack"><div class="card-back-mono">AK</div></div>
+      </div>
+      <div class="reveal-spread-label">${s.label}</div>
+      <div class="reveal-label" id="revealLabel">HOLD &middot; 2S</div>
+      <button class="link-dim" id="revealBackBtn">Back</button>
+    </div>`;
+
+  const wrap = document.getElementById('revealCircleWrap');
+  const circle = document.getElementById('revealCardBack');
+  const ring = document.getElementById('revealRingFg');
+  const shimmer = document.getElementById('revealShimmer');
+  const label = document.getElementById('revealLabel');
+
+  const circumference = 2 * Math.PI * 54;
+  ring.style.strokeDasharray = String(circumference);
+  ring.style.strokeDashoffset = String(circumference);
+
+  let holdTimer = null;
+
+  function startHold(e) {
+    if (e.cancelable) e.preventDefault();
+    if (holdTimer) return;
+    circle.classList.add('pressed');
+    shimmer.classList.add('active');
+    label.textContent = 'HOLD…';
+    ring.style.transition = `stroke-dashoffset ${REVEAL_HOLD_MS}ms linear`;
+    ring.style.strokeDashoffset = '0';
+    try { if (navigator.vibrate) navigator.vibrate([0, 30, 40, 40, 50, 50, 60, 60]); } catch (err) {}
+    holdTimer = setTimeout(completeReveal, REVEAL_HOLD_MS);
+  }
+  function cancelHold() {
+    if (!holdTimer) return;
+    clearTimeout(holdTimer); holdTimer = null;
+    circle.classList.remove('pressed');
+    shimmer.classList.remove('active');
+    label.textContent = 'HOLD · 2S';
+    ring.style.transition = 'stroke-dashoffset .25s ease';
+    ring.style.strokeDashoffset = String(circumference);
+  }
+  function completeReveal() {
+    holdTimer = null;
+    try { if (navigator.vibrate) navigator.vibrate(120); } catch (err) {}
+    const card = revealCard;
+    revealCard = null;
+    drawnCards = [card]; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
+    render();
+  }
+
+  wrap.addEventListener('pointerdown', startHold);
+  wrap.addEventListener('pointerup', cancelHold);
+  wrap.addEventListener('pointerleave', cancelHold);
+  wrap.addEventListener('pointercancel', cancelHold);
+  document.getElementById('revealBackBtn').addEventListener('click', () => { revealCard = null; goHome(); });
+}
+
 function renderReading(root) {
   const current = drawnCards[cardIndex];
   const positions = spreadKey === 'seasonal' ? SEASONS[selectedSeason].positions : POSITIONS[spreadKey];
@@ -756,7 +838,7 @@ try {
         return;
       }
       if (screen === 'reading') { readingPreviewOnly ? goToSavedCards() : prevCard(); return; }
-      if (screen === 'synthesis' || screen === 'saved' || screen === 'journal') { goHome(); return; }
+      if (screen === 'revealing' || screen === 'synthesis' || screen === 'saved' || screen === 'journal') { revealCard = null; goHome(); return; }
       if (screen === 'home') { window.Capacitor.Plugins.App.exitApp(); return; }
       // 'intro' — no back target, let the hardware button do nothing.
     });
