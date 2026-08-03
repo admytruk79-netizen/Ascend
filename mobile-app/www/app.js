@@ -64,6 +64,24 @@ function seasonalSynthesisText() {
 
 function hueFor(phaseNum) { return HUES[phaseNum] ?? 264; }
 function colorFor(phaseNum) { return `oklch(0.65 0.1 ${hueFor(phaseNum)})`; }
+
+// Design trend #1: phase-tinted ambient background. Reuses the same
+// per-phase hue already driving the dots/edges/breath-timer color — just
+// applied, very faintly, to the whole screen's background while a card is
+// actually being read. Everywhere else falls back to the original neutral
+// gold tint. No CSS transition on this: animating a gradient's color via a
+// custom property doesn't reliably interpolate across WebView versions, it
+// just snaps either way — safer to accept the instant swap than ship a
+// "transition" that silently does nothing (or worse, stutters) on some
+// devices.
+const DEFAULT_PHASE_TINT = 'rgba(196,168,74,.08)';
+function applyPhaseTint() {
+  let tint = DEFAULT_PHASE_TINT;
+  if (screen === 'reading' && drawnCards[cardIndex]) {
+    tint = `oklch(0.65 0.1 ${hueFor(drawnCards[cardIndex].phase)} / 0.09)`;
+  }
+  document.documentElement.style.setProperty('--phase-tint', tint);
+}
 function phaseNameFor(phaseNum) { const p = PHASES.find(x => x.num === phaseNum); return p ? p.name : ''; }
 function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 
@@ -304,6 +322,7 @@ function render() {
   // nodes. renderReading() below starts a fresh one if the new screen is
   // still 'reading' (e.g. moving to the next card).
   stopBreathTimer();
+  applyPhaseTint();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
   const root = document.getElementById('screen');
   if (screen === 'intro') return renderIntro(root);

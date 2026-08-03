@@ -13,6 +13,7 @@
     --cream: #F3ECD9;
     --parchment: #F6F1E4; --ink: #241D0F;
     --supported: #5a7a3a; --resisted: #a3492f; --quality: #8a6d1f;
+    --phase-tint: rgba(196,168,74,.08);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg1); }
@@ -21,7 +22,7 @@
     color: var(--cream);
     min-height: 100vh;
     background:
-      radial-gradient(ellipse 700px 400px at 50% 0%, rgba(196,168,74,.08), transparent 60%),
+      radial-gradient(ellipse 700px 400px at 50% 0%, var(--phase-tint), transparent 60%),
       linear-gradient(180deg, var(--bg2), var(--bg1));
     display: flex;
     justify-content: center;
@@ -87,6 +88,7 @@
   .spread-card {
     border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
     overflow: hidden; transition: border-color .3s ease;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
   .spread-card.expanded { border-color: rgba(196,168,74,.4); }
   .spread-row {
@@ -220,7 +222,8 @@
   /* ---- MODAL (About the Breathwork) ---- */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 300; align-items: center; justify-content: center;
-    background: rgba(6,7,16,.86); padding: 24px;
+    background: rgba(6,7,16,.7); padding: 24px;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
   .modal-overlay.active { display: flex; }
   .modal-card {
