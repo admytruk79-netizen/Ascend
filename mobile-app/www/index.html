@@ -33,6 +33,16 @@
 
   #app { width: 100%; max-width: 480px; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
 
+  /* Design trend: film-grain overlay, site-wide. Generated inline as an SVG
+     fractal-noise data URI rather than a bundled PNG — no extra asset,
+     scales/tiles cleanly at any density. Kept to ~4% opacity so it reads
+     as texture, not visible static; pointer-events:none so it never
+     blocks taps on whatever's underneath. */
+  .grain-overlay {
+    position: fixed; inset: 0; z-index: 5; pointer-events: none; opacity: .045;
+    background-repeat: repeat; background-size: 140px 140px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
   .header { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 10px; }
   .wordmark { font: 600 13px/1 'Cinzel', serif; letter-spacing: 3px; color: var(--gold); }
   .member-pill {
@@ -179,7 +189,14 @@
   .reading-num-row { display: flex; align-items: center; justify-content: center; gap: 7px; margin-bottom: 10px; }
   .reading-num-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
   .reading-num { font: 10px/1 'Inter', sans-serif; letter-spacing: 1.5px; color: rgba(243,236,217,.4); text-transform: uppercase; }
-  .reading-title { font: 500 26px/1.25 'Cormorant Garamond', serif; text-shadow: 0 2px 20px rgba(196,168,74,.15); }
+  @keyframes kineticTitleIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reading-title {
+    font: 500 26px/1.25 'Cormorant Garamond', serif; text-shadow: 0 2px 20px rgba(196,168,74,.15);
+    animation: kineticTitleIn .38s cubic-bezier(.2,.8,.2,1) both; animation-delay: .05s;
+  }
   .reading-title-rule { width: 36px; height: 1px; background: linear-gradient(90deg,transparent,rgba(196,168,74,.6),transparent); margin: 12px auto 0; }
   @keyframes naturalBreathPulse {
     0%, 100% { transform: scale(0.85); opacity: .7; }
@@ -344,6 +361,7 @@
 </head>
 <body>
 
+<div class="grain-overlay" aria-hidden="true"></div>
 <div id="js-error-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:9999; background:#c0392b; color:#fff; padding:14px; font-family:monospace; font-size:13px; line-height:1.4; word-break:break-word;"></div>
 <script>
   function showJsErrorBanner(text) {
