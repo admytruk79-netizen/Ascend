@@ -73,10 +73,13 @@ app still works, just without purchasing.
 `.github/workflows/android-build.yml` builds the app on GitHub's runners:
 
 - **`debug` job** runs automatically on every push touching `mobile-app/**`.
-  It runs `npx cap sync android` + `./gradlew assembleDebug` and uploads the
-  resulting debug APK as a workflow artifact (Actions tab → the run → Artifacts).
-  Sideload that APK on any Android phone (enable "install unknown apps") to
-  try the app without installing anything locally.
+  It runs `npx cap sync android` + `./gradlew assembleDebug`, uploads the
+  resulting debug APK as a workflow artifact (Actions tab → the run →
+  Artifacts), and also publishes it to a GitHub Release tagged
+  `debug-v<versionCode>-run<N>` (repo's Releases page) so it's easy to find
+  and download without digging through Actions runs. Sideload that APK on
+  any Android phone (enable "install unknown apps") to try the app without
+  installing anything locally.
 - **`release` job** builds a signed `.aab` for Play Console. It only runs when
   triggered manually (Actions tab → "Android build" → "Run workflow"), and
   needs four repo secrets set first — see below.
