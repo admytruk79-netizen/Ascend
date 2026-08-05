@@ -169,7 +169,7 @@ function colorFor(phaseNum) { return `oklch(0.65 0.1 ${hueFor(phaseNum)})`; }
 // just snaps either way — safer to accept the instant swap than ship a
 // "transition" that silently does nothing (or worse, stutters) on some
 // devices.
-const DEFAULT_PHASE_TINT = 'rgba(196,168,74,.08)';
+const DEFAULT_PHASE_TINT = 'rgba(var(--gold-rgb),.08)';
 function applyPhaseTint() {
   let tint = DEFAULT_PHASE_TINT;
   if (screen === 'reading' && drawnCards[cardIndex]) {
@@ -202,6 +202,41 @@ function toggleSaved(num) {
   if (savedCardNums.has(num)) savedCardNums.delete(num); else savedCardNums.add(num);
   persistSavedCards();
 }
+
+// ── DAY / NIGHT MODE ──────────────────────────────────────────────────────
+// Auto by device clock (day: 6am-6pm local time) with a manual override the
+// user can cycle through a header toggle. No background time-tracking —
+// re-evaluated only when applyThemeMode() runs (on render and on toggle tap).
+const THEME_MODE_KEY = 'ascend_theme_mode';
+function loadThemeMode() {
+  const raw = localStorage.getItem(THEME_MODE_KEY);
+  return (raw === 'day' || raw === 'night') ? raw : 'auto';
+}
+function persistThemeMode(mode) {
+  try { localStorage.setItem(THEME_MODE_KEY, mode); } catch (e) {}
+}
+function isDaytime() {
+  const h = new Date().getHours();
+  return h >= 6 && h < 18;
+}
+function effectiveThemeMode() {
+  return themeMode === 'auto' ? (isDaytime() ? 'day' : 'night') : themeMode;
+}
+function applyThemeMode() {
+  document.documentElement.setAttribute('data-mode', effectiveThemeMode());
+  const btn = document.getElementById('themeToggleBtn');
+  if (!btn) return;
+  const eff = effectiveThemeMode();
+  const glyph = eff === 'day' ? '&#9728;' : '&#9790;';
+  const label = themeMode === 'auto' ? 'AUTO' : (themeMode === 'day' ? 'DAY' : 'NIGHT');
+  btn.innerHTML = glyph + ' ' + label;
+}
+function cycleThemeMode() {
+  themeMode = themeMode === 'auto' ? 'day' : (themeMode === 'day' ? 'night' : 'auto');
+  persistThemeMode(themeMode);
+  applyThemeMode();
+}
+let themeMode = loadThemeMode();
 
 // ── JOURNAL (Stage 4) ────────────────────────────────────────────────────
 const JOURNAL_KEY = 'ascend_journal_entries';
@@ -425,6 +460,7 @@ function render() {
   // still 'reading' (e.g. moving to the next card).
   stopBreathTimer();
   applyPhaseTint();
+  applyThemeMode();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
   const root = document.getElementById('screen');
   if (screen === 'intro') return renderIntro(root);
@@ -456,7 +492,7 @@ function renderHome(root) {
     const locked = !s.free && !isSubscribed();
     const expanded = expandedKey === s.key;
     const tag = s.free ? 'FREE' : (isSubscribed() ? 'INCLUDED' : 'MEMBERSHIP');
-    const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'rgba(196,168,74,.6)' : 'rgba(243,236,217,.35)');
+    const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'rgba(var(--gold-rgb),.6)' : 'rgba(var(--text-rgb),.45)');
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
     const plural = s.count > 1 ? 'S' : '';
 
@@ -940,6 +976,10 @@ document.getElementById('wordmark').addEventListener('click', handleWordmarkTap)
 function openAboutModal() { document.getElementById('aboutOverlay').classList.add('active'); }
 function closeAboutModal() { document.getElementById('aboutOverlay').classList.remove('active'); }
 document.getElementById('aboutCloseBtn').addEventListener('click', closeAboutModal);
+
+// ── Day/Night mode toggle ─────────────────────────────────────────────────
+document.getElementById('themeToggleBtn').addEventListener('click', cycleThemeMode);
+applyThemeMode();
 
 // ── Google Play Billing wiring ──────────────────────────────────────────
 // Wired up last and fully isolated: if window.AscendBilling is missing or
