@@ -21,6 +21,15 @@
        hold-to-reveal orb. Their text/glow must never flip to the day
        palette or it goes dark-on-dark. */
     --gold-fixed: #C4A84A; --gold-fixed-rgb: 196,168,74;
+    /* Frosted-glass tokens for the Home spread cards + header. Night gets a
+       cool, low-opacity "smoked glass" over the dark gradient; day gets a
+       much more opaque "misty glass" since a faint white overlay barely
+       reads against an already-light background. */
+    --frost-bg: rgba(255,255,255,.045);
+    --frost-bg-strong: rgba(255,255,255,.075);
+    --frost-border: rgba(255,255,255,.12);
+    --frost-highlight: rgba(255,255,255,.18);
+    --frost-blur: 14px;
   }
   /* Day mode: lighter atmosphere, deeper gold for contrast, softer glow.
      Night (default) stays the original dark/luminous palette untouched. */
@@ -30,6 +39,11 @@
     --text: var(--ink); --text-rgb: 36,29,15;
     --phase-tint: rgba(var(--gold-rgb),.12);
     --glow: .4;
+    --frost-bg: rgba(255,255,255,.5);
+    --frost-bg-strong: rgba(255,255,255,.62);
+    --frost-border: rgba(255,255,255,.75);
+    --frost-highlight: rgba(255,255,255,.95);
+    --frost-blur: 18px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg1); }
@@ -59,7 +73,13 @@
     background-repeat: repeat; background-size: 140px 140px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  .header { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 10px; }
+  .header {
+    display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 14px;
+    position: sticky; top: 0; z-index: 20;
+    background: var(--frost-bg-strong); border-bottom: 1px solid var(--frost-border);
+    backdrop-filter: blur(var(--frost-blur)); -webkit-backdrop-filter: blur(var(--frost-blur));
+    box-shadow: inset 0 -1px 0 var(--frost-highlight);
+  }
   .wordmark { font: 600 13px/1 'Cinzel', serif; letter-spacing: 3px; color: var(--gold); text-shadow: 0 0 16px rgba(var(--gold-rgb),calc(.5 * var(--glow))); }
   .member-pill {
     font: 600 9px/1 'Inter', sans-serif; letter-spacing: 1.5px; color: var(--gold);
@@ -119,11 +139,12 @@
   }
   .spread-list { display: flex; flex-direction: column; gap: 10px; }
   .spread-card {
-    border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
-    overflow: hidden; transition: border-color .3s ease;
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    position: relative; border-radius: 12px; background: var(--frost-bg); border: 1px solid var(--frost-border);
+    overflow: hidden; transition: border-color .3s ease, background .3s ease;
+    backdrop-filter: blur(var(--frost-blur)); -webkit-backdrop-filter: blur(var(--frost-blur));
+    box-shadow: inset 0 1px 0 var(--frost-highlight);
   }
-  .spread-card.expanded { border-color: rgba(var(--gold-rgb),.4); }
+  .spread-card.expanded { border-color: rgba(var(--gold-rgb),.4); background: var(--frost-bg-strong); }
   .spread-row {
     display: flex; align-items: center; gap: 14px; padding: 16px;
     cursor: pointer; -webkit-tap-highlight-color: transparent;
