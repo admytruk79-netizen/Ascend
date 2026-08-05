@@ -184,6 +184,142 @@ function phaseNameFor(phaseNum) {
 }
 function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 
+// ── RESONANCE ENGINE ────────────────────────────────────────────────────
+// Deterministic, explainable weighted-random draw logic — no AI, no
+// network, nothing beyond arithmetic over a local history log. Three
+// pieces:
+//  1. Recency weighting — a card drawn recently is less likely to come up
+//     again until the weighting window (RECENCY_WINDOW draws) passes.
+//  2. Phase-fairness weighting — phases under-represented relative to their
+//     natural share of the deck get a boost, over-represented phases get
+//     dampened, computed from the user's own draw history.
+//  3. Phase-arc guarantees — Five/Nine Card Draw ("a fuller arc across the
+//     phases" / "the full ascent, phase by phase") sample a fixed quota
+//     from each phase in ascending order instead of leaving coverage to
+//     chance, so the spread actually delivers the structure its label
+//     promises every time.
+// Falls back to neutral weights (equivalent to the old pure Math.random())
+// whenever there's no history yet — first launch, cleared storage, or a
+// failed localStorage write all degrade to the same safe default.
+const DRAW_HISTORY_KEY = 'ascend_draw_history';
+const DRAW_HISTORY_MAX = 200;
+const RECENCY_WINDOW = 16;
+const FAIRNESS_WINDOW = 60;
+
+function loadDrawHistory() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(DRAW_HISTORY_KEY) || '[]');
+    return Array.isArray(raw) ? raw : [];
+  } catch (e) { return []; }
+}
+function recordDraw(cards) {
+  try {
+    const history = loadDrawHistory();
+    const now = Date.now();
+    cards.forEach(c => history.push({ num: c.num, phase: c.phase == null ? null : c.phase, ts: now }));
+    const trimmed = history.slice(-DRAW_HISTORY_MAX);
+    localStorage.setItem(DRAW_HISTORY_KEY, JSON.stringify(trimmed));
+  } catch (e) {}
+}
+
+// Weight 1 = neutral. A card drawn `d` draws ago (1 = last draw) is
+// weighted down toward .15 and recovers linearly back to 1 by the time
+// RECENCY_WINDOW draws have passed since it last appeared.
+function recencyWeight(num, history) {
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].num === num) {
+      const d = history.length - i; // draws ago, 1 = immediately previous draw
+      if (d >= RECENCY_WINDOW) return 1;
+      return 0.15 + 0.85 * (d / RECENCY_WINDOW);
+    }
+  }
+  return 1; // never drawn
+}
+
+// bucketKey: a phase number (1-5) or the sentinel 'wildcard'. Compares the
+// bucket's natural share of the full pool against how often it's actually
+// come up in the last FAIRNESS_WINDOW draws, boosting under-drawn phases
+// and damping over-drawn ones. Needs a handful of data points before it
+// asserts anything — returns neutral (1) until then.
+function phaseFairnessWeight(bucketKey, history) {
+  const recent = history.slice(-FAIRNESS_WINDOW);
+  if (recent.length < 6) return 1;
+  const naturalShare = bucketKey === 'wildcard'
+    ? WILDCARD_CARDS.length / (CARDS.length + WILDCARD_CARDS.length)
+    : (PHASES.find(p => p.num === bucketKey)?.range
+        ? (PHASES.find(p => p.num === bucketKey).range[1] - PHASES.find(p => p.num === bucketKey).range[0] + 1) / CARDS.length
+        : 1 / 5);
+  const matches = bucketKey === 'wildcard'
+    ? recent.filter(e => e.phase == null).length
+    : recent.filter(e => e.phase === bucketKey).length;
+  const actualShare = matches / recent.length;
+  if (actualShare === 0) return 1.6; // never seen recently — strong boost, clamped below anyway
+  const ratio = naturalShare / actualShare;
+  return Math.max(0.5, Math.min(1.8, ratio));
+}
+
+// Picks one card out of `entries` (mutates it via splice) using the given
+// per-card weight function. Falls back to uniform if every weight is 0.
+function weightedSplicePick(entries, weightFn) {
+  const weights = entries.map(weightFn);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let threshold = total > 0 ? Math.random() * total : Math.random() * entries.length;
+  let idx = entries.length - 1;
+  for (let i = 0; i < entries.length; i++) {
+    threshold -= total > 0 ? weights[i] : 1;
+    if (threshold <= 0) { idx = i; break; }
+  }
+  return entries.splice(idx, 1)[0];
+}
+
+function pickSingleWeighted(pool, history) {
+  const entries = [...pool];
+  return weightedSplicePick(entries, c => recencyWeight(c.num, history) * phaseFairnessWeight(c.phase == null ? 'wildcard' : c.phase, history));
+}
+
+// Generic multi-pick with no phase structure (used for Seasonal Attunement,
+// which has its own position labels but no phase-arc premise to honor).
+function pickManyWeighted(pool, n, history) {
+  const entries = [...pool];
+  const picked = [];
+  for (let i = 0; i < n && entries.length; i++) {
+    picked.push(weightedSplicePick(entries, c => recencyWeight(c.num, history) * phaseFairnessWeight(c.phase == null ? 'wildcard' : c.phase, history)));
+  }
+  return picked;
+}
+
+// quota: [[phaseNum, count], ...] in the order they should appear in the
+// reading. Pulls exactly `count` cards from that phase only (recency-
+// weighted, no wildcards) — this is what makes "the full ascent, phase by
+// phase" a guarantee instead of a coincidence.
+function pickPhaseArc(quota, history) {
+  const picked = [];
+  quota.forEach(([phaseNum, count]) => {
+    const entries = CARDS.filter(c => c.phase === phaseNum);
+    for (let i = 0; i < count && entries.length; i++) {
+      picked.push(weightedSplicePick(entries, c => recencyWeight(c.num, history)));
+    }
+  });
+  return picked;
+}
+
+// Picks `n` distinct buckets (the 5 phases + a wildcard bucket) weighted by
+// phase-fairness, then one recency-weighted card from each chosen bucket —
+// guarantees a Three Card Draw reads as three different angles instead of
+// three cards that happen to land in the same phase.
+function pickDiverseBuckets(n, history) {
+  const buckets = [1, 2, 3, 4, 5, 'wildcard'];
+  const remaining = [...buckets];
+  const pickedBuckets = [];
+  for (let i = 0; i < n && remaining.length; i++) {
+    pickedBuckets.push(weightedSplicePick(remaining, b => phaseFairnessWeight(b, history)));
+  }
+  return pickedBuckets.map(b => {
+    const entries = b === 'wildcard' ? [...WILDCARD_CARDS] : CARDS.filter(c => c.phase === b);
+    return weightedSplicePick(entries, c => recencyWeight(c.num, history));
+  });
+}
+
 // ── STATE ────────────────────────────────────────────────────────────────
 
 // ── SAVED CARDS (Stage 2) ───────────────────────────────────────────────
@@ -373,15 +509,27 @@ function toggleSpread(key) {
 function drawFor(key) {
   if (CARDS.length === 0) return;
   const s = spreadByKey(key);
-  // Every spread here is a free-draw spread (no fixed-position protocol
-  // referencing exact core-deck numbers exists), so the 12 wildcards are
-  // eligible in every draw, mixed into the same pool as the core 108.
-  const pool = [...CARDS, ...WILDCARD_CARDS];
-  const picked = [];
-  for (let i = 0; i < s.count && pool.length; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    picked.push(pool.splice(idx, 1)[0]);
+  const history = loadDrawHistory();
+  let picked;
+  if (key === 'five') {
+    // "A fuller arc across the phases" — one card per phase, guaranteed.
+    picked = pickPhaseArc([[1, 1], [2, 1], [3, 1], [4, 1], [5, 1]], history);
+  } else if (key === 'nine') {
+    // "The full ascent, phase by phase" — every phase represented in
+    // ascending order; Phase 1 (only 8 cards) gets 1 slot, the rest get 2.
+    picked = pickPhaseArc([[1, 1], [2, 2], [3, 2], [4, 2], [5, 2]], history);
+  } else if (key === 'three') {
+    // Three distinct phases (or a wildcard) instead of three independent
+    // random picks that can accidentally land on near-duplicate angles.
+    picked = pickDiverseBuckets(3, history);
+  } else if (s.count === 1) {
+    picked = [pickSingleWeighted([...CARDS, ...WILDCARD_CARDS], history)];
+  } else {
+    // Seasonal Attunement: fixed position labels, no phase-arc premise to
+    // honor, so a plain recency/fairness-weighted pick is enough.
+    picked = pickManyWeighted([...CARDS, ...WILDCARD_CARDS], s.count, history);
   }
+  recordDraw(picked);
   spreadKey = key; expandedKey = null; readingPreviewOnly = false;
   currentJournalId = null; // fresh draw — Save Entry on Synthesis should create a new entry, not edit the last one
   if (s.count === 1) {
