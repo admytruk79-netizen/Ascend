@@ -151,6 +151,11 @@
   .reveal-circle-wrap {
     position: relative; width: 148px; height: 148px; display: flex; align-items: center; justify-content: center;
     cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: none;
+    /* Without this, holding the circle for the 2s gesture gets read as a
+       long-press text-selection instead, which eats the hold and leaves the
+       card stuck unrevealed (reported by a tester). user-select is
+       inherited, so this also covers the "AK" mark inside. */
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   }
   .reveal-ring { position: absolute; inset: 0; width: 148px; height: 148px; transform: rotate(-90deg); }
   .reveal-ring-bg, .reveal-ring-fg { fill: none; stroke-width: 3; }
