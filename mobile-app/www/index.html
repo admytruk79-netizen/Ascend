@@ -140,7 +140,15 @@
     transition: transform .15s ease;
   }
   .reveal-card-back.pressed { transform: scale(0.94); }
-  .reveal-card-back .card-back-mono { font: 600 13px/1 'Cinzel', serif; letter-spacing: 2px; color: var(--gold); opacity: .7; }
+  /* Concentric-ring sigil so the card back reads as a designed seal rather
+     than a plain gradient circle; sits behind the AK mark at low opacity. */
+  .reveal-card-back::before {
+    content: ''; position: absolute; inset: 10px; border-radius: 50%; pointer-events: none;
+    background:
+      radial-gradient(circle, transparent 0 38%, rgba(196,168,74,.22) 38% 39%, transparent 39% 58%, rgba(196,168,74,.16) 58% 59%, transparent 59%),
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.14), transparent 45%);
+  }
+  .reveal-card-back .card-back-mono { position: relative; font: 600 13px/1 'Cinzel', serif; letter-spacing: 2px; color: var(--gold); opacity: .7; }
   .reveal-shimmer {
     position: absolute; inset: 0; border-radius: 50%; overflow: hidden; pointer-events: none;
     opacity: 0; transition: opacity .2s ease;
@@ -213,6 +221,9 @@
     width: 52px; height: 52px; border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, rgba(196,168,74,.65), rgba(196,168,74,.18));
     border: 1.5px solid rgba(196,168,74,.6); transform: scale(1);
+    /* Glass-orb specular highlight + rim shadow, layered via box-shadow so it
+       survives the phase-tinted background swaps below untouched. */
+    box-shadow: inset 3px 4px 7px rgba(255,255,255,.4), inset -4px -5px 9px rgba(0,0,0,.3);
   }
   .breath-circle.natural { animation: naturalBreathPulse 4s ease-in-out infinite; }
   .breath-circle.category-grounding {
