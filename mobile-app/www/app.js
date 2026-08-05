@@ -505,6 +505,7 @@ function renderHome(root) {
         <div class="home-quick-links">
           <button class="saved-entry-btn" id="savedEntryBtn">&#9733; Saved${savedCardNums.size ? ' (' + savedCardNums.size + ')' : ''}</button>
           <button class="saved-entry-btn" id="journalEntryBtn">&#9998; Journal${journalEntries.length ? ' (' + journalEntries.length + ')' : ''}</button>
+          <button class="saved-entry-btn" id="aboutEntryBtn">&#9432; About</button>
         </div>
       </div>
       <div class="section-label">Choose a spread</div>
@@ -514,6 +515,7 @@ function renderHome(root) {
 
   document.getElementById('savedEntryBtn').addEventListener('click', goToSavedCards);
   document.getElementById('journalEntryBtn').addEventListener('click', goToJournalHistory);
+  document.getElementById('aboutEntryBtn').addEventListener('click', openAboutModal);
   root.querySelectorAll('[data-toggle]').forEach(el => {
     el.addEventListener('click', () => toggleSpread(el.getAttribute('data-toggle')));
   });
@@ -934,6 +936,11 @@ function closeBreathInfoModal() { document.getElementById('breathInfoOverlay').c
 document.getElementById('breathInfoCloseBtn').addEventListener('click', closeBreathInfoModal);
 document.getElementById('wordmark').addEventListener('click', handleWordmarkTap);
 
+// ── About ASCEND Keys modal ──────────────────────────────────────────────
+function openAboutModal() { document.getElementById('aboutOverlay').classList.add('active'); }
+function closeAboutModal() { document.getElementById('aboutOverlay').classList.remove('active'); }
+document.getElementById('aboutCloseBtn').addEventListener('click', closeAboutModal);
+
 // ── Google Play Billing wiring ──────────────────────────────────────────
 // Wired up last and fully isolated: if window.AscendBilling is missing or
 // throws for any reason (plugin bridge not ready, script load failure),
@@ -968,6 +975,10 @@ try {
     window.Capacitor.Plugins.App.addListener('backButton', () => {
       if (document.getElementById('breathInfoOverlay').classList.contains('active')) {
         closeBreathInfoModal();
+        return;
+      }
+      if (document.getElementById('aboutOverlay').classList.contains('active')) {
+        closeAboutModal();
         return;
       }
       if (screen === 'reading') { readingPreviewOnly ? goToSavedCards() : prevCard(); return; }
