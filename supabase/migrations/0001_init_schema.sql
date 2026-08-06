@@ -21,12 +21,16 @@ create policy "profiles_update_own" on public.profiles
 create policy "profiles_insert_own" on public.profiles
   for insert with check (auth.uid() = id);
 
--- 2. Cards — spec §4 canonical Card model. Content is versioned via the manifest;
--- this table lets the client know which manifest version the backend expects.
+-- 2. Cards — spec §4 canonical Card model, plus acute_recommended from the
+-- real card-manifest-34-final.json (whether the card is recommended for
+-- acute/crisis use vs. reflective browsing only). Content is versioned via
+-- the manifest; this table lets the client know which manifest version the
+-- backend expects.
 create table public.cards (
   id text primary key,
   asset_key text not null,
   category text not null,
+  acute_recommended boolean not null default false,
   version integer not null default 1,
   created_at timestamptz not null default now()
 );
