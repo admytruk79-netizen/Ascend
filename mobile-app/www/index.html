@@ -428,6 +428,20 @@
   .journal-item { padding: 16px; border-radius: 12px; background: var(--frost-bg); border: 1px solid var(--frost-border); }
   .journal-item-meta { font: 600 9.5px/1 'Inter', sans-serif; letter-spacing: 1px; color: rgba(var(--text-rgb),.4); text-transform: uppercase; margin-bottom: 10px; }
   .journal-item-text { font: 14px/1.55 'Inter', sans-serif; color: rgba(var(--text-rgb),.85); white-space: pre-wrap; }
+
+  /* ---- TABLET (>=768px) ---- */
+  /* #app is otherwise hard-capped at 480px and centered, which on a tablet
+     just floats a phone-width column in a sea of background. Widen it
+     moderately (not full-bleed -- long text lines get hard to read past
+     ~70 characters) and let Home's spread list actually use the extra
+     width as a two-column grid instead of one long single column.
+     align-items: start (not the grid default stretch) keeps each card at
+     its own natural height when one is expanded, so an open accordion
+     doesn't stretch its row-mate to match. */
+  @media (min-width: 768px) {
+    #app { max-width: 640px; }
+    .spread-list { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 10px; }
+  }
 </style>
 </head>
 <body>
