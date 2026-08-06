@@ -8,12 +8,12 @@ import SettingsScreen from '../screens/SettingsScreen';
 import SignInScreen from '../screens/SignInScreen';
 import JournalScreen from '../screens/JournalScreen';
 import InsightsScreen from '../screens/InsightsScreen';
+import WearableScreen from '../screens/WearableScreen';
 import { TriggerSource } from '../types/session';
 
 // Spec §3 IA: one main Home surface + full-screen modals for secondary
-// features. Deck, Session, Settings, SignIn, Journal, Insights are wired up
-// (P1/P2/P3/P4/P5); the Wearable modal lands in P6 and is stubbed as an
-// alert on Home for now.
+// features. All of Deck, Session, Settings, SignIn, Journal, Insights,
+// Wearable are wired up now (P1-P6).
 
 export type RootStackParamList = {
   Home: undefined;
@@ -23,13 +23,15 @@ export type RootStackParamList = {
   SignIn: undefined;
   Journal: { cardId?: string; sessionId?: string } | undefined;
   Insights: undefined;
+  Wearable: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-// Module-level ref so a session can be started from outside the React tree —
-// e.g. a future P6 BLE characteristic-notification handler — without needing
-// navigation props threaded down to it. See ../session/startSession.ts.
+// Module-level ref so a session can be started from outside the React tree
+// — e.g. a real BLE characteristic-notification handler, once one exists,
+// see the TODO in WearableScreen.tsx — without needing navigation props
+// threaded down to it. See ../session/startSession.ts.
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 export default function RootNavigator() {
@@ -66,6 +68,11 @@ export default function RootNavigator() {
           name="Insights"
           component={InsightsScreen}
           options={{ presentation: 'modal', title: 'Insights' }}
+        />
+        <Stack.Screen
+          name="Wearable"
+          component={WearableScreen}
+          options={{ presentation: 'modal', title: 'Wearable' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

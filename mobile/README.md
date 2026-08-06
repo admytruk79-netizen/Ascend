@@ -3,7 +3,7 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0–P5 done
+## Current status: P0–P6 done
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
@@ -14,7 +14,7 @@ product context — this README only covers getting the code running.
   export is blocked by this environment's network policy.
 - P2: Session mechanics — double-tap on Home starts a session on the
   Primary Anchor (`src/session/startSession.ts` is the single entry point;
-  a future P6 BLE handler calls the same function with `triggerSource:
+  P6's "Test trigger" button calls the same function with `triggerSource:
   'wearable'` instead of adding its own path). 120s timer with up to 3
   extends of +60s each, `AppState`-driven pause/resume with a 60s
   background grace period past which the session logs as `interrupted`,
@@ -71,7 +71,28 @@ product context — this README only covers getting the code running.
   environment. Deploy with `npx supabase functions deploy ai-reflection
   ai-weekly-summary` and `npx supabase secrets set ANTHROPIC_API_KEY=...`
   before trying this for real.
-- P6–P8 (BLE, subscriptions, QA): not started yet.
+- P6: BLE — `WearableScreen`: scan, select a device to pair (saves its id
+  locally), and a "Test trigger" button that calls
+  `startPrimaryAnchorSession('wearable')` — the same shared entry point
+  double-tap uses, exactly as P2 set it up to allow. Foreground-only per
+  spec, no background scanning.
+  **What's real vs. stubbed**: scanning, permission requests, and device
+  selection are fully implemented against `react-native-ble-plx`. What's
+  *not* built is subscribing to an actual trigger notification from the
+  paired device's GATT characteristic — that needs the real hardware's
+  service/characteristic UUIDs, which were never provided (this was built
+  without a hardware spec in hand). See the `TODO(real hardware)` comment
+  in `WearableScreen.tsx` for exactly where that plugs in once you have
+  those UUIDs; "Test trigger" is a manual stand-in for it until then.
+  `getBleManager()` constructs the native `BleManager` **lazily**, only
+  when `WearableScreen` mounts — react-native-ble-plx's native module only
+  exists in a custom EAS dev client, not Expo Go, and eagerly constructing
+  it at import time would have crashed every other screen in Expo Go, not
+  just this one.
+  **Completely untestable in this environment** — no EAS dev client build,
+  no simulator, no physical device, no actual BLE peripheral to scan for.
+  This is code written to the spec, never run.
+- P7–P8 (subscriptions, QA): not started yet.
 
 ## Setup this environment could NOT do for you
 
@@ -124,9 +145,10 @@ mobile/
   App.tsx                  entry point: AuthProvider, SyncManager, RootNavigator
   src/
     navigation/             React Navigation stack (Home + modal screens)
-    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4); Insights (P5)
-    storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts, journalLog.ts)
-    session/                startSession.ts — shared session-start entry point (manual + future BLE)
+    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4); Insights (P5); Wearable (P6)
+    storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts, journalLog.ts, bleDevice.ts)
+    session/                startSession.ts — shared session-start entry point (manual + BLE)
+    ble/                    bleManager.ts — lazily-constructed react-native-ble-plx client
     data/                   cardManifest.ts (real metadata) + cardImages.ts (real art), both all 42
     types/                  Card / UserCardState / Session / JournalEntry per spec §4/5/7
     lib/supabase.ts         Supabase client (null if env vars unset — see .env.example)

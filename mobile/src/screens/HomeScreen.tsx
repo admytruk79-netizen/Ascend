@@ -13,10 +13,6 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-function notBuiltYet(feature: string) {
-  Alert.alert(feature, 'Not built yet — see the phase plan in the build guide.');
-}
-
 const DOUBLE_TAP_DELAY_MS = 300;
 
 export default function HomeScreen({ navigation }: Props) {
@@ -119,7 +115,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <TouchableOpacity
         style={styles.entryButton}
-        onPress={() => notBuiltYet('Wearable setup (P6)')}
+        onPress={() => navigation.navigate('Wearable')}
       >
         <Text style={styles.entryButtonText}>Wearable</Text>
       </TouchableOpacity>
