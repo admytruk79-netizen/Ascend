@@ -1,20 +1,37 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth } from '../auth/AuthContext';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { getAiConsent } from '../ai/consent';
 
 // Spec §3 Settings: session params, privacy/AI consent, account/data.
-// Account (this phase) and AI consent (P5) are the only sections built so
-// far — session params has no configurable UI yet since P2 ships fixed
-// defaults (120s / +60s / max 3), and account/data deletion is P3 sync
-// follow-up, not built here.
+// Account (P3) and a privacy/AI-consent status section (P5) are built;
+// session params has no configurable UI yet since P2 ships fixed defaults
+// (120s / +60s / max 3), and account/data deletion isn't built here.
+//
+// The actual opt-in/opt-out toggle lives on InsightsScreen, not here — spec
+// §11 wants a real consent screen, not a settings toggle someone glosses
+// over. This section just shows status and links there, so "privacy/AI
+// consent" is still findable from Settings the way spec §3 lists it.
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 export default function SettingsScreen({ navigation }: Props) {
   const { session, isLoading } = useAuth();
+  const [aiConsent, setAiConsentState] = useState<boolean | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (session) {
+        getAiConsent(session.user.id).then(setAiConsentState);
+      } else {
+        setAiConsentState(null);
+      }
+    }, [session])
+  );
 
   const onSignOut = async () => {
     if (supabase) await supabase.auth.signOut();
@@ -43,6 +60,22 @@ export default function SettingsScreen({ navigation }: Props) {
           <Text style={styles.buttonText}>Sign in to sync</Text>
         </TouchableOpacity>
       )}
+
+      <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Privacy</Text>
+      <Text style={styles.body}>
+        {!session
+          ? 'AI insights need an account — sign in above first.'
+          : aiConsent
+          ? 'AI insights are enabled. You can turn them off from the Insights screen.'
+          : 'AI insights are off. Nothing is sent to an AI model until you enable them.'}
+      </Text>
+      {session && (
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Insights')}>
+          <Text style={styles.buttonText}>
+            {aiConsent ? 'Manage AI insights' : 'Turn on AI insights'}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -59,6 +92,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
+  },
+  sectionSpacing: {
+    marginTop: 16,
   },
   body: {
     color: '#b8b8c8',

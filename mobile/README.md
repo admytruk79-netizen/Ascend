@@ -3,7 +3,7 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0–P4 done
+## Current status: P0–P5 done
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
@@ -47,7 +47,31 @@ product context — this README only covers getting the code running.
   wins by `updatedAt`, since a pure-append model doesn't fit an editable
   record. Same unverified caveat as P3: no live Supabase project here, so
   the sync path type-checks and follows the spec but hasn't round-tripped.
-- P5–P8 (AI, BLE, subscriptions, QA): not started yet.
+- P5: AI insights — two Edge Functions in `../supabase/functions/`
+  (`ai-reflection`, `ai-weekly-summary`), both running the **two-step safety
+  check as two genuinely separate steps**: a deterministic keyword/pattern
+  pass (`_shared/safetyCheck.ts`, no LLM call) runs first, and only if it
+  doesn't flag anything does the function call Anthropic at all. A flagged
+  input gets a neutral resource message instead of a reflection, always.
+  **The keyword list is a first pass, not a clinically-reviewed one** — see
+  the comment in `_shared/safetyCheck.ts`; treat it as a starting point that
+  needs real safety/clinical review before this ships to anyone.
+  The weekly-summary function runs the same safety check too, even though
+  the build guide only asked for it on post-session reflection — see the
+  comment in that function for why skipping it there felt like the wrong
+  default to guess at.
+  Consent (spec §11) is enforced **server-side** in both functions (checks
+  `profiles.ai_consent`, not just gated in the app UI) — `InsightsScreen` is
+  the actual consent screen (a real screen state, not a buried toggle),
+  reachable from Home or from a status line in Settings. AI insights are
+  the one feature that needs an account, since the Edge Function has to
+  identify the caller to check consent and attribute the insight.
+  **Untested**: no live Supabase project (so the functions have never been
+  deployed or invoked) and no Anthropic API key configured anywhere in this
+  environment. Deploy with `npx supabase functions deploy ai-reflection
+  ai-weekly-summary` and `npx supabase secrets set ANTHROPIC_API_KEY=...`
+  before trying this for real.
+- P6–P8 (BLE, subscriptions, QA): not started yet.
 
 ## Setup this environment could NOT do for you
 
@@ -69,8 +93,12 @@ sandboxed coding session can't create these:
 3. **RevenueCat** (P7) — dashboard account + entitlement config, plus the
    7-day trial configured separately in App Store Connect and Google Play
    Console per spec §10. Code-only setup can't do the store-side config.
-4. **Anthropic API key** for the AI Edge Function (P5) — goes in Supabase's
-   Edge Function secrets, never in the app bundle.
+4. **Anthropic API key** for the AI Edge Functions (P5) — set it with
+   `npx supabase secrets set ANTHROPIC_API_KEY=sk-ant-...` (and optionally
+   `ANTHROPIC_MODEL=...` to override the default), then deploy the
+   functions: `npx supabase functions deploy ai-reflection ai-weekly-summary`.
+   Never in the app bundle — the app only ever calls these functions by
+   name via `supabase.functions.invoke`, never Anthropic directly.
 
 ## Running locally
 
@@ -96,16 +124,21 @@ mobile/
   App.tsx                  entry point: AuthProvider, SyncManager, RootNavigator
   src/
     navigation/             React Navigation stack (Home + modal screens)
-    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4)
+    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4); Insights (P5)
     storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts, journalLog.ts)
     session/                startSession.ts — shared session-start entry point (manual + future BLE)
     data/                   cardManifest.ts (real metadata) + cardImages.ts (real art), both all 42
-    types/                  Card / UserCardState / Session per spec §4/5
+    types/                  Card / UserCardState / Session / JournalEntry per spec §4/5/7
     lib/supabase.ts         Supabase client (null if env vars unset — see .env.example)
     auth/                   AuthContext, magic-link deep-link handling
     sync/                   syncEngine.ts (pull/push) + SyncManager.tsx (trigger points)
+    ai/                     consent.ts, aiClient.ts — call the Edge Functions below
 supabase/
   migrations/0001_init_schema.sql   Users/Cards/UserCardState/Sessions/
                                      JournalEntries/AIInsights per spec §4/7/9
   migrations/0002_profile_on_signup.sql   auto-create profiles row on signup
+  functions/
+    _shared/                safetyCheck.ts, anthropic.ts, supabaseClients.ts
+    ai-reflection/           post-session reflection, two-step safety check
+    ai-weekly-summary/       weekly pattern summary, same safety check
 ```

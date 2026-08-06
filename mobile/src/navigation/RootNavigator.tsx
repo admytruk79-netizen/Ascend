@@ -7,12 +7,13 @@ import SessionScreen from '../screens/SessionScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import SignInScreen from '../screens/SignInScreen';
 import JournalScreen from '../screens/JournalScreen';
+import InsightsScreen from '../screens/InsightsScreen';
 import { TriggerSource } from '../types/session';
 
 // Spec §3 IA: one main Home surface + full-screen modals for secondary
-// features. Deck, Session, Settings, SignIn, Journal are wired up
-// (P1/P2/P3/P4); Insights/Wearable modals land in their own phases (P5/P6)
-// and are stubbed as alerts on Home for now.
+// features. Deck, Session, Settings, SignIn, Journal, Insights are wired up
+// (P1/P2/P3/P4/P5); the Wearable modal lands in P6 and is stubbed as an
+// alert on Home for now.
 
 export type RootStackParamList = {
   Home: undefined;
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   Settings: undefined;
   SignIn: undefined;
   Journal: { cardId?: string; sessionId?: string } | undefined;
+  Insights: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -59,6 +61,11 @@ export default function RootNavigator() {
           name="Journal"
           component={JournalScreen}
           options={{ presentation: 'modal', title: 'Journal' }}
+        />
+        <Stack.Screen
+          name="Insights"
+          component={InsightsScreen}
+          options={{ presentation: 'modal', title: 'Insights' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

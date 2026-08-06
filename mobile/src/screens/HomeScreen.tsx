@@ -112,7 +112,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <TouchableOpacity
         style={styles.entryButton}
-        onPress={() => notBuiltYet('AI insights (P5)')}
+        onPress={() => navigation.navigate('Insights')}
       >
         <Text style={styles.entryButtonText}>Insights</Text>
       </TouchableOpacity>
