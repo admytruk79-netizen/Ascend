@@ -4,6 +4,7 @@ import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-na
 import { CARD_MANIFEST } from '../data/cardManifest';
 import { CARD_IMAGES } from '../data/cardImages';
 import { getPrimaryAnchorId } from '../storage/cardState';
+import { getAllSessions } from '../storage/sessionLog';
 import { startPrimaryAnchorSession } from '../session/startSession';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -21,11 +22,39 @@ const DOUBLE_TAP_DELAY_MS = 300;
 export default function HomeScreen({ navigation }: Props) {
   const [anchorId, setAnchorId] = useState<string | null>(null);
   const lastTapRef = useRef(0);
+  const lastPromptedSessionIdRef = useRef<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       getPrimaryAnchorId().then(setAnchorId);
-    }, [])
+
+      // Spec §7: optional post-session journal prompt. Only for sessions
+      // that ran to natural completion — an interrupted/closed-early session
+      // isn't the moment to ask "how did that feel?". The ref guard stops
+      // re-prompting for the same session every time Home regains focus.
+      getAllSessions().then((sessions) => {
+        const latest = sessions[sessions.length - 1];
+        if (
+          latest &&
+          latest.completed &&
+          !latest.interrupted &&
+          latest.sessionId !== lastPromptedSessionIdRef.current
+        ) {
+          lastPromptedSessionIdRef.current = latest.sessionId;
+          Alert.alert('How did that feel?', 'Add a quick journal note about it?', [
+            { text: 'Skip', style: 'cancel' },
+            {
+              text: 'Add note',
+              onPress: () =>
+                navigation.navigate('Journal', {
+                  cardId: latest.cardId,
+                  sessionId: latest.sessionId,
+                }),
+            },
+          ]);
+        }
+      });
+    }, [navigation])
   );
 
   const anchorCard = anchorId
@@ -76,7 +105,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       <TouchableOpacity
         style={styles.entryButton}
-        onPress={() => notBuiltYet('Journal (P4)')}
+        onPress={() => navigation.navigate('Journal')}
       >
         <Text style={styles.entryButtonText}>Journal</Text>
       </TouchableOpacity>

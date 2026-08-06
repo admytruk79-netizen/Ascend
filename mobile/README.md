@@ -3,7 +3,7 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0–P2 done
+## Current status: P0–P4 done
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
@@ -39,7 +39,15 @@ product context — this README only covers getting the code running.
   this has actually round-tripped against a real database or sent a real
   magic-link email. It type-checks and the logic follows the spec, but
   "type-checks" and "works" are different claims here.
-- P4–P8 (journal, AI, BLE, subscriptions, QA): not started yet.
+- P4: Journal — `JournalScreen` for both the optional post-session prompt
+  (Home shows it once per completed, non-interrupted session, via
+  `getAllSessions` + a ref guard) and manual "add entry" from Home. Entries
+  are editable (spec §7 permits edits, explicitly not edit history, so
+  there isn't one) and sync the same way UserCardState does — last-write-
+  wins by `updatedAt`, since a pure-append model doesn't fit an editable
+  record. Same unverified caveat as P3: no live Supabase project here, so
+  the sync path type-checks and follows the spec but hasn't round-tripped.
+- P5–P8 (AI, BLE, subscriptions, QA): not started yet.
 
 ## Setup this environment could NOT do for you
 
@@ -88,8 +96,8 @@ mobile/
   App.tsx                  entry point: AuthProvider, SyncManager, RootNavigator
   src/
     navigation/             React Navigation stack (Home + modal screens)
-    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3)
-    storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts)
+    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4)
+    storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts, journalLog.ts)
     session/                startSession.ts — shared session-start entry point (manual + future BLE)
     data/                   cardManifest.ts (real metadata) + cardImages.ts (real art), both all 42
     types/                  Card / UserCardState / Session per spec §4/5

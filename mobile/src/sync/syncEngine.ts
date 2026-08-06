@@ -2,14 +2,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { getAllCardStates, replaceAllCardStates } from '../storage/cardState';
 import { getAllSessions } from '../storage/sessionLog';
+import { getAllEntries, replaceAllEntries } from '../storage/journalLog';
 import { UserCardState } from '../types/card';
 import { Session } from '../types/session';
+import { JournalEntry } from '../types/journal';
 
 // Spec §9 sync strategy, deliberately simple (not a full sync engine —
-// WatermelonDB-style conflict resolution is overkill for these two rules):
+// WatermelonDB-style conflict resolution is overkill for these three rules):
 //   - Sessions: append-only. Push whatever hasn't been pushed yet.
 //   - UserCardState (Primary Anchor + favorites): last-write-wins by
 //     updatedAt, merged client-side.
+//   - JournalEntries: mostly append-only, but edits are permitted (spec §7),
+//     so entries sync the same last-write-wins-by-updatedAt way card state
+//     does, not the pure-insert way sessions do.
 //
 // Known simplification: user_card_state has a DB constraint allowing only
 // one is_primary_anchor row per user. If two devices set different anchors
@@ -78,6 +83,40 @@ function toDbSessionRow(userId: string, session: Session) {
   };
 }
 
+function toDbJournalRow(userId: string, entry: JournalEntry) {
+  return {
+    entry_id: entry.entryId,
+    user_id: userId,
+    created_at: entry.createdAt,
+    updated_at: entry.updatedAt,
+    text: entry.text,
+    mood: entry.mood,
+    card_id: entry.cardId,
+    session_id: entry.sessionId,
+  };
+}
+
+function fromDbJournalRow(row: {
+  entry_id: string;
+  created_at: string;
+  updated_at: string;
+  text: string;
+  mood: number | null;
+  card_id: string | null;
+  session_id: string | null;
+}): JournalEntry {
+  return {
+    entryId: row.entry_id,
+    userId: null, // filled in by the caller if ever needed; local records don't carry it
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    text: row.text,
+    mood: row.mood,
+    cardId: row.card_id,
+    sessionId: row.session_id,
+  };
+}
+
 // Pull remote UserCardState, merge into local by updatedAt (last write wins
 // per card), write the merged map back locally.
 async function pullAndMergeCardState(userId: string): Promise<void> {
@@ -128,6 +167,42 @@ async function pushCardState(userId: string): Promise<void> {
   }
 }
 
+// Same last-write-wins merge shape as pullAndMergeCardState, keyed by
+// entryId instead of cardId — entries have no single-row invariant to
+// re-check afterward, so this is simpler than the card-state version.
+async function pullAndMergeJournal(userId: string): Promise<void> {
+  if (!supabase) return;
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .select('*')
+    .eq('user_id', userId);
+  if (error || !data) return;
+
+  const local = await getAllEntries();
+  const byId = new Map(local.map((e) => [e.entryId, e]));
+
+  for (const row of data) {
+    const remote = fromDbJournalRow(row);
+    const existing = byId.get(remote.entryId);
+    if (!existing || new Date(remote.updatedAt) > new Date(existing.updatedAt)) {
+      byId.set(remote.entryId, remote);
+    }
+  }
+
+  await replaceAllEntries([...byId.values()]);
+}
+
+async function pushJournal(userId: string): Promise<void> {
+  if (!supabase) return;
+  const local = await getAllEntries();
+  if (local.length === 0) return;
+  const rows = local.map((e) => toDbJournalRow(userId, e));
+  const { error } = await supabase.from('journal_entries').upsert(rows);
+  if (error) {
+    console.warn('[sync] journal_entries push failed:', error.message);
+  }
+}
+
 async function pushPendingSessions(userId: string): Promise<void> {
   if (!supabase) return;
   const [allSessions, syncedIds] = await Promise.all([
@@ -154,6 +229,8 @@ export async function runSync(userId: string): Promise<void> {
   try {
     await pullAndMergeCardState(userId);
     await pushCardState(userId);
+    await pullAndMergeJournal(userId);
+    await pushJournal(userId);
     await pushPendingSessions(userId);
   } catch (err) {
     console.warn('[sync] runSync failed:', err);
