@@ -3,19 +3,15 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0 done, P1 mostly real
+## Current status: P0 done, P1 done (cards + Home)
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
-  Primary Anchor + favorites state. **All 42 card images are wired in**
-  (`assets/cards/*.webp`, mapped in `src/data/cardImages.ts`) — Canva export
-  is blocked by this environment's network policy, so these came from the
-  user attaching them directly in chat instead.
-  What's still placeholder: the actual manifest *metadata*.
-  `card-manifest-34-final.json` (real mechanism mood-tags per card) was
-  never reachable, so `cardManifest.ts` has every card hardcoded to
-  `category: 'general_reflective'` — replace that file wholesale once the
-  real manifest is available, rather than trusting the current tags.
+  Primary Anchor + favorites state. **All 42 cards are real** — art
+  (`assets/cards/*.webp`, mapped in `src/data/cardImages.ts`) and manifest
+  metadata (mechanism mood-tag `category` + `acuteRecommended` per card in
+  `src/data/cardManifest.ts`) both came from the user directly, since Canva
+  export is blocked by this environment's network policy.
 - P2–P8 (session timer, backend sync, journal, AI, BLE, subscriptions, QA):
   not started. See the phase plan for what's next.
 
@@ -65,7 +61,7 @@ mobile/
     navigation/             React Navigation stack (Home + modal screens)
     screens/                HomeScreen, DeckScreen (P1); more land per phase
     storage/                AsyncStorage-backed local state (cardState.ts)
-    data/                   cardManifest.ts (metadata, still placeholder tags) + cardImages.ts (real art, all 42)
+    data/                   cardManifest.ts (real metadata) + cardImages.ts (real art), both all 42
     types/                  Card / UserCardState per spec §4
 supabase/
   migrations/0001_init_schema.sql   Users/Cards/UserCardState/Sessions/

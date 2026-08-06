@@ -1,20 +1,15 @@
 import { Card } from '../types/card';
 
-// Cards 1-34 use the real card-manifest-34-final.json (mechanism-tagged mood
-// category + acuteRecommended). Cards 35-42 have real art (see cardImages.ts)
-// but no manifest entry exists for them yet — per the build guide they were
-// never tagged, so they stay `general_reflective` / acuteRecommended: false
-// as an explicit placeholder, not a real assignment.
-//
-// `debugLabel` is not part of the canonical Card model (spec §4) — it's
-// only shown on long-press (DeckScreen) as a dev label, and as the
-// deck-tile fallback for any card without art in cardImages.ts.
+// Full 42-card manifest — mechanism-tagged mood category + acuteRecommended
+// per card, from the real card manifest data. `debugLabel` is not part of
+// the canonical Card model (spec §4) — it's only shown on long-press
+// (DeckScreen) as a dev label.
 
 interface PlaceholderCard extends Card {
   debugLabel: string;
 }
 
-const CARDS_1_TO_34: Array<{
+const CARDS: Array<{
   title: string;
   category: string;
   acuteRecommended: boolean;
@@ -53,6 +48,14 @@ const CARDS_1_TO_34: Array<{
   { title: 'The Phoenix Gateway', category: 'grief_loss', acuteRecommended: true },
   { title: 'The Inner Compass', category: 'racing_thoughts', acuteRecommended: true },
   { title: 'The Cosmic Cycle', category: 'racing_thoughts', acuteRecommended: true },
+  { title: 'The Solar Storm', category: 'panic_crisis', acuteRecommended: true },
+  { title: 'The Crystalline Silence', category: 'racing_thoughts', acuteRecommended: true },
+  { title: 'The Integrity', category: 'general_reflective', acuteRecommended: false },
+  { title: 'The Illuminating Consciousness', category: 'general_reflective', acuteRecommended: false },
+  { title: 'The Star Navigator', category: 'grief_loss', acuteRecommended: true },
+  { title: 'The Cosmic Harbor', category: 'anger_friction', acuteRecommended: true },
+  { title: 'The Sacred Flame Rise', category: 'grief_loss', acuteRecommended: true },
+  { title: 'The Source of Guidance', category: 'racing_thoughts', acuteRecommended: true },
 ];
 
 function slugify(title: string): string {
@@ -62,28 +65,14 @@ function slugify(title: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-export const CARD_MANIFEST: PlaceholderCard[] = [
-  ...CARDS_1_TO_34.map((card, index) => {
-    const id = String(index + 1);
-    return {
-      id,
-      assetKey: `anchor_${slugify(card.title)}`,
-      category: card.category,
-      acuteRecommended: card.acuteRecommended,
-      version: 1,
-      debugLabel: card.title,
-    };
-  }),
-  ...Array.from({ length: 8 }, (_, i) => {
-    const num = 35 + i;
-    const id = String(num);
-    return {
-      id,
-      assetKey: `placeholder/${id}`,
-      category: 'general_reflective',
-      acuteRecommended: false,
-      version: 1,
-      debugLabel: `Card ${num} (untitled)`,
-    };
-  }),
-];
+export const CARD_MANIFEST: PlaceholderCard[] = CARDS.map((card, index) => {
+  const id = String(index + 1);
+  return {
+    id,
+    assetKey: `anchor_${slugify(card.title)}`,
+    category: card.category,
+    acuteRecommended: card.acuteRecommended,
+    version: 1,
+    debugLabel: card.title,
+  };
+});
