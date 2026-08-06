@@ -461,7 +461,7 @@ function saveJournalEntry() {
   const text = textarea.value.trim();
   const statusEl = document.getElementById('journalStatus');
   if (!text) {
-    if (statusEl) statusEl.textContent = 'Write something first.';
+    if (statusEl) { statusEl.textContent = 'Write something first.'; statusEl.classList.add('warn'); }
     return;
   }
   if (currentJournalId) {
@@ -481,7 +481,7 @@ function saveJournalEntry() {
     currentJournalId = entry.id;
   }
   persistJournalEntries();
-  if (statusEl) statusEl.textContent = 'Saved';
+  if (statusEl) { statusEl.textContent = 'Saved'; statusEl.classList.remove('warn'); }
 }
 
 function goToSavedCards() {

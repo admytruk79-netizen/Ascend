@@ -159,7 +159,7 @@
   .spread-expand.open { grid-template-rows: 1fr; }
   .spread-expand-inner { overflow: hidden; }
   .spread-expand-content { padding: 0 18px 20px; }
-  .spread-expand-rule { height: 1px; background: rgba(255,255,255,.08); margin-bottom: 16px; }
+  .spread-expand-rule { height: 1px; background: rgba(var(--text-rgb),.1); margin-bottom: 16px; }
   .spread-expand-content.locked { text-align: center; }
   .locked-glyph { font-size: 20px; opacity: .7; margin-bottom: 8px; }
   .locked-body { font: 13px/1.55 'Inter', sans-serif; color: rgba(var(--text-rgb),.55); margin-bottom: 12px; }
@@ -180,7 +180,7 @@
   }
   .reveal-ring { position: absolute; inset: 0; width: 148px; height: 148px; transform: rotate(-90deg); }
   .reveal-ring-bg, .reveal-ring-fg { fill: none; stroke-width: 3; }
-  .reveal-ring-bg { stroke: rgba(255,255,255,.08); }
+  .reveal-ring-bg { stroke: rgba(var(--text-rgb),.12); }
   .reveal-ring-fg { stroke: var(--gold); stroke-linecap: round; }
   .reveal-card-back {
     position: relative; width: 108px; height: 108px; border-radius: 50%; overflow: hidden;
@@ -218,7 +218,7 @@
   .season-select-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
   .season-select-label { font: 600 10px/1 'Inter', sans-serif; letter-spacing: 1.5px; color: rgba(var(--text-rgb),.5); text-transform: uppercase; }
   .season-select {
-    flex: 1; max-width: 62%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
+    flex: 1; max-width: 62%; background: var(--frost-bg); border: 1px solid var(--frost-border); border-radius: 8px;
     color: var(--text); font: 12.5px/1 'Inter', sans-serif; padding: 8px 10px;
   }
   .btn-gold-block {
@@ -290,7 +290,7 @@
   .breath-controls { display: flex; gap: 10px; }
   .breath-ctrl-btn {
     font: 600 10px/1 'Inter', sans-serif; letter-spacing: 1px; padding: 8px 16px; border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.15); background: transparent; color: var(--text); cursor: pointer;
+    border: 1px solid rgba(var(--gold-rgb),.3); background: transparent; color: var(--text); cursor: pointer;
   }
   .breath-info-btn {
     position: absolute; top: 10px; right: 12px; width: 20px; height: 20px; border-radius: 50%;
@@ -362,7 +362,7 @@
   .spirit-subtext { font: 13.5px/1.55 'Cormorant Garamond', serif; color: rgba(var(--text-rgb),.75); margin-bottom: 16px; }
   .reading-nav { display: flex; gap: 10px; margin-top: 22px; }
   .btn-outline {
-    flex: none; padding: 13px 20px; border-radius: 22px; border: 1px solid rgba(255,255,255,.15);
+    flex: none; padding: 13px 20px; border-radius: 22px; border: 1px solid rgba(var(--gold-rgb),.35);
     background: transparent; color: var(--text); font: 600 12px/1 'Inter', sans-serif; cursor: pointer;
   }
   .btn-next {
@@ -379,7 +379,7 @@
   }
   .synth-thread { display: flex; align-items: center; gap: 0; margin-bottom: 24px; }
   .synth-thread span.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-  .synth-thread span.line { flex: 1; height: 1px; background: rgba(255,255,255,.15); }
+  .synth-thread span.line { flex: 1; height: 1px; background: rgba(var(--text-rgb),.15); }
   .synth-headline { font: 400 19px/1.55 'Cormorant Garamond', serif; color: var(--text); margin-bottom: 16px; text-align: center; }
   .synth-sub { font: 13px/1.6 'Inter', sans-serif; color: rgba(var(--text-rgb),.55); margin-bottom: 20px; text-align: center; }
   .synth-takeaway { border-left: 2px solid var(--gold); padding-left: 16px; font: 500 14px/1.6 'Inter', sans-serif; color: var(--text); margin-bottom: 32px; }
@@ -394,7 +394,7 @@
   .saved-list { display: flex; flex-direction: column; gap: 10px; }
   .saved-row {
     display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px;
-    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); cursor: pointer;
+    background: var(--frost-bg); border: 1px solid var(--frost-border); cursor: pointer;
   }
   .saved-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
   .saved-row-body { flex: 1; }
@@ -406,25 +406,26 @@
   }
 
   /* ---- JOURNAL ---- */
-  .journal-box { margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1); text-align: left; }
+  .journal-box { margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(var(--text-rgb),.12); text-align: left; }
   .journal-label {
     font: 600 10.5px/1 'Inter', sans-serif; letter-spacing: 2px; color: rgba(var(--text-rgb),.4);
     text-transform: uppercase; margin-bottom: 12px;
   }
   .optional-tag { text-transform: none; letter-spacing: 0; font: italic 400 12px 'Cormorant Garamond', serif; color: rgba(var(--text-rgb),.35); }
   .journal-input {
-    width: 100%; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+    width: 100%; background: var(--frost-bg); border: 1px solid var(--frost-border); border-radius: 10px;
     color: var(--text); font: 14px/1.5 'Inter', sans-serif; padding: 12px 14px; resize: vertical; box-sizing: border-box;
     margin-bottom: 10px;
   }
   .journal-input::placeholder { color: rgba(var(--text-rgb),.3); }
   .journal-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
   .journal-status { font: 11px/1 'Inter', sans-serif; color: rgba(var(--gold-rgb),.8); }
+  .journal-status.warn { color: var(--resisted); }
   .journal-disclaimer { font: 11px/1.5 'Inter', sans-serif; color: rgba(var(--text-rgb),.35); }
 
   .journal-history { padding: 8px 24px 40px; }
   .journal-list { display: flex; flex-direction: column; gap: 14px; }
-  .journal-item { padding: 16px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); }
+  .journal-item { padding: 16px; border-radius: 12px; background: var(--frost-bg); border: 1px solid var(--frost-border); }
   .journal-item-meta { font: 600 9.5px/1 'Inter', sans-serif; letter-spacing: 1px; color: rgba(var(--text-rgb),.4); text-transform: uppercase; margin-bottom: 10px; }
   .journal-item-text { font: 14px/1.55 'Inter', sans-serif; color: rgba(var(--text-rgb),.85); white-space: pre-wrap; }
 </style>
