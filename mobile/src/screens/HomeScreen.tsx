@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CARD_MANIFEST } from '../data/cardManifest';
+import { CARD_IMAGES } from '../data/cardImages';
 import { getPrimaryAnchorId } from '../storage/cardState';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -36,7 +37,15 @@ export default function HomeScreen({ navigation }: Props) {
       <View style={styles.anchorCard}>
         {anchorCard ? (
           <>
-            <Text style={styles.anchorLabel}>{anchorCard.debugLabel}</Text>
+            {CARD_IMAGES[anchorCard.id] ? (
+              <Image
+                source={CARD_IMAGES[anchorCard.id]}
+                style={styles.anchorImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <Text style={styles.anchorLabel}>{anchorCard.debugLabel}</Text>
+            )}
             <TouchableOpacity
               style={styles.activateButton}
               onPress={() => notBuiltYet('Session activation (P2)')}
@@ -105,6 +114,12 @@ const styles = StyleSheet.create({
   anchorLabel: {
     color: '#e6e6f0',
     fontSize: 16,
+    marginBottom: 12,
+  },
+  anchorImage: {
+    width: 220,
+    aspectRatio: 2 / 3,
+    borderRadius: 16,
     marginBottom: 12,
   },
   activateButton: {

@@ -2,12 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { CARD_MANIFEST } from '../data/cardManifest';
+import { CARD_IMAGES } from '../data/cardImages';
 import {
   getAllCardStates,
   setPrimaryAnchor,
@@ -16,10 +18,11 @@ import {
 import { UserCardState } from '../types/card';
 
 // Deck modal — spec §3: "browse 11 [now 42] cards, select Primary Anchor,
-// favorites, recent." Cards render as plain color tiles with a debug label
-// until real card art replaces the placeholder manifest (see cardManifest.ts).
+// favorites, recent." Cards with an entry in CARD_IMAGES render the real
+// art; the rest fall back to a placeholder color tile with a debug label
+// until their art is added (see cardManifest.ts / cardImages.ts).
 // Spec §4: cards are abstract images with NO embedded text in the shipped
-// product — the debugLabel text here is dev-only scaffolding.
+// product — the debugLabel text is dev-only scaffolding for the fallback.
 
 export default function DeckScreen() {
   const [states, setStates] = useState<Record<string, UserCardState>>({});
@@ -50,6 +53,7 @@ export default function DeckScreen() {
         const state = states[item.id];
         const isAnchor = !!state?.isPrimaryAnchor;
         const isFavorite = !!state?.isFavorite;
+        const artSource = CARD_IMAGES[item.id];
         return (
           <View style={styles.tileWrap}>
             <TouchableOpacity
@@ -59,9 +63,17 @@ export default function DeckScreen() {
                 Alert.alert(item.debugLabel, `Card ${item.id} · ${item.category}`)
               }
             >
-              <Text style={styles.tileLabel} numberOfLines={2}>
-                {item.debugLabel}
-              </Text>
+              {artSource ? (
+                <Image
+                  source={artSource}
+                  style={styles.tileImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text style={styles.tileLabel} numberOfLines={2}>
+                  {item.debugLabel}
+                </Text>
+              )}
               {isAnchor && <Text style={styles.anchorBadge}>ANCHOR</Text>}
             </TouchableOpacity>
             <TouchableOpacity
@@ -95,11 +107,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#2b2b3a',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
     padding: 8,
   },
   tileAnchor: {
     borderWidth: 2,
     borderColor: '#f2c14e',
+  },
+  tileImage: {
+    width: '100%',
+    height: '100%',
   },
   tileLabel: {
     color: '#e6e6f0',

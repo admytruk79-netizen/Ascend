@@ -1,19 +1,18 @@
 import { Card } from '../types/card';
 
-// PLACEHOLDER MANIFEST — not the real asset manifest.
+// PARTIAL PLACEHOLDER MANIFEST — not the real asset manifest.
 //
-// The real source of truth is `card-manifest-34-final.json` (cards 1-34,
-// mechanism-tagged with panic_crisis / racing_thoughts / grief_loss /
-// anger_friction / general_reflective) plus 8 more from a direct-upload set
-// (cards 35-42, untagged). Neither file nor any of the 42 card images were
-// reachable from this environment when this manifest was written, so every
-// card below is `category: 'general_reflective'` — do not treat that as a
-// real mood-tag assignment, it's a placeholder pending the actual manifest.
+// Real art for all 42 cards is wired in via cardImages.ts. What's still
+// missing is the actual manifest metadata: `card-manifest-34-final.json`
+// (cards 1-34, mechanism-tagged with panic_crisis / racing_thoughts /
+// grief_loss / anger_friction / general_reflective) was never reachable
+// from this environment, so every card below is `category:
+// 'general_reflective'` — do not treat that as a real mood-tag assignment,
+// it's a placeholder pending the actual manifest file.
 //
-// `debugLabel` is not part of the canonical Card model (spec §4) — it only
-// exists so the deck screen has something legible to show before real card
-// art is wired in. Delete it once real assets replace the placeholder tiles
-// in DeckScreen.tsx.
+// `debugLabel` is not part of the canonical Card model (spec §4) — it's
+// only shown on long-press (DeckScreen) as a dev label, and as the
+// deck-tile fallback for any future card without art in cardImages.ts.
 
 interface PlaceholderCard extends Card {
   debugLabel: string;
