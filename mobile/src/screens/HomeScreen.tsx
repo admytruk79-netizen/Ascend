@@ -94,6 +94,13 @@ export default function HomeScreen({ navigation }: Props) {
       >
         <Text style={styles.entryButtonText}>Wearable</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.entryButton}
+        onPress={() => navigation.navigate('Settings')}
+      >
+        <Text style={styles.entryButtonText}>Settings</Text>
+      </TouchableOpacity>
     </View>
   );
 }

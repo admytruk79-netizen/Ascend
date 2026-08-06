@@ -2,9 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserCardState } from '../types/card';
 
 // Local-first card state (spec §9 sync strategy: last-write-wins for anchor
-// and favorites). P3 adds the Supabase push/pull; until then this is the
-// only source of truth, matching the build guide's P1 instruction to store
-// locally first.
+// and favorites). This remains the source of truth signed-out; P3's sync
+// engine (../sync/syncEngine.ts) merges it with Supabase when signed in.
 
 const STORAGE_KEY = 'ascend.userCardState.v1';
 
@@ -17,6 +16,7 @@ function emptyState(cardId: string): UserCardState {
     isPrimaryAnchor: false,
     lastUsedAt: null,
     useCount: 0,
+    updatedAt: new Date(0).toISOString(),
   };
 }
 
@@ -33,6 +33,12 @@ export async function getAllCardStates(): Promise<StateMap> {
   return readAll();
 }
 
+// Sync engine only — replaces the whole map after a pull/merge. Not for
+// regular app code (use the mutators below, which stamp updatedAt).
+export async function replaceAllCardStates(state: StateMap): Promise<void> {
+  await writeAll(state);
+}
+
 export async function getPrimaryAnchorId(): Promise<string | null> {
   const state = await readAll();
   const entry = Object.values(state).find((s) => s.isPrimaryAnchor);
@@ -43,12 +49,16 @@ export async function getPrimaryAnchorId(): Promise<string | null> {
 // the flag on every other card before setting it on the chosen one.
 export async function setPrimaryAnchor(cardId: string): Promise<StateMap> {
   const state = await readAll();
+  const now = new Date().toISOString();
   for (const key of Object.keys(state)) {
-    state[key] = { ...state[key], isPrimaryAnchor: false };
+    if (state[key].isPrimaryAnchor) {
+      state[key] = { ...state[key], isPrimaryAnchor: false, updatedAt: now };
+    }
   }
   state[cardId] = {
     ...(state[cardId] ?? emptyState(cardId)),
     isPrimaryAnchor: true,
+    updatedAt: now,
   };
   await writeAll(state);
   return state;
@@ -57,7 +67,11 @@ export async function setPrimaryAnchor(cardId: string): Promise<StateMap> {
 export async function toggleFavorite(cardId: string): Promise<StateMap> {
   const state = await readAll();
   const current = state[cardId] ?? emptyState(cardId);
-  state[cardId] = { ...current, isFavorite: !current.isFavorite };
+  state[cardId] = {
+    ...current,
+    isFavorite: !current.isFavorite,
+    updatedAt: new Date().toISOString(),
+  };
   await writeAll(state);
   return state;
 }
@@ -69,6 +83,7 @@ export async function recordUse(cardId: string): Promise<StateMap> {
     ...current,
     lastUsedAt: new Date().toISOString(),
     useCount: current.useCount + 1,
+    updatedAt: new Date().toISOString(),
   };
   await writeAll(state);
   return state;

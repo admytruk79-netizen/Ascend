@@ -10,10 +10,13 @@ export interface Card {
 }
 
 // Per-user card state — spec §4. Exactly one card may have isPrimaryAnchor = true.
+// updatedAt drives P3's last-write-wins sync for anchor/favorites (spec §9)
+// — not itself a spec §4 field, but required to implement that sync rule.
 export interface UserCardState {
   cardId: string;
   isFavorite: boolean;
   isPrimaryAnchor: boolean;
   lastUsedAt: string | null;
   useCount: number;
+  updatedAt: string;
 }

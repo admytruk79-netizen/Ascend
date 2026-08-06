@@ -27,7 +27,19 @@ product context — this README only covers getting the code running.
   The breathing cue is a generic 4s-in/4s-out pulse, not real per-card
   breathing patterns — no source for those was provided (same situation
   category/acuteRecommended were in before you sent the real manifest).
-- P3–P8 (backend sync, journal, AI, BLE, subscriptions, QA): not started.
+- P3: Backend — Supabase client (`src/lib/supabase.ts`), magic-link auth
+  (`SignInScreen`, `AuthContext`, deep-link callback handling), and a sync
+  engine (`src/sync/`) that pulls remote `user_card_state` on sign-in/reconnect
+  (last-write-wins by `updatedAt`) and pushes local Primary Anchor/favorites
+  state plus any not-yet-synced sessions (append-only). **Auth is additive,
+  not a gate** — Home/Deck/Session all still work fully offline/signed-out,
+  matching spec §9's offline-first framing; signing in (from Settings) just
+  turns sync on. **Completely unverified end-to-end** — there is no live
+  Supabase project in this environment (see setup steps below), so none of
+  this has actually round-tripped against a real database or sent a real
+  magic-link email. It type-checks and the logic follows the spec, but
+  "type-checks" and "works" are different claims here.
+- P4–P8 (journal, AI, BLE, subscriptions, QA): not started yet.
 
 ## Setup this environment could NOT do for you
 
@@ -36,13 +48,16 @@ sandboxed coding session can't create these:
 
 1. **EAS account** — run `eas login` (or `eas login --sso` if your org uses
    SSO) from a real terminal, then `eas build:configure` inside `mobile/`.
-2. **Supabase project** — create one at supabase.com, then either:
+2. **Supabase project** — create one at supabase.com, then:
    - `npx supabase link --project-ref <your-ref>` from the repo root, then
-     `npx supabase db push` to apply `supabase/migrations/0001_init_schema.sql`, or
-   - paste that file's contents into the Supabase SQL editor directly.
-   Copy the project URL and anon key into `mobile/.env` (create it from
-   `.env.example` once that exists — not yet added, since there's no client
-   code calling Supabase until P3).
+     `npx supabase db push` to apply both files in `supabase/migrations/`
+     (or paste them into the Supabase SQL editor, in order — `0002` depends
+     on `0001`), and
+   - in the dashboard, Authentication > URL Configuration, add
+     `ascend://auth/callback` as a redirect URL (the app's magic-link
+     callback won't work without this), and
+   - copy `mobile/.env.example` to `mobile/.env` and fill in the project URL
+     + anon key from Project Settings > API.
 3. **RevenueCat** (P7) — dashboard account + entitlement config, plus the
    7-day trial configured separately in App Store Connect and Google Play
    Console per spec §10. Code-only setup can't do the store-side config.
@@ -70,14 +85,19 @@ is a reasonable smoke test in that situation and currently passes clean.
 
 ```
 mobile/
-  App.tsx                  entry point, wires up RootNavigator
+  App.tsx                  entry point: AuthProvider, SyncManager, RootNavigator
   src/
     navigation/             React Navigation stack (Home + modal screens)
-    screens/                HomeScreen, DeckScreen (P1); more land per phase
-    storage/                AsyncStorage-backed local state (cardState.ts)
+    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3)
+    storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts)
+    session/                startSession.ts — shared session-start entry point (manual + future BLE)
     data/                   cardManifest.ts (real metadata) + cardImages.ts (real art), both all 42
-    types/                  Card / UserCardState per spec §4
+    types/                  Card / UserCardState / Session per spec §4/5
+    lib/supabase.ts         Supabase client (null if env vars unset — see .env.example)
+    auth/                   AuthContext, magic-link deep-link handling
+    sync/                   syncEngine.ts (pull/push) + SyncManager.tsx (trigger points)
 supabase/
   migrations/0001_init_schema.sql   Users/Cards/UserCardState/Sessions/
                                      JournalEntries/AIInsights per spec §4/7/9
+  migrations/0002_profile_on_signup.sql   auto-create profiles row on signup
 ```

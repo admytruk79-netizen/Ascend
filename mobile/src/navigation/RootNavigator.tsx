@@ -4,17 +4,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import DeckScreen from '../screens/DeckScreen';
 import SessionScreen from '../screens/SessionScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import SignInScreen from '../screens/SignInScreen';
 import { TriggerSource } from '../types/session';
 
 // Spec §3 IA: one main Home surface + full-screen modals for secondary
-// features. Deck and Session are wired up (P1/P2); Journal/Insights/Wearable
-// modals land in their own phases (P4/P5/P6) and are stubbed as alerts on
-// Home for now.
+// features. Deck, Session, Settings, SignIn are wired up (P1/P2/P3);
+// Journal/Insights/Wearable modals land in their own phases (P4/P5/P6) and
+// are stubbed as alerts on Home for now.
 
 export type RootStackParamList = {
   Home: undefined;
   Deck: undefined;
   Session: { cardId: string; triggerSource: TriggerSource };
+  Settings: undefined;
+  SignIn: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -38,6 +42,16 @@ export default function RootNavigator() {
           name="Session"
           component={SessionScreen}
           options={{ presentation: 'fullScreenModal', headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ presentation: 'modal', title: 'Settings' }}
+        />
+        <Stack.Screen
+          name="SignIn"
+          component={SignInScreen}
+          options={{ presentation: 'modal', title: 'Sign in' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
