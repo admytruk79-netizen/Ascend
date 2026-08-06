@@ -1,15 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CARD_MANIFEST } from '../data/cardManifest';
 import { CARD_IMAGES } from '../data/cardImages';
 import { getPrimaryAnchorId } from '../storage/cardState';
+import { startPrimaryAnchorSession } from '../session/startSession';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 // Home — spec §3: primary anchor, quick activate, stats preview, entry points.
-// Quick-activate here is a placeholder button; the real double-tap trigger,
-// 120s timer, and +60s extend land in P2 (session mechanics).
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -17,8 +16,11 @@ function notBuiltYet(feature: string) {
   Alert.alert(feature, 'Not built yet — see the phase plan in the build guide.');
 }
 
+const DOUBLE_TAP_DELAY_MS = 300;
+
 export default function HomeScreen({ navigation }: Props) {
   const [anchorId, setAnchorId] = useState<string | null>(null);
+  const lastTapRef = useRef(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -29,6 +31,16 @@ export default function HomeScreen({ navigation }: Props) {
   const anchorCard = anchorId
     ? CARD_MANIFEST.find((c) => c.id === anchorId)
     : null;
+
+  const onAnchorPress = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY_MS) {
+      lastTapRef.current = 0;
+      startPrimaryAnchorSession('manual');
+    } else {
+      lastTapRef.current = now;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -46,10 +58,7 @@ export default function HomeScreen({ navigation }: Props) {
             ) : (
               <Text style={styles.anchorLabel}>{anchorCard.debugLabel}</Text>
             )}
-            <TouchableOpacity
-              style={styles.activateButton}
-              onPress={() => notBuiltYet('Session activation (P2)')}
-            >
+            <TouchableOpacity style={styles.activateButton} onPress={onAnchorPress}>
               <Text style={styles.activateButtonText}>Double-tap to activate</Text>
             </TouchableOpacity>
           </>

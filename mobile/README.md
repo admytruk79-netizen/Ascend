@@ -3,7 +3,7 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0 done, P1 done (cards + Home)
+## Current status: P0–P2 done
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
@@ -12,8 +12,22 @@ product context — this README only covers getting the code running.
   metadata (mechanism mood-tag `category` + `acuteRecommended` per card in
   `src/data/cardManifest.ts`) both came from the user directly, since Canva
   export is blocked by this environment's network policy.
-- P2–P8 (session timer, backend sync, journal, AI, BLE, subscriptions, QA):
-  not started. See the phase plan for what's next.
+- P2: Session mechanics — double-tap on Home starts a session on the
+  Primary Anchor (`src/session/startSession.ts` is the single entry point;
+  a future P6 BLE handler calls the same function with `triggerSource:
+  'wearable'` instead of adding its own path). 120s timer with up to 3
+  extends of +60s each, `AppState`-driven pause/resume with a 60s
+  background grace period past which the session logs as `interrupted`,
+  and an append-only local session log (`src/storage/sessionLog.ts`) —
+  Supabase sync is still P3. **Not tested on physical iOS/Android devices**
+  — this sandboxed environment has no device or simulator access, and the
+  build guide is explicit that background-timer behavior differs enough
+  between platforms that simulator testing wouldn't be trustworthy anyway.
+  Test on real hardware before treating this as verified.
+  The breathing cue is a generic 4s-in/4s-out pulse, not real per-card
+  breathing patterns — no source for those was provided (same situation
+  category/acuteRecommended were in before you sent the real manifest).
+- P3–P8 (backend sync, journal, AI, BLE, subscriptions, QA): not started.
 
 ## Setup this environment could NOT do for you
 
