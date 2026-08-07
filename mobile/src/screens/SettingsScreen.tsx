@@ -1,26 +1,30 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Purchases from 'react-native-purchases';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth } from '../auth/AuthContext';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { getAiConsent } from '../ai/consent';
+import { useEntitlement } from '../purchases/EntitlementContext';
+import { isPurchasesConfigured } from '../purchases/purchases';
 
 // Spec §3 Settings: session params, privacy/AI consent, account/data.
-// Account (P3) and a privacy/AI-consent status section (P5) are built;
-// session params has no configurable UI yet since P2 ships fixed defaults
-// (120s / +60s / max 3), and account/data deletion isn't built here.
+// Account (P3), privacy/AI-consent status (P5), and subscription/restore
+// (P7) are built; session params has no configurable UI yet since P2 ships
+// fixed defaults (120s / +60s / max 3), and account/data deletion isn't
+// built here.
 //
-// The actual opt-in/opt-out toggle lives on InsightsScreen, not here — spec
-// §11 wants a real consent screen, not a settings toggle someone glosses
-// over. This section just shows status and links there, so "privacy/AI
-// consent" is still findable from Settings the way spec §3 lists it.
+// The actual AI opt-in/opt-out toggle lives on InsightsScreen, not here —
+// spec §11 wants a real consent screen, not a settings toggle someone
+// glosses over. This section just shows status and links there.
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 export default function SettingsScreen({ navigation }: Props) {
   const { session, isLoading } = useAuth();
+  const { hasPremium, refresh } = useEntitlement();
   const [aiConsent, setAiConsentState] = useState<boolean | null>(null);
 
   useFocusEffect(
@@ -35,6 +39,16 @@ export default function SettingsScreen({ navigation }: Props) {
 
   const onSignOut = async () => {
     if (supabase) await supabase.auth.signOut();
+  };
+
+  const onRestorePurchases = async () => {
+    try {
+      await Purchases.restorePurchases();
+      await refresh();
+      Alert.alert('Restored', 'Your purchases have been restored.');
+    } catch (err: any) {
+      Alert.alert('Restore failed', err?.message ?? String(err));
+    }
   };
 
   return (
@@ -59,6 +73,30 @@ export default function SettingsScreen({ navigation }: Props) {
         >
           <Text style={styles.buttonText}>Sign in to sync</Text>
         </TouchableOpacity>
+      )}
+
+      <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Subscription</Text>
+      {!isPurchasesConfigured ? (
+        <Text style={styles.body}>Subscriptions aren't set up for this build yet.</Text>
+      ) : (
+        <>
+          <Text style={styles.body}>
+            {hasPremium
+              ? 'ASCEND Premium is active.'
+              : 'Free tier. Upgrade for the wearable trigger, AI insights, unlimited sessions, and full sync.'}
+          </Text>
+          {!hasPremium && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Paywall')}
+            >
+              <Text style={styles.buttonText}>Upgrade</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.button} onPress={onRestorePurchases}>
+            <Text style={styles.buttonText}>Restore purchases</Text>
+          </TouchableOpacity>
+        </>
       )}
 
       <Text style={[styles.sectionTitle, styles.sectionSpacing]}>Privacy</Text>

@@ -9,11 +9,11 @@ import SignInScreen from '../screens/SignInScreen';
 import JournalScreen from '../screens/JournalScreen';
 import InsightsScreen from '../screens/InsightsScreen';
 import WearableScreen from '../screens/WearableScreen';
+import PaywallScreen from '../screens/PaywallScreen';
 import { TriggerSource } from '../types/session';
 
 // Spec §3 IA: one main Home surface + full-screen modals for secondary
-// features. All of Deck, Session, Settings, SignIn, Journal, Insights,
-// Wearable are wired up now (P1-P6).
+// features. All screens P1-P7 call for are wired up now.
 
 export type RootStackParamList = {
   Home: undefined;
@@ -24,6 +24,7 @@ export type RootStackParamList = {
   Journal: { cardId?: string; sessionId?: string } | undefined;
   Insights: undefined;
   Wearable: undefined;
+  Paywall: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -73,6 +74,11 @@ export default function RootNavigator() {
           name="Wearable"
           component={WearableScreen}
           options={{ presentation: 'modal', title: 'Wearable' }}
+        />
+        <Stack.Screen
+          name="Paywall"
+          component={PaywallScreen}
+          options={{ presentation: 'modal', title: 'Upgrade' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

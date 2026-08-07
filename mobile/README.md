@@ -3,7 +3,7 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0–P6 done
+## Current status: P0–P7 done
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
@@ -92,7 +92,28 @@ product context — this README only covers getting the code running.
   **Completely untestable in this environment** — no EAS dev client build,
   no simulator, no physical device, no actual BLE peripheral to scan for.
   This is code written to the spec, never run.
-- P7–P8 (subscriptions, QA): not started yet.
+- P7: Subscriptions — RevenueCat (`src/purchases/`), gating spec §10's four
+  premium features: wearable (`RequiresPremium` wraps `WearableScreen`),
+  AI insights (same gate, inline in `InsightsScreen`), unlimited sessions
+  (`startSession.ts` caps free-tier sessions at **3/day — a guessed
+  placeholder number, spec doesn't specify one, don't treat it as real**),
+  and cloud sync (`syncEngine.ts`'s `runSync` still pulls for free users but
+  skips every push — **read-only for free tier, a decision made explicitly
+  for this build since the build guide flagged it as unspecified**; revisit
+  if that's not actually what's wanted).
+  `PaywallScreen` shows the offering with required price/trial disclosure
+  and a restore-purchases button; **restore purchases is also reachable
+  from Settings** per both stores' review requirements. `configurePurchasesIfPossible()`
+  is lazy like the Supabase client and BLE manager — a no-op without both
+  RevenueCat API keys configured.
+  **Two things that will need real values before shipping, flagged in
+  code**: the entitlement identifier `PREMIUM_ENTITLEMENT_ID = 'premium'`
+  in `purchases.ts` is a guessed name, not confirmed against a real
+  RevenueCat dashboard; the Terms/Privacy links on `PaywallScreen` point at
+  `example.com` and will fail App Store/Play Store review as-is.
+  **Untestable here**: no RevenueCat account, no App Store Connect/Play
+  Console trial configuration, no dev client, no device.
+- P8 (QA): not started yet.
 
 ## Setup this environment could NOT do for you
 
@@ -111,9 +132,14 @@ sandboxed coding session can't create these:
      callback won't work without this), and
    - copy `mobile/.env.example` to `mobile/.env` and fill in the project URL
      + anon key from Project Settings > API.
-3. **RevenueCat** (P7) — dashboard account + entitlement config, plus the
-   7-day trial configured separately in App Store Connect and Google Play
-   Console per spec §10. Code-only setup can't do the store-side config.
+3. **RevenueCat** (P7) — dashboard account, an entitlement named to match
+   `PREMIUM_ENTITLEMENT_ID` in `src/purchases/purchases.ts` (or edit that
+   constant to match whatever you actually name it), an offering with at
+   least one package, plus the 7-day trial configured separately in App
+   Store Connect and Google Play Console per spec §10. Copy the iOS/Android
+   public SDK keys into `mobile/.env` (see `.env.example`). Also replace
+   the placeholder `example.com` Terms/Privacy links in `PaywallScreen.tsx`
+   — both stores will reject a paywall with fake legal links.
 4. **Anthropic API key** for the AI Edge Functions (P5) — set it with
    `npx supabase secrets set ANTHROPIC_API_KEY=sk-ant-...` (and optionally
    `ANTHROPIC_MODEL=...` to override the default), then deploy the
@@ -129,9 +155,13 @@ npm install
 npx expo start
 ```
 
-Scan the QR code with Expo Go for anything through P5 (no native modules
-yet). From P6 (BLE) onward you'll need a custom dev client instead:
-`eas build --profile development`.
+Scan the QR code with Expo Go for anything through P5. P6 (BLE) and P7
+(RevenueCat) both add native modules — Expo Go can't run them at all, so
+`WearableScreen` and the RevenueCat calls in `PaywallScreen`/`SettingsScreen`
+need a custom dev client instead: `eas build --profile development`. Every
+other screen keeps working in Expo Go regardless, since both native modules
+are constructed lazily and every call site is guarded — see the
+`getBleManager`/`configurePurchasesIfPossible` comments.
 
 Note: `npx expo export` and other commands that phone home to Expo's
 servers will fail in network-sandboxed environments (this one included) —
@@ -142,18 +172,19 @@ is a reasonable smoke test in that situation and currently passes clean.
 
 ```
 mobile/
-  App.tsx                  entry point: AuthProvider, SyncManager, RootNavigator
+  App.tsx                  entry point: AuthProvider, EntitlementProvider, SyncManager, RootNavigator
   src/
     navigation/             React Navigation stack (Home + modal screens)
-    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4); Insights (P5); Wearable (P6)
+    screens/                Home, Deck (P1); Session (P2); Settings, SignIn (P3); Journal (P4); Insights (P5); Wearable (P6); Paywall (P7)
     storage/                AsyncStorage-backed local state (cardState.ts, sessionLog.ts, journalLog.ts, bleDevice.ts)
-    session/                startSession.ts — shared session-start entry point (manual + BLE)
+    session/                startSession.ts — shared session-start entry point (manual + BLE), free-tier session cap
     ble/                    bleManager.ts — lazily-constructed react-native-ble-plx client
+    purchases/               purchases.ts, EntitlementContext.tsx, RequiresPremium.tsx — RevenueCat wiring + gate
     data/                   cardManifest.ts (real metadata) + cardImages.ts (real art), both all 42
     types/                  Card / UserCardState / Session / JournalEntry per spec §4/5/7
     lib/supabase.ts         Supabase client (null if env vars unset — see .env.example)
     auth/                   AuthContext, magic-link deep-link handling
-    sync/                   syncEngine.ts (pull/push) + SyncManager.tsx (trigger points)
+    sync/                   syncEngine.ts (pull/push, read-only for free tier) + SyncManager.tsx (trigger points)
     ai/                     consent.ts, aiClient.ts — call the Edge Functions below
 supabase/
   migrations/0001_init_schema.sql   Users/Cards/UserCardState/Sessions/

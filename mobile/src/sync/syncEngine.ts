@@ -6,6 +6,7 @@ import { getAllEntries, replaceAllEntries } from '../storage/journalLog';
 import { UserCardState } from '../types/card';
 import { Session } from '../types/session';
 import { JournalEntry } from '../types/journal';
+import { hasPremiumEntitlement, isPurchasesConfigured } from '../purchases/purchases';
 
 // Spec §9 sync strategy, deliberately simple (not a full sync engine —
 // WatermelonDB-style conflict resolution is overkill for these three rules):
@@ -15,6 +16,12 @@ import { JournalEntry } from '../types/journal';
 //   - JournalEntries: mostly append-only, but edits are permitted (spec §7),
 //     so entries sync the same last-write-wins-by-updatedAt way card state
 //     does, not the pure-insert way sessions do.
+//
+// Spec §10: cloud sync is a premium entitlement — free tier is read-only
+// (pull, no push), per an explicit product decision since the build guide
+// flagged this behavior as unspecified. Skipped entirely (full sync, same
+// as before P7) when RevenueCat isn't configured for this build, same as
+// every other entitlement gate in this app.
 //
 // Known simplification: user_card_state has a DB constraint allowing only
 // one is_primary_anchor row per user. If two devices set different anchors
@@ -227,11 +234,15 @@ async function pushPendingSessions(userId: string): Promise<void> {
 // thrown, so a flaky connection never crashes the app around this.
 export async function runSync(userId: string): Promise<void> {
   try {
+    const canPush = !isPurchasesConfigured || (await hasPremiumEntitlement());
+
     await pullAndMergeCardState(userId);
-    await pushCardState(userId);
+    if (canPush) await pushCardState(userId);
+
     await pullAndMergeJournal(userId);
-    await pushJournal(userId);
-    await pushPendingSessions(userId);
+    if (canPush) await pushJournal(userId);
+
+    if (canPush) await pushPendingSessions(userId);
   } catch (err) {
     console.warn('[sync] runSync failed:', err);
   }

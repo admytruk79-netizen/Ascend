@@ -13,6 +13,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth } from '../auth/AuthContext';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { useEntitlement } from '../purchases/EntitlementContext';
+import { isPurchasesConfigured } from '../purchases/purchases';
 import { getAiConsent, setAiConsent } from '../ai/consent';
 import {
   AIInsight,
@@ -37,6 +39,7 @@ type ConsentState = 'loading' | 'granted' | 'not-granted';
 
 export default function InsightsScreen({ navigation }: Props) {
   const { session } = useAuth();
+  const { hasPremium, isLoading: entitlementLoading } = useEntitlement();
   const [consent, setConsent] = useState<ConsentState>('loading');
   const [insights, setInsights] = useState<AIInsight[]>([]);
   const [lastSessionId, setLastSessionId] = useState<string | null>(null);
@@ -79,6 +82,33 @@ export default function InsightsScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('SignIn')}
         >
           <Text style={styles.primaryButtonText}>Sign in</Text>
+        </TouchableOpacity>
+      </Centered>
+    );
+  }
+
+  // Spec §10: AI insights is a premium feature. Skipped entirely when
+  // RevenueCat isn't configured for this build, same as the other gates.
+  if (isPurchasesConfigured && entitlementLoading) {
+    return (
+      <Centered>
+        <ActivityIndicator color="#f2c14e" />
+      </Centered>
+    );
+  }
+
+  if (isPurchasesConfigured && !hasPremium) {
+    return (
+      <Centered>
+        <Text style={styles.title}>AI insights is a premium feature</Text>
+        <Text style={styles.body}>
+          Upgrade to unlock post-session reflections and weekly summaries.
+        </Text>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => navigation.navigate('Paywall')}
+        >
+          <Text style={styles.primaryButtonText}>Upgrade</Text>
         </TouchableOpacity>
       </Centered>
     );

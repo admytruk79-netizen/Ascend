@@ -15,6 +15,7 @@ import type { Device } from 'react-native-ble-plx';
 import { getBleManager } from '../ble/bleManager';
 import { getPairedDevice, setPairedDevice, PairedDevice } from '../storage/bleDevice';
 import { startPrimaryAnchorSession } from '../session/startSession';
+import { RequiresPremium } from '../purchases/RequiresPremium';
 
 // Spec §6: BLE trigger device, foreground only — no background scanning or
 // triggering, that's explicitly out of scope for the MVP.
@@ -133,40 +134,42 @@ export default function WearableScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {paired && (
-        <View style={styles.pairedCard}>
-          <Text style={styles.pairedLabel}>Paired device</Text>
-          <Text style={styles.pairedName}>{paired.name ?? paired.id}</Text>
-          <TouchableOpacity style={styles.primaryButton} onPress={onTestTrigger}>
-            <Text style={styles.primaryButtonText}>Test trigger</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <TouchableOpacity style={styles.scanButton} onPress={onStartScan} disabled={isScanning}>
-        {isScanning ? (
-          <ActivityIndicator color="#1a1a24" />
-        ) : (
-          <Text style={styles.scanButtonText}>Scan for devices</Text>
+    <RequiresPremium featureName="Wearable">
+      <View style={styles.container}>
+        {paired && (
+          <View style={styles.pairedCard}>
+            <Text style={styles.pairedLabel}>Paired device</Text>
+            <Text style={styles.pairedName}>{paired.name ?? paired.id}</Text>
+            <TouchableOpacity style={styles.primaryButton} onPress={onTestTrigger}>
+              <Text style={styles.primaryButtonText}>Test trigger</Text>
+            </TouchableOpacity>
+          </View>
         )}
-      </TouchableOpacity>
 
-      <FlatList
-        data={devices}
-        keyExtractor={(d) => d.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.deviceRow} onPress={() => onSelectDevice(item)}>
-            <Text style={styles.deviceName}>{item.name}</Text>
-            <Text style={styles.deviceId}>{item.id}</Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={
-          isScanning ? null : <Text style={styles.emptyText}>No devices found yet.</Text>
-        }
-      />
-    </View>
+        <TouchableOpacity style={styles.scanButton} onPress={onStartScan} disabled={isScanning}>
+          {isScanning ? (
+            <ActivityIndicator color="#1a1a24" />
+          ) : (
+            <Text style={styles.scanButtonText}>Scan for devices</Text>
+          )}
+        </TouchableOpacity>
+
+        <FlatList
+          data={devices}
+          keyExtractor={(d) => d.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.deviceRow} onPress={() => onSelectDevice(item)}>
+              <Text style={styles.deviceName}>{item.name}</Text>
+              <Text style={styles.deviceId}>{item.id}</Text>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            isScanning ? null : <Text style={styles.emptyText}>No devices found yet.</Text>
+          }
+        />
+      </View>
+    </RequiresPremium>
   );
 }
 

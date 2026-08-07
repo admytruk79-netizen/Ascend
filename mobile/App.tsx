@@ -5,6 +5,7 @@ import RootNavigator from './src/navigation/RootNavigator';
 import { AuthProvider } from './src/auth/AuthContext';
 import { handleAuthDeepLink } from './src/auth/handleAuthDeepLink';
 import { SyncManager } from './src/sync/SyncManager';
+import { EntitlementProvider } from './src/purchases/EntitlementContext';
 
 export default function App() {
   useEffect(() => {
@@ -19,9 +20,11 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <SyncManager />
-      <RootNavigator />
-      <StatusBar style="light" />
+      <EntitlementProvider>
+        <SyncManager />
+        <RootNavigator />
+        <StatusBar style="light" />
+      </EntitlementProvider>
     </AuthProvider>
   );
 }
