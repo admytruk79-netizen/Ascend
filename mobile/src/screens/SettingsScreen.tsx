@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Purchases from 'react-native-purchases';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -19,6 +19,12 @@ import { isPurchasesConfigured } from '../purchases/purchases';
 // The actual AI opt-in/opt-out toggle lives on InsightsScreen, not here —
 // spec §11 wants a real consent screen, not a settings toggle someone
 // glosses over. This section just shows status and links there.
+//
+// The About/disclaimer section (spec §1 hard constraint, §11 "disclaimer in
+// the app") lives here specifically because it's the one screen every user
+// can reach regardless of sign-in or subscription state — PaywallScreen
+// also carries a disclaimer, but free users who never open the paywall
+// would otherwise never see one at all.
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
@@ -52,7 +58,7 @@ export default function SettingsScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.sectionTitle}>Account</Text>
 
       {!isSupabaseConfigured ? (
@@ -114,7 +120,16 @@ export default function SettingsScreen({ navigation }: Props) {
           </Text>
         </TouchableOpacity>
       )}
-    </View>
+
+      <Text style={[styles.sectionTitle, styles.sectionSpacing]}>About</Text>
+      <Text style={styles.disclaimer}>
+        ASCEND is a wellness tool for nervous-system regulation. It is not
+        therapy, not a medical device, not a diagnostic or treatment tool,
+        and not a substitute for professional care. If you're in crisis, in
+        the US you can call or text 988 (Suicide & Crisis Lifeline) any
+        time.
+      </Text>
+    </ScrollView>
   );
 }
 
@@ -122,6 +137,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a24',
+  },
+  content: {
     padding: 24,
     gap: 12,
   },
@@ -148,5 +165,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#e6e6f0',
     fontSize: 15,
+  },
+  disclaimer: {
+    color: '#8a8aa0',
+    fontSize: 12,
+    lineHeight: 18,
   },
 });

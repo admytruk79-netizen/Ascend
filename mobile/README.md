@@ -3,7 +3,7 @@
 Nervous-system regulation app. See the build guide and MVP spec (§1–13) for
 product context — this README only covers getting the code running.
 
-## Current status: P0–P7 done
+## Current status: P0–P8 done (see QA_CHECKLIST.md before treating any of this as verified)
 
 - P0: Expo TS app scaffolded, Supabase schema written (`../supabase/migrations/0001_init_schema.sql`).
 - P1: Home + Deck screens exist and read/write a local, AsyncStorage-backed
@@ -113,7 +113,16 @@ product context — this README only covers getting the code running.
   `example.com` and will fail App Store/Play Store review as-is.
   **Untestable here**: no RevenueCat account, no App Store Connect/Play
   Console trial configuration, no dev client, no device.
-- P8 (QA): not started yet.
+- P8: QA — `QA_CHECKLIST.md` walks spec §13's checklist item by item,
+  marking what's actually been verified here (code-level checks: clinical-
+  language grep, disclaimer presence, BLE scan doesn't run in background)
+  versus what's code-complete-but-needs-a-real-device-or-live-infra versus
+  what's an outright gap (no crash-reporting/observability was ever built,
+  since no P0–P8 instruction covered it). While auditing this, found the
+  in-app disclaimer only existed on `PaywallScreen` — free users who never
+  open the paywall would never see one, which doesn't satisfy spec §11's
+  "disclaimer in the app." Added one to `SettingsScreen` too, since that's
+  reachable regardless of sign-in or subscription state.
 
 ## Setup this environment could NOT do for you
 
