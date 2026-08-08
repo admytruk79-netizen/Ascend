@@ -402,6 +402,7 @@ let drawnCards = [];
 let cardIndex = 0;
 let activeTab = 'grounded';
 let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
+let reviewingReading = false; // true when stepping back into a just-drawn reading from Synthesis
 let revealCard = null; // card pending a hold-to-reveal, single-card draws only
 const REVEAL_HOLD_MS = 2000;
 
@@ -447,7 +448,19 @@ function handleWordmarkTap() {
 function isSubscribed() { return subscribed || testerUnlocked; }
 
 function goHome() {
-  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false;
+  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false; reviewingReading = false;
+  render();
+}
+
+// Lets someone step back into the cards they just drew from the Synthesis
+// screen -- previously the only path off Synthesis was NEW READING, which
+// discarded the draw entirely with no way to re-read it. reviewingReading
+// makes BACK on the first card return to Synthesis instead of abandoning
+// the draw to Home; forward navigation (NEXT CARD / SEE SYNTHESIS) already
+// works unchanged since drawnCards was never cleared.
+function reviewReading() {
+  reviewingReading = true;
+  cardIndex = 0; activeTab = 'grounded'; screen = 'reading';
   render();
 }
 
@@ -492,7 +505,7 @@ function goToSavedCards() {
 function openSavedCard(num) {
   const card = findCardByNum(num);
   if (!card) return;
-  spreadKey = null; drawnCards = [card]; cardIndex = 0; activeTab = 'grounded'; readingPreviewOnly = true;
+  spreadKey = null; drawnCards = [card]; cardIndex = 0; activeTab = 'grounded'; readingPreviewOnly = true; reviewingReading = false;
   screen = 'reading';
   render();
 }
@@ -530,7 +543,7 @@ function drawFor(key) {
     picked = pickManyWeighted([...CARDS, ...WILDCARD_CARDS], s.count, history);
   }
   recordDraw(picked);
-  spreadKey = key; expandedKey = null; readingPreviewOnly = false;
+  spreadKey = key; expandedKey = null; readingPreviewOnly = false; reviewingReading = false;
   currentJournalId = null; // fresh draw — Save Entry on Synthesis should create a new entry, not edit the last one
   if (s.count === 1) {
     // Single-card draws get the hold-to-reveal ritual; multi-card spreads
@@ -580,8 +593,9 @@ function nextCard() {
   render();
 }
 function prevCard() {
-  if (cardIndex > 0) { cardIndex -= 1; activeTab = 'grounded'; render(); }
-  else { goHome(); } // BACK on the first card abandons the draw and returns to Home
+  if (cardIndex > 0) { cardIndex -= 1; activeTab = 'grounded'; render(); return; }
+  if (reviewingReading) { reviewingReading = false; screen = 'synthesis'; render(); return; }
+  goHome(); // BACK on the first card of a fresh draw abandons it and returns to Home
 }
 
 function composeSynthesis(cards) {
@@ -1086,9 +1100,11 @@ function renderSynthesis(root) {
         <div class="journal-disclaimer">Saved on this device only — lost if the app is uninstalled or you switch devices. No cloud backup.</div>
       </div>
       <button class="btn-outline-gold" id="newReadingBtn">NEW READING</button>
+      <button class="link-dim" id="reviewReadingBtn" style="margin-top:14px;align-self:center;">&larr; Review this reading</button>
     </div>`;
   document.getElementById('journalSaveBtn').addEventListener('click', saveJournalEntry);
   document.getElementById('newReadingBtn').addEventListener('click', goHome);
+  document.getElementById('reviewReadingBtn').addEventListener('click', reviewReading);
 }
 
 function renderJournalHistory(root) {
