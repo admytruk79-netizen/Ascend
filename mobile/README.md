@@ -126,21 +126,20 @@ product context — this README only covers getting the code running.
 
 ## Setup this environment could NOT do for you
 
-Everything below needs a human with browser access to a real account — a
-sandboxed coding session can't create these:
-
-1. **EAS account** — run `eas login` (or `eas login --sso` if your org uses
-   SSO) from a real terminal, then `eas build:configure` inside `mobile/`.
-2. **Supabase project** — create one at supabase.com, then:
-   - `npx supabase link --project-ref <your-ref>` from the repo root, then
-     `npx supabase db push` to apply both files in `supabase/migrations/`
-     (or paste them into the Supabase SQL editor, in order — `0002` depends
-     on `0001`), and
-   - in the dashboard, Authentication > URL Configuration, add
-     `ascend://auth/callback` as a redirect URL (the app's magic-link
-     callback won't work without this), and
-   - copy `mobile/.env.example` to `mobile/.env` and fill in the project URL
-     + anon key from Project Settings > API.
+1. ~~**EAS account**~~ — still needed: run `eas login` (or `eas login --sso`
+   if your org uses SSO) from a real terminal, then `eas build:configure`
+   inside `mobile/`. `app.json` now has real bundle identifiers
+   (`com.ascend.nerve` for both iOS and Android, matching the app identity
+   from the `ascend-nerve` prototype repo) so `build:configure` won't fail
+   on a missing identifier.
+2. ~~**Supabase project**~~ — **done**: project `ascend`
+   (`nqionqvuudamqkfbaopk`, `us-east-1`) is live under this account's org,
+   both migrations in `supabase/migrations/` are applied (verified via
+   `list_tables` — all 6 tables present with RLS enabled), and
+   `mobile/.env` has the real project URL + anon key. One step still needs
+   the dashboard (not exposed through any Supabase MCP tool): in
+   Authentication > URL Configuration, add `ascend://auth/callback` as a
+   redirect URL — the magic-link callback won't work without it.
 3. **RevenueCat** (P7) — dashboard account, an entitlement named to match
    `PREMIUM_ENTITLEMENT_ID` in `src/purchases/purchases.ts` (or edit that
    constant to match whatever you actually name it), an offering with at

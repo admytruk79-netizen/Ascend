@@ -9,11 +9,13 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.ascend.nerve",
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "ASCEND uses Bluetooth to connect to your wearable trigger device."
       }
     },
     "android": {
+      "package": "com.ascend.nerve",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
