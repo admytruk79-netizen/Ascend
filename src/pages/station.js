@@ -1,14 +1,4 @@
-import { richText, mediaBlock, diagramFrame, escapeHtml } from "../layout.js";
-import {
-  siteLayoutDiagram,
-  interiorLayoutDiagram,
-  socarLayoutDiagram,
-  portlandSocarLayoutDiagram,
-  masterRoadmapDiagram,
-  motorCourtLayoutDiagram,
-  postStationLayoutDiagram,
-  vehicleRelayDiagram
-} from "../diagrams.js";
+import { richText, mediaBlock, diagramImage, escapeHtml } from "../layout.js";
 
 const SERVICES = [
   { key: "fuel", title: "Fuel", accent: "gold" },
@@ -40,13 +30,10 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.concept_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>${richText(c["station.concept_body"])}</div>
-      <div class="grid grid--2" style="gap:1rem;">
-        ${mediaBlock(c["station.image_okko"], "OKKO reference", "OKKO station (reference mood)")}
-        ${mediaBlock(c["station.image_socar"], "SOCAR reference", "SOCAR station (reference mood)")}
-      </div>
+      ${mediaBlock(c["station.image_okko"], "Reference board: OKKO, café hospitality, forecourt, motor court, and swap-station influences", "Reference mood board")}
     </div>
     <div style="margin-top:2rem;">
-      ${diagramFrame(socarLayoutDiagram(), "Reference model: SOCAR-style premium forecourt — mechanics only, not the brand.")}
+      ${diagramImage("/diagrams/socar_layout.png", "SOCAR-style premium forecourt reference layout", "Reference model: SOCAR-style premium forecourt — mechanics only, not the brand.")}
     </div>
   </div>
 </section>
@@ -77,8 +64,8 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.layout_heading"])}</h2>
     ${richText(c["station.layout_body"])}
     <div class="grid grid--2" style="margin-top:1.5rem;">
-      ${diagramFrame(siteLayoutDiagram(), "Site layout — fuel/EV canopy at the perimeter, café + retail anchoring the center, wash at the rear.")}
-      ${diagramFrame(interiorLayoutDiagram(), "Interior layout — one counter, one guided queue, multiple revenue lines.")}
+      ${diagramImage("/diagrams/site_layout.png", "Roviq Station site layout schematic", "Site layout — fuel/EV canopy at the perimeter, café + retail anchoring the center, wash at the rear.")}
+      ${diagramImage("/diagrams/interior_layout.png", "Roviq Station interior zoning schematic", "Interior layout — fast lane kept separate from sit-down café flow.")}
     </div>
   </div>
 </section>
@@ -89,7 +76,7 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.portland_heading"])}</h2>
     ${richText(c["station.portland_body"])}
     <div style="margin-top:1.5rem;">
-      ${diagramFrame(portlandSocarLayoutDiagram(), "Portland entry path and the three regulatory/tax constraints designed into the plan from day one.")}
+      ${diagramImage("/diagrams/portland_socar_layout.png", "Portland, Oregon entry site layout", "Portland entry path and the regulatory/tax constraints designed into the plan from day one: attendant-pump law, OLCC wine-and-beer-only retail, no state sales tax.")}
     </div>
     ${mediaBlock(c["station.image_portland"], "Portland streetscape", "Portland, Oregon streetscape / coffee culture photo")}
   </div>
@@ -101,7 +88,7 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.roadmap_heading"])}</h2>
     ${richText(c["station.roadmap_body"])}
     <div style="margin: 1.5rem 0 2rem;">
-      ${diagramFrame(masterRoadmapDiagram(), "Master staged roadmap — Tier 1 core pilot, Tier 2 low-capex layer, Tier 3 moonshot.")}
+      ${diagramImage("/diagrams/master_roadmap.png", "Roviq Station master staged roadmap", "Master staged roadmap — Tier 1 core pilot, Tier 2 low-capex layer, Tier 3 moonshot, laid out month by month.")}
     </div>
     <div class="tier-columns">
       <div class="tier tier--1">
@@ -132,21 +119,22 @@ export function stationPage(c) {
     <div class="card card--accent-rust" style="margin-top:2rem;">
       <h3>Motor Court <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_motor_court_body"])}</p>
-      ${diagramFrame(motorCourtLayoutDiagram(), "Motor court concept — boutique lodging arranged around the shared forecourt.")}
+      ${diagramImage("/diagrams/motor_court_layout.png", "Motor court expansion module layout", "Motor court concept — boutique lodging arranged around the shared forecourt.")}
       ${mediaBlock(c["station.image_motor_court"], "Motor court reference", "Route 66 boutique motor-court revival photo")}
     </div>
 
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Post Station <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_post_station_body"])}</p>
-      ${diagramFrame(postStationLayoutDiagram(), 'Post Station concept — a battery-swap bay layered onto the existing forecourt.')}
+      ${diagramImage("/diagrams/post_station_layout.png", "Post Station battery-swap module layout", "Post Station concept — a battery-swap bay layered onto the existing forecourt, named for the 19th-century relay stations that swapped a tired horse for a fresh one.")}
       ${mediaBlock(c["station.image_battery_swap"], "Battery swap reference", "NIO / Ample battery-swap station photo")}
     </div>
 
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Vehicle Relay <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_vehicle_relay_body"])}</p>
-      ${diagramFrame(vehicleRelayDiagram(), "Vehicle relay concept — stations as custody hand-off points, logged in Roviq Core.")}
+      ${diagramImage("/diagrams/vehicle_relay.png", "Vehicle relay concept diagram", "Vehicle relay concept — a corridor of 3+ stations acting as custody hand-off points, logged in Roviq Core.")}
+      ${mediaBlock(c["station.image_vehicle_relay"], "Relay station reference", "Relay-station reference — a modern take on the 19th-century post/relay stagecoach stop")}
     </div>
   </div>
 </section>

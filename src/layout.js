@@ -37,8 +37,10 @@ export function mediaBlock(url, alt, placeholderLabel) {
   return `<div class="media"><div class="media-placeholder">${escapeHtml(placeholderLabel)}<br><small>Add a real photo URL in /admin</small></div></div>`;
 }
 
-export function diagramFrame(svg, caption) {
-  return `<div class="diagram-frame">${svg}</div><p class="diagram-caption">${escapeHtml(caption)}</p>`;
+// A diagram backed by a real static asset (served from /public via the
+// Worker's ASSETS binding) rather than a hand-drawn inline SVG.
+export function diagramImage(src, alt, caption) {
+  return `<div class="diagram-frame"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy"></div><p class="diagram-caption">${escapeHtml(caption)}</p>`;
 }
 
 export function renderPage({ title, description, activePath, body }) {

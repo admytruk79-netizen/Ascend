@@ -19,12 +19,13 @@ change text or swap a photo.
 ## Project layout
 
 ```
-wrangler.toml          Worker config + KV binding
+wrangler.toml          Worker config + KV binding + static assets binding
+public/diagrams/*.png   The 8 schematic diagrams, served as static assets
+public/photos/*.jpg     Reference photography, served as static assets
 src/index.js           Router / entry point
 src/layout.js           Shared header/nav/footer shell + render helpers
 src/styles.js           Design system (embedded CSS, no build step)
 src/content.js          Content schema + default copy for every editable block
-src/diagrams.js         8 inline SVG schematics (site layout, roadmap, etc.)
 src/admin.js            Password auth (signed cookie) + admin UI + KV writes
 src/pages/*.js          One render function per page
 ```
@@ -37,23 +38,25 @@ Every editable piece of text or image lives under a dotted key
 overlays anything saved in the `CONTENT` KV namespace under `content:<key>`,
 so the site renders correctly even before `/admin` has ever been touched.
 
-## A note on images and diagrams
+## Images and diagrams
 
-- **Diagrams**: the 8 schematics referenced in the brief
-  (`site_layout`, `interior_layout`, `socar_layout`, `portland_socar_layout`,
+- **Diagrams**: the 8 schematics referenced in the brief — `site_layout`,
+  `interior_layout`, `socar_layout`, `portland_socar_layout`,
   `motor_court_layout`, `post_station_layout`, `vehicle_relay`,
-  `master_roadmap`) were not present as PNG files anywhere in this repo, so
-  each was rebuilt as a real, legible inline SVG in `src/diagrams.js` instead
-  of a hallucinated image reference. Swap any of them for a designed PNG
-  later by replacing the diagram function and passing `mediaBlock(url, ...)`
-  in its place inside `src/pages/station.js`.
-- **Photos**: the build environment this site was created in has no outbound
-  network access to image hosts (Wikimedia, Unsplash, Pexels, etc. all
-  blocked), so no photo URLs could be fetched or verified. Every photo slot
-  (fuel canopy, EV bay, café interior, OKKO/SOCAR reference, Portland
-  streetscape, motor court, battery swap, founder photo, ...) renders a
-  labeled placeholder until a real URL is entered in `/admin`. Nothing is a
-  broken or fake image link.
+  `master_roadmap` — are real PNGs at `public/diagrams/*.png`, served as
+  static assets via the Worker's `ASSETS` binding (see `[assets]` in
+  `wrangler.toml`) and referenced with `diagramImage()` in
+  `src/pages/station.js`.
+- **Photos**: real reference photography lives at `public/photos/*.jpg`
+  (resized to a 1600px-wide max and re-encoded as quality-78 JPEG — most
+  are 175–330KB, down from multi-megabyte source PNGs) and is wired in as
+  the default value for the matching `station.image_*` / `home.image_*`
+  keys in `src/content.js`. A few slots (EV close-up, SOCAR-specific photo,
+  Portland streetscape, Roviq platform/dispatch UI mockup) have no matching
+  source image yet and intentionally render a labeled placeholder — swap
+  those in via `/admin` rather than guessing at a stock URL. Every image
+  field, including the ones with a default photo, stays editable at
+  `/admin` at any time.
 
 ## Local development
 

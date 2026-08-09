@@ -70,6 +70,14 @@ export default {
         });
       }
 
+      // Static assets (diagram PNGs, etc.) are served automatically by the
+      // ASSETS binding for matching paths, but fall through here explicitly
+      // in case the request reaches the Worker first.
+      if (method === "GET" && env.ASSETS) {
+        const assetResponse = await env.ASSETS.fetch(request);
+        if (assetResponse.status !== 404) return assetResponse;
+      }
+
       return new Response("Not found", { status: 404 });
     } catch (err) {
       return new Response(`Internal error: ${err.message}`, { status: 500 });

@@ -84,7 +84,8 @@ export const CONTENT_SECTIONS = [
       { key: "station.image_socar", label: "SOCAR reference image", type: "image" },
       { key: "station.image_portland", label: "Portland streetscape image", type: "image" },
       { key: "station.image_motor_court", label: "Motor court reference image", type: "image" },
-      { key: "station.image_battery_swap", label: "Battery swap reference image", type: "image" }
+      { key: "station.image_battery_swap", label: "Battery swap reference image", type: "image" },
+      { key: "station.image_vehicle_relay", label: "Vehicle relay reference image", type: "image" }
     ]
   },
   {
@@ -134,7 +135,7 @@ export const DEFAULT_CONTENT = {
   "home.throughline_body":
     "Roviq Core is one backend feeding many digital front ends. Roviq Station is one physical location housing many services. Neither is a bundle bolted together after the fact — both were designed from the center outward, so every new front end or every new service line inherits the same routing logic, the same brand, and the same operating discipline.",
   "home.image_roviq": "",
-  "home.image_station": "",
+  "home.image_station": "/photos/station_hero.jpg",
 
   // ---------- ROVIQ ----------
   "roviq.hero_eyebrow": "The platform",
@@ -209,15 +210,16 @@ export const DEFAULT_CONTENT = {
     "\"Post Station\" — a battery-swap layer inspired by NIO and Ample, letting EV drivers exchange a depleted pack for a charged one in minutes instead of waiting to charge, for vehicles built to support it.",
   "station.expansion_vehicle_relay_body":
     "A vehicle relay concept: using the station network as custody hand-off points for vehicles in transit — service, delivery, or fleet repositioning — tying the physical network back into Roviq Core's dispatch logic.",
-  "station.image_hero": "",
-  "station.image_cafe": "",
+  "station.image_hero": "/photos/station_forecourt_dusk.jpg",
+  "station.image_cafe": "/photos/station_interior_cafe.jpg",
   "station.image_ev": "",
-  "station.image_fuel": "",
-  "station.image_okko": "",
+  "station.image_fuel": "/photos/station_forecourt_reference.jpg",
+  "station.image_okko": "/photos/reference_board.jpg",
   "station.image_socar": "",
   "station.image_portland": "",
-  "station.image_motor_court": "",
-  "station.image_battery_swap": "",
+  "station.image_motor_court": "/photos/motor_court_reference.jpg",
+  "station.image_battery_swap": "/photos/swap_station_reference.jpg",
+  "station.image_vehicle_relay": "/photos/relay_station_reference.jpg",
 
   // ---------- CONNECTION ----------
   "connection.hero_eyebrow": "Where they meet",
