@@ -1,4 +1,4 @@
-import { richText, mediaBlock, diagramImage, escapeHtml } from "../layout.js";
+import { richText, mediaBlock, diagramImage, renderBullets, escapeHtml } from "../layout.js";
 
 const SERVICES = [
   { key: "fuel", title: "Fuel", accent: "gold" },
@@ -35,6 +35,26 @@ export function stationPage(c) {
     <div style="margin-top:2rem;">
       ${diagramImage("/diagrams/socar_layout.png", "SOCAR-style premium forecourt reference layout", "Reference model: SOCAR-style premium forecourt — mechanics only, not the brand.")}
     </div>
+  </div>
+</section>
+
+<section class="section section--cream-alt">
+  <div class="container">
+    <span class="eyebrow">Why now</span>
+    <h2>${escapeHtml(c["station.market_heading"])}</h2>
+    ${richText(c["station.market_body"])}
+    <div class="callout">
+      <span class="eyebrow">${escapeHtml(c["station.proof_heading"])}</span>
+      ${richText(c["station.proof_body"])}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">Where Roviq Station fits</span>
+    <h2>${escapeHtml(c["station.benchmark_heading"])}</h2>
+    ${renderBullets(c["station.benchmark_body"])}
   </div>
 </section>
 
@@ -79,6 +99,23 @@ export function stationPage(c) {
       ${diagramImage("/diagrams/portland_socar_layout.png", "Portland, Oregon entry site layout", "Portland entry path and the regulatory/tax constraints designed into the plan from day one: attendant-pump law, OLCC wine-and-beer-only retail, no state sales tax.")}
     </div>
     ${mediaBlock(c["station.image_portland"], "Portland streetscape", "Portland, Oregon streetscape / coffee culture photo")}
+  </div>
+</section>
+
+<section class="section section--cream-alt">
+  <div class="container">
+    <div class="grid grid--2" style="align-items:start;">
+      <div>
+        <span class="eyebrow">Planning frame</span>
+        <h2>${escapeHtml(c["station.financials_heading"])}</h2>
+        ${richText(c["station.financials_body"])}
+      </div>
+      <div>
+        <span class="eyebrow">Named directly</span>
+        <h2>${escapeHtml(c["station.risks_heading"])}</h2>
+        ${richText(c["station.risks_body"])}
+      </div>
+    </div>
   </div>
 </section>
 

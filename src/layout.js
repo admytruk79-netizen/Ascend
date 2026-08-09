@@ -27,6 +27,21 @@ export function renderList(str) {
   return `<ol class="steps">${lines.map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ol>`;
 }
 
+// Renders "Label — rest of line" entries (one per line) as a bulleted list
+// with the label bolded, e.g. a competitor benchmark or a glossary.
+export function renderBullets(str) {
+  const lines = String(str ?? "").split("\n").map((l) => l.trim()).filter(Boolean);
+  return `<ul class="bullets">${lines
+    .map((l) => {
+      const idx = l.indexOf("—");
+      if (idx === -1) return `<li>${escapeHtml(l)}</li>`;
+      const label = l.slice(0, idx).trim();
+      const rest = l.slice(idx + 1).trim();
+      return `<li><strong>${escapeHtml(label)}</strong> — ${escapeHtml(rest)}</li>`;
+    })
+    .join("")}</ul>`;
+}
+
 // An image block backed by a KV-editable URL. Falls back to a labeled
 // placeholder so the site always renders something meaningful before an
 // admin has supplied a real photo.

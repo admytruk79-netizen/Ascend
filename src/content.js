@@ -60,6 +60,12 @@ export const CONTENT_SECTIONS = [
       { key: "station.hero_sub", label: "Hero subheading", type: "textarea" },
       { key: "station.concept_heading", label: "Concept heading", type: "text" },
       { key: "station.concept_body", label: "Concept body", type: "textarea" },
+      { key: "station.market_heading", label: "Market & consumer psyche heading", type: "text" },
+      { key: "station.market_body", label: "Market & consumer psyche body", type: "textarea" },
+      { key: "station.proof_heading", label: "Local proof point heading", type: "text" },
+      { key: "station.proof_body", label: "Local proof point body (Krays Coffee)", type: "textarea" },
+      { key: "station.benchmark_heading", label: "Competitive benchmark heading", type: "text" },
+      { key: "station.benchmark_body", label: "Competitive benchmark list (Chain — differentiator, one per line)", type: "textarea" },
       { key: "station.service_fuel_body", label: "Fuel service body", type: "textarea" },
       { key: "station.service_ev_body", label: "EV charging body", type: "textarea" },
       { key: "station.service_cafe_body", label: "Café body", type: "textarea" },
@@ -69,6 +75,10 @@ export const CONTENT_SECTIONS = [
       { key: "station.layout_body", label: "Layout section body", type: "textarea" },
       { key: "station.portland_heading", label: "Portland section heading", type: "text" },
       { key: "station.portland_body", label: "Portland section body", type: "textarea" },
+      { key: "station.financials_heading", label: "Illustrative financials heading", type: "text" },
+      { key: "station.financials_body", label: "Illustrative financials body", type: "textarea" },
+      { key: "station.risks_heading", label: "Key risks heading", type: "text" },
+      { key: "station.risks_body", label: "Key risks body", type: "textarea" },
       { key: "station.roadmap_heading", label: "Roadmap heading", type: "text" },
       { key: "station.roadmap_body", label: "Roadmap intro body", type: "textarea" },
       { key: "station.tier1_heading", label: "Tier 1 heading", type: "text" },
@@ -188,47 +198,62 @@ export const DEFAULT_CONTENT = {
   "station.hero_heading": "One stop. Every service you actually need.",
   "station.tagline": "A Luxury Experience, at an Affordable Price.",
   "station.hero_sub":
-    "Fuel, EV charging, a café, curated wine and retail, and a car wash — aggregated under one brand, at one location, instead of built as five unrelated stops.",
+    "Roviq Station adapts OKKO's Ukrainian \"filling complex\" model — full-service fuel plus a genuine café, curated wine, and retail — for the US market: European-style hospitality and curation, delivered inside a footprint that fits US site economics, drive-through expectations, and state-by-state alcohol law.",
   "station.concept_heading": "The concept",
   "station.concept_body":
-    "Roviq Station is an independent brand. We are not licensed by, affiliated with, or operating under the OKKO or SOCAR name — those two chains are strategic reference models only: OKKO for its hospitality and food-service playbook, SOCAR for its premium-fuel positioning and acquisition-led market entry. We borrowed the logic, not the brand, and built our own identity around it.",
+    "Roviq Station borrows the look, materials, and hospitality standard of a premium brand — glass architecture, curated retail, real sit-down seating, genuine coffee and food craft — but prices it at mainstream convenience-store levels, not boutique-café or wine-bar levels. The luxury is in the experience and design language, not the price tag; the accessibility is what makes it a daily habit rather than an occasional treat. Roviq Station is a fully independent US brand: no OKKO license, no SOCAR license, no franchise or trademark dependency on either company. OKKO and SOCAR are existing registered brands (Galnaftogaz/OKKO Group and the State Oil Company of Azerbaijan) used strictly as strategic reference models — OKKO for its hospitality/food/wine playbook, SOCAR for its premium-fuel and acquisition-led entry playbook. Their names, marks, and identities are not used commercially anywhere in Roviq Station's branding.",
+  "station.market_heading": "Why now: the US market already agrees",
+  "station.market_body":
+    "US convenience-store industry sales reached $817.5B across roughly 152,000 locations in 2025 — a 23rd consecutive year of in-store sales growth. Foodservice now represents about 28.5% of in-store sales, and 58% of consumers say they'd bypass a closer competitor for a brand with a signature food item. A direct copy of the Ukrainian format won't fit US expectations, though: speed stays non-negotiable for the fast-lane customer — pump, grab-and-go, pay, leave — and every slower feature in this plan (sit-down café, wine, motor court, dwell-time features) is opt-in for a customer already choosing to spend time, never a change to what the fast lane owes the rushed customer. If the two ever compete for the same path or staff attention, the fast lane wins. Self-service defaults (pay-at-pump, self-checkout, app ordering), a branded loyalty app, and larger to-go formats are expected, not novel. Alcohol is regulated state-by-state, not nationally, so site selection has to be filtered by state ABC law before any wine program is finalized.",
+  "station.proof_heading": "A real-world proof point, ten minutes from Portland",
+  "station.proof_body":
+    "Krays Coffee, a Ukrainian-owned café in an ordinary Vancouver, WA strip mall, has built a 4.4–4.5-star following doing the opposite of fast-and-generic: real sit-down seating, Eastern European sweet breads and pastries, local-artist wall displays, and an unhurried atmosphere customers say is worth a 15–20 minute wait. This validates three things directly: American customers will choose sit-down European-café hospitality over speed when the experience earns it; an authentic Ukrainian heritage story is a genuine asset here, not something to downplay; and unglamorous real estate doesn't cap what the concept can become if the hospitality is real. Roviq Station's takeaway: budget for genuine sit-down seating, lean into the founder's Ukrainian heritage in the brand story, and don't over-index site selection on \"perfect\" real estate.",
+  "station.benchmark_heading": "Competitive benchmark",
+  "station.benchmark_body":
+    "Wawa — custom hoagies and top-ranked customer satisfaction; proof food quality plus service builds loyalty beyond fuel\nQuikTrip (QT) — clean stores, extensive fresh food; the benchmark for operational execution and site cleanliness\nBuc-ee's — massive travel-center format, brand-as-destination; shows US appetite for a c-store as \"a stop worth choosing\"\nCasey's — signature food (breakfast pizza), rural density; proprietary food items create a loyalty barrier competitors can't copy\n7-Eleven — scale leader, Slurpee/brand icon items; sets the baseline convenience bar nationally",
   "station.service_fuel_body":
-    "Premium and standard fuel grades under a canopy designed to feel like arrival, not a commodity stop.",
+    "Standard gasoline grades plus diesel, with an optional premium \"Nano\"-style top-grade fuel line as a separately branded, price-insensitive upgrade path — not the default.",
   "station.service_ev_body":
-    "Fast-charging bays positioned as a first-class use case, not an afterthought retrofit — built for the wait, not just the plug.",
+    "An EV charging bank as a differentiator and dwell-time driver — per 2026 industry trend data, EV infrastructure is now a top-6 convenience-store trend.",
   "station.service_cafe_body":
-    "A real café, not a warmer case — quality coffee and food worth the stop on its own merits.",
+    "Coffee as the anchor product (drip, espresso, cold brew, fully customizable), plus a small, fresh, rotating hot-food menu built around 1–2 signature items the brand becomes known for — the same way Casey's owns breakfast pizza.",
   "station.service_wine_body":
-    "A curated, small-format wine and retail selection that treats the stop as a destination, not a convenience aisle.",
+    "20–40 curated labels, not a full liquor-store range, paired with a cheese/charcuterie case to sell \"dinner,\" not just a bottle — subject to a state-by-state legal check before the program is finalized at any specific site.",
   "station.service_wash_body":
-    "A fast, high-quality wash bundled into the same visit, so the stop covers the whole vehicle, not just the tank.",
+    "A high-margin, low-labor car wash and vacuum module — often the single most profitable module per square foot in the format.",
   "station.layout_heading": "How the site is laid out",
   "station.layout_body":
-    "Every service line shares one forecourt and one building envelope by design: fuel and EV charging sit under a shared canopy at the perimeter, the café and retail anchor the center so foot traffic from fuel and charging both pass through it, and the wash sits at the rear for a clean traffic flow in and out. The interior is built around the same principle — one counter, one queue, multiple revenue lines.",
+    "The forecourt logic is already close to US best practice: one-way circulation, separate wash/EV queuing, and the store itself as the visual anchor. Interior zoning splits the fast lane (grab-and-go, checkout) from the sit-down café side (seating, hot food, wine aisle), so a 90-second customer and a 20-minute customer never compete for the same path.",
   "station.portland_heading": "Why Portland, Oregon first",
   "station.portland_body":
-    "Portland gives us a SOCAR-style acquisition entry: buy or convert an existing site rather than build from raw ground, which shortens time to open. Oregon's attendant-pump law (self-service is only legal in larger counties as of recent reform, and full-service remains the norm in many areas) is a real operating constraint we're designing staffing around from day one, not discovering later. OLCC rules limit on-site retail to wine and beer, not spirits, which shapes the retail assortment. And Oregon has no state sales tax, which is a genuine, if modest, margin and pricing advantage on every retail and food item sold on-site.",
+    "The Portland entry runs the SOCAR path: acquisition or joint venture with an existing, underperforming independent fuel site near a freeway corridor (I-84/I-205) or a dense NE/SE Portland commercial strip — not a greenfield build. An existing site brings an already-permitted fuel license and USTs, which materially shortens time-to-open. Sequence: acquire, then reconstruct the forecourt/canopy and add the EV bank, then build out café/wine retail inside the existing footprint, then validate 6–12 months before any second site. Three Oregon-specific facts shape the plan: Multnomah County allows self-service on at most 50% of pumps — the other 50% must stay attendant-run at all hours, a standing payroll line, not optional; OLCC governs off-premise beer and wine, with hard liquor restricted to state-contracted stores and out of scope entirely; and Oregon has no state sales tax, a genuine, usable edge on the café/wine/retail side. The Oregon Clean Fuels Program also lets EV charging register as a credit-generating activity — a real revenue line on top of per-kWh fees, not just a differentiator. The café partners with a known local roaster rather than running a generic in-house program, the wine list leans toward Willamette Valley producers alongside imports, and the brand narrative leads with the founder's Ukrainian roots and the OKKO/SOCAR-inspired format rather than positioning this as an imported franchise.",
+  "station.financials_heading": "Illustrative financial frame",
+  "station.financials_body":
+    "Directional, industry-pattern ranges to frame planning discussions — not a projection for any specific site, and not financial or investment advice. Per site, annually: fuel gross margin $250K–$450K (thin per-gallon margin, driven by volume); in-store (food, wine, retail) gross margin $300K–$650K; EV charging $20K–$80K (currently more differentiator than profit center); car wash $80K–$200K (often the single most profitable module per square foot); build-out cost for a new site $3.5M–$7M+ (highly variable by land cost, canopy size, and market). Actual figures depend heavily on land cost, fuel volume, local competition, and state alcohol law, and should be built from real site-level data before any capital commitment.",
+  "station.risks_heading": "Key risks",
+  "station.risks_body":
+    "Trademark/brand risk if the OKKO or SOCAR name were ever used without a formal license — which is why Roviq Station uses neither. Alcohol licensing complexity varies enough by state and county that the wine program may need to be a market-by-market variable, not a fixed standard. New-build fuel sites carry high capital intensity — land, environmental (UST) permitting, and construction can run well past initial estimates, part of why the Portland pilot is acquisition-led instead. And entrenched, well-capitalized competitors (Wawa, QT, Buc-ee's) already occupy the \"food + fuel done well\" position in many strong markets, so pilot site selection needs genuine white space, not a head-on fight.",
   "station.roadmap_heading": "The staged roadmap",
   "station.roadmap_body":
-    "We are sequencing this deliberately in three tiers, and we want that sequencing to be unmistakable everywhere it shows up — what we're building now is not the same claim as what we might build later.",
+    "Everything in this plan collapses into three strategic tiers. Tier 1 is the actual business and must be proven before anything else is funded. Tier 2 is cheap, low-risk upside that layers directly onto a working pilot. Tier 3 is a set of genuine moonshots — each interesting, none assumed into the base case, each requiring its own validation before capital commitment.",
   "station.tier1_heading": "Tier 1 — Core pilot",
   "station.tier1_body":
-    "The first Roviq Station location: fuel, EV charging, café, wine and retail, and car wash, operating as one integrated site. This is what gets built and funded first, and it's the only tier we're making near-term commitments against.",
+    "Stages 0–2, months 0–15. Stage 0: lock the brand, select the Portland/Oregon corridor, run the state regulatory screen. Stage 1: acquire or JV an existing site (SOCAR-style entry), reconstruct the forecourt, build out café plus curated wine/retail plus standard EV charging, staff to Multnomah County's attendant requirement. Stage 2: run the single site 6–12 months, measuring food/wine attach rate, EV utilization, and labor cost — the go/no-go checkpoint for everything else.",
   "station.tier2_heading": "Tier 2 — Low-capex layer",
   "station.tier2_body":
-    "Additional revenue and service lines that can be added to an operating Tier 1 site without major new construction — expanded retail assortment, loyalty and membership tie-ins to the Roviq platform, and added charging capacity as utilization proves out.",
+    "Stages 3–5, months 12–24, additive to a working pilot. Stage 3: bolt on the Roviq Core tie-ins (parts locker, tow staging, diagnostic drop-off) — cheap relative to the pilot build. Stage 4: add the SOCAR-style premium fuel bay and VIP loyalty program once base traffic is proven. Stage 5: replicate the now-proven format at a second site, ideally on the same I-5 corridor.",
   "station.tier3_heading": "Tier 3 — Moonshot",
   "station.tier3_body":
-    "Later-stage, higher-capex concepts that extend the same one-hub-many-services logic well beyond a single site: motor court hospitality, battery swap infrastructure, and vehicle relay. These are directional, not committed, and are presented here as concepts, not plans.",
+    "Stages 6–8, 24+ months, each its own business case. Stage 6: motor court — boutique lodging, only at a genuine destination/road-trip site. Stage 7: battery swap — fleet-focused, most realistically via an Ample-style partnership rather than in-house tech. Stage 8: vehicle relay network — only viable once 3+ sites exist on one corridor, explicitly the last-mover module in the whole plan. Fund and de-risk Tier 1 completely before spending real capital on Tier 2, and treat every Tier 3 module as a separate pitch with its own numbers.",
   "station.expansion_heading": "Expansion concepts",
   "station.expansion_body":
     "Three Tier 3 concepts extend the Roviq Station idea past the first site. Each is presented on its own with its own diagram, and each is explicitly later-stage — none of these are part of the funded Tier 1 pilot.",
   "station.expansion_motor_court_body":
-    "A boutique motor-court revival, in the spirit of the Route 66 restoration trend: short-stay lodging built around the same forecourt, for travelers who want to fuel, charge, eat, and rest without leaving one site.",
+    "A boutique motor-court revival, timed with Route 66's centennial and the live 2026 trend of restored properties appearing in the MICHELIN Guide as legitimate boutique stays. EV dwell time is the enabler: a 20–30 minute charge is currently dead time at every competitor's site; a small motor court (10–20 rooms around a courtyard) turns that same dwell time into an overnight-stay opportunity instead of losing the traveler the moment charging finishes. It also reframes Oregon's attendant-service requirement as authentic branding — uniformed attendants and windshield service read as genuine \"golden age full service,\" not compliance overhead. This is a Phase 3+ concept, evaluated only at a genuine destination/road-trip site, not part of the initial pilot.",
   "station.expansion_post_station_body":
-    "\"Post Station\" — a battery-swap layer inspired by NIO and Ample, letting EV drivers exchange a depleted pack for a charged one in minutes instead of waiting to charge, for vehicles built to support it.",
+    "\"Post Station\" — named for 19th-century relay stations that swapped a tired horse for a fresh one rather than resting it for hours. Applied to EVs: exchange a depleted battery for a charged one in minutes instead of a 20–40 minute charge. This is proven at scale in China — NIO operates roughly 9,000 charging and swap facilities, completed its 100-millionth swap in February 2026, and swaps average about 3 minutes — and exists in the US today at smaller scale via Ample, a Shell Ventures/Repsol-backed startup already pairing swap stations with a Repsol fuel retail forecourt in Madrid. Honest constraint: no major US consumer EV currently ships swap-ready from the factory, so a Roviq Station swap bay would realistically serve fleet, rideshare, and delivery vehicles first — a fleet-focused module and a long-term option, not a near-term mass-market feature.",
   "station.expansion_vehicle_relay_body":
-    "A vehicle relay concept: using the station network as custody hand-off points for vehicles in transit — service, delivery, or fleet repositioning — tying the physical network back into Roviq Core's dispatch logic.",
+    "The more literal version of the historic analog: stagecoach lines swapped entire teams, and sometimes the coach itself, at fixed relay stations. Applied today, a traveler drops off a Roviq rental EV at one station and picks up a different, fully-charged one at the next — the same Hertz/Turo-style one-way rental logic already in Roviq's own platform strategy, applied to a fixed physical corridor. The honest risk, shared by every one-way rental network including U-Haul: vehicles pile up at popular destinations and run short at popular origins, requiring paid repositioning. This requires 3+ Roviq Station sites on one fixed corridor before it's viable at all — the natural first candidate is the I-5 Pacific Northwest spine (Seattle–Portland–Eugene) — and should be modeled and piloted separately from the core fuel/café/wine business.",
   "station.image_hero": "/photos/station_forecourt_dusk.jpg",
   "station.image_cafe": "/photos/station_interior_cafe.jpg",
   "station.image_ev": "",
@@ -247,15 +272,15 @@ export const DEFAULT_CONTENT = {
     "Roviq Core is one backend feeding many digital front ends. Roviq Station is one hub housing many physical services. They're the same idea, and on the ground, they connect directly.",
   "connection.parallel_heading": "One hub, many services — twice",
   "connection.parallel_body":
-    "The parallel isn't a metaphor we reached for after the fact — it's the design principle both were built on. Roviq Core routes a job to the right provider from a single source of truth; Roviq Station routes a customer to the right service from a single physical location. Put them in the same place and the two systems start doing real work together.",
+    "Roviq Station isn't a separate idea from the Roviq auto-marketplace platform — it's the same architecture, applied physically. Roviq Core runs one shared backend with multiple role-based front ends (Customer, Diagnostic, Shop Partner, Parts Vendor, Tow Truck), none of which talk to each other directly; Core does all routing, ranking, and state transitions. Roviq Station is the physical equivalent: one location, multiple services (fuel, EV charging, café, wine/retail, car wash), aggregated under one operating system rather than built as five unrelated stops. This is a strategic option, not a requirement — Roviq Station stands on its own as a business even without these integrations; they're upside, not a dependency.",
   "connection.tiein_tow_body":
-    "A Roviq Station location doubles as a staging point for tow dispatch — a known, mapped site where a tow job can be routed to hand off a vehicle, rather than an arbitrary curb.",
+    "Roviq Station can serve as a designated drop-off/staging point for Roviq-dispatched tow jobs — a physical node the routing logic already knows how to send vehicles to.",
   "connection.tiein_parts_body":
-    "Parts ordered through the Parts Vendor app can be routed to a locker at a Roviq Station for pickup, turning the station into a fulfillment point for the platform, not just a stop for gas.",
+    "The site's retail footprint can host a Roviq parts-locker pickup point — the same unmanned, badge-access, Amazon-Locker-style pattern already scoped for the parts hub — turning a café visit into a parts pickup errand.",
   "connection.tiein_diagnostic_body":
-    "A customer dropping a vehicle off for diagnostic work has somewhere real to wait — the café — instead of a folding chair in a service bay.",
+    "Roviq Station's EV bays and wash bay are natural dwell-time slots for a Tier 1 diagnose-and-route visit, with the café as the waiting area instead of a folding chair in a service bay.",
   "connection.tiein_custody_body":
-    "Vehicle relay hand-offs (ROVIC) use Roviq Station sites as the custody point where a vehicle formally changes hands between legs of a trip, logged in the same system that dispatched it.",
+    "Roviq Station can act as a hand-off point for ROVIC vehicle custody transfers, consistent with its role as a trusted, staffed physical location — naming it Roviq Station rather than a standalone brand keeps the physical and digital businesses legible as one ecosystem.",
 
   // ---------- ABOUT ----------
   "about.hero_heading": "About",

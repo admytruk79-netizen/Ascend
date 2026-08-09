@@ -165,6 +165,19 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
 .diagram-frame svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 .diagram-caption { text-align: center; font-size: 0.85rem; color: #555; margin-top: 0.75rem; }
 
+.bullets { list-style: none; margin: 1rem 0 0; padding: 0; }
+.bullets li {
+  padding-left: 1.3rem; position: relative; margin-bottom: 0.85rem; color: var(--ink);
+}
+.bullets li::before {
+  content: ""; position: absolute; left: 0; top: 0.55em;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+}
+.callout {
+  background: #fff; border-left: 4px solid var(--teal);
+  border-radius: 6px; padding: 1.5rem; margin-top: 1.5rem;
+}
+
 .steps { counter-reset: step; list-style: none; margin: 0; padding: 0; }
 .steps li {
   counter-increment: step;
