@@ -27,14 +27,14 @@ export function roviqPage(c) {
 
 <section class="section section--cream-alt">
   <div class="container">
-    <span class="eyebrow">Flagship example</span>
+    <span class="eyebrow">How it works</span>
     <h2>${escapeHtml(c["roviq.dispatch_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>
         ${richText(c["roviq.dispatch_body"])}
         ${renderList(c["roviq.dispatch_steps"])}
       </div>
-      ${mediaBlock(c["roviq.dispatch_image"], "Tow dispatch map view", "Dispatch map / routing UI mockup")}
+      ${mediaBlock(c["roviq.dispatch_image"], "Roviq dispatch flow", "Dispatch map / routing UI mockup")}
     </div>
   </div>
 </section>
@@ -51,6 +51,30 @@ export function roviqPage(c) {
         </div>`
       ).join("\n")}
     </div>
+  </div>
+</section>
+
+<section class="section section--cream-alt">
+  <div class="container">
+    <span class="eyebrow">How Roviq makes money</span>
+    <h2>${escapeHtml(c["roviq.revenue_heading"])}</h2>
+    ${richText(c["roviq.revenue_body"])}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">The opportunity</span>
+    <h2>${escapeHtml(c["roviq.market_heading"])}</h2>
+    ${richText(c["roviq.market_body"])}
+  </div>
+</section>
+
+<section class="section section--cream-alt">
+  <div class="container">
+    <span class="eyebrow">A distinct product line</span>
+    <h2>${escapeHtml(c["roviq.dealership_heading"])}</h2>
+    ${richText(c["roviq.dealership_body"])}
   </div>
 </section>
 

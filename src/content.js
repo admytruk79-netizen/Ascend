@@ -39,8 +39,14 @@ export const CONTENT_SECTIONS = [
       { key: "roviq.frontend_shop_body", label: "Shop Partner app body", type: "textarea" },
       { key: "roviq.frontend_vendor_body", label: "Parts Vendor app body", type: "textarea" },
       { key: "roviq.frontend_tow_body", label: "Tow Truck app body", type: "textarea" },
-      { key: "roviq.playbook_heading", label: "Playbook heading", type: "text" },
-      { key: "roviq.playbook_body", label: "Playbook body", type: "textarea" },
+      { key: "roviq.revenue_heading", label: "Revenue model heading", type: "text" },
+      { key: "roviq.revenue_body", label: "Revenue model body", type: "textarea" },
+      { key: "roviq.market_heading", label: "Market opportunity heading", type: "text" },
+      { key: "roviq.market_body", label: "Market opportunity body", type: "textarea" },
+      { key: "roviq.dealership_heading", label: "Dealership partnerships heading", type: "text" },
+      { key: "roviq.dealership_body", label: "Dealership partnerships body", type: "textarea" },
+      { key: "roviq.playbook_heading", label: "Competitive landscape heading", type: "text" },
+      { key: "roviq.playbook_body", label: "Competitive landscape body", type: "textarea" },
       { key: "roviq.dispatch_image", label: "Dispatch/map image", type: "image" }
     ]
   },
@@ -110,9 +116,12 @@ export const CONTENT_SECTIONS = [
       { key: "about.hero_heading", label: "Hero heading", type: "text" },
       { key: "about.founder_heading", label: "Founder section heading", type: "text" },
       { key: "about.founder_body", label: "Founder story body", type: "textarea" },
+      { key: "about.team_heading", label: "Team section heading", type: "text" },
+      { key: "about.team_body", label: "Team section body", type: "textarea" },
       { key: "about.contact_heading", label: "Contact heading", type: "text" },
       { key: "about.contact_body", label: "Contact body", type: "textarea" },
       { key: "about.contact_email", label: "Contact email", type: "text" },
+      { key: "about.contact_phone", label: "Contact phone", type: "text" },
       { key: "about.image_founder", label: "Founder/story image", type: "image" }
     ]
   }
@@ -125,9 +134,9 @@ export const DEFAULT_CONTENT = {
   "home.subheadline": "One shared backend. Many ways in. One physical hub, built the same way.",
   "home.intro":
     "Roviq is a dispatch platform for auto services, and Roviq Station is a physical location built on the same idea. Both start from a single core system and branch into the specific experiences people actually need — digital front ends on one side, physical services on the other.",
-  "home.roviq_tagline": "The dispatch engine behind auto service.",
+  "home.roviq_tagline": "A diagnostic-first dispatch and referral network for auto service.",
   "home.roviq_body":
-    "One backend — Roviq Core — handles routing, ranking, and state for every job in the system, whether it's a tow request, a diagnostic case, or a parts order. Five role-based apps sit on top of it: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck.",
+    "One backend — Roviq Core — sits behind a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner shops and independent technicians. Five role-based apps share it: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck.",
   "home.station_tagline": "A Luxury Experience, at an Affordable Price.",
   "home.station_body":
     "One physical location bringing fuel, EV charging, a café, curated wine and retail, and a car wash under a single independent brand — instead of five unrelated stops. Inspired by the OKKO and SOCAR playbooks, built as our own.",
@@ -140,28 +149,38 @@ export const DEFAULT_CONTENT = {
   // ---------- ROVIQ ----------
   "roviq.hero_eyebrow": "The platform",
   "roviq.hero_heading": "Roviq Core",
-  "roviq.hero_sub": "One backend. Real-time routing. Five role-based front ends.",
-  "roviq.core_heading": "One engine, built to route, rank, and move state",
+  "roviq.hero_sub":
+    "A dispatch and referral network for auto service in the Portland metro area — diagnostic-first, with five purpose-built apps sharing one backend and one database.",
+  "roviq.core_heading": "The coordination layer, not another repair shop",
   "roviq.core_body":
-    "Roviq Core is the shared backend underneath every Roviq experience. It doesn't know or care whether a request came from a stranded driver, a shop technician, or a parts warehouse — it takes the job, ranks the eligible providers in real time against location, availability, price, and rating, assigns it, and tracks it through every state change until it's closed out. Every front end is a different view into the same engine.",
-  "roviq.dispatch_heading": "Flagship example: dispatching a tow",
+    "Roviq's objective isn't to become the largest repair shop in the market — it's to become the coordination layer that sits above every shop and independent technician: the single point of entry customers use, and the system that determines where their business flows. Think of it as Uber or Lyft, but for auto maintenance. The customer doesn't need to know or care which shop or technician handles their car, only that it gets fixed quickly and nearby. Roviq owns the routing intelligence, the data, and the relationships that make the network valuable — at the center are a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner repair shops and independent mobile technicians.",
+  "roviq.dispatch_heading": "How a job actually moves through the network",
   "roviq.dispatch_body":
-    "Tow dispatch is where the engine is easiest to see working, because the clock matters most here. A stranded driver opens the Customer app, and within seconds Roviq Core has already found, ranked, and notified the right truck.",
+    "Every job passes through the same diagnostic-first sequence, moving across the five apps in order. Critically, once a job needs a shop, the customer — not an automated matching algorithm — sees the diagnostic findings and picks where the work gets done, from a short list of eligible partners.",
   "roviq.dispatch_steps":
-    "Customer requests a tow with pickup and drop-off location\nRoviq Core ranks nearby available trucks by distance, ETA, price, and rating\nTop-ranked driver receives the job and accepts or declines in real time\nJob state moves from requested to assigned to en route to completed, visible to the customer the entire time\nPayment and rating close the loop and feed back into future ranking",
+    "Entry (Customer App): a customer submits a request with an urgency level — warning light, dead battery, tire trouble, and similar\nDiagnosis (Diagnostic App): a technician claims the request, diagnoses on-site, and logs findings\nTriage: simple jobs (battery, tire) are handled directly; jobs needing a shop move to the next step\nShop choice (Customer App): the customer sees the findings alongside eligible shops (distance, rating, job types) and picks one\nAcceptance (Shop Partner App): the chosen shop accepts, and provides a loaner if the vehicle must stay\nParts, if needed (Parts Vendor App): additional parts are sourced through the vendor layer and added as their own line item\nTowing or valet, as an alternate path (Tow Truck App): a non-drivable vehicle or a premium-tier driven transfer routes through a separate, real-time layer instead",
   "roviq.frontend_customer_body":
-    "Request a tow, a diagnostic, or a repair, track it in real time, and pay — the same simple flow whether the job is urgent or scheduled.",
+    "Booking, diagnostic intake, choosing a shop once diagnosis is complete, live status, and payment — optimized for speed and zero friction.",
   "roviq.frontend_diagnostic_body":
-    "Independent diagnostic technicians pick up cases, run the inspection, and log findings that flow straight into the customer's record and the shop's estimate.",
+    "Shows a queue of new requests. The technician claims one, logs findings, and decides whether to handle it directly or send it to the customer for a shop choice.",
   "roviq.frontend_shop_body":
-    "Shops see incoming jobs ranked and routed to them automatically, manage bay capacity, and quote directly against verified diagnostic data instead of guesswork.",
+    "Job acceptance, scheduling, and payout tracking — showing a shop only the jobs a customer actually chose them for, not an open pool every shop competes over.",
   "roviq.frontend_vendor_body":
-    "Parts vendors get routed orders based on stock, price, and proximity to the shop that needs the part — no manual sourcing calls.",
+    "Receives part orders tied to a specific job, confirms cost and delivery time, and updates fulfillment status.",
   "roviq.frontend_tow_body":
-    "Drivers accept ranked jobs, navigate to pickup, and update status with one tap, with pay calculated automatically from the same job record.",
-  "roviq.playbook_heading": "A proven playbook, recombined",
+    "A genuinely separate, real-time layer — because towing is GPS-tracked and urgent-by-definition, closer to a rideshare driver app than a shop dashboard. Covers both towing a non-drivable vehicle and valet (a driver takes the customer's own car to the shop instead), primarily for premium and luxury-tier customers.",
+  "roviq.revenue_heading": "Three revenue streams, not one referral fee",
+  "roviq.revenue_body":
+    "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then roughly $99–$499/month by tier). Platform-Priced shops accept jobs at a Roviq-calculated price once a firm diagnosis exists, keep 100% of the labor, while Roviq's margin comes from a markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
+  "roviq.market_heading": "A structural, well-documented pain point",
+  "roviq.market_body":
+    "Portland metro's population is approximately 2.27 million, and U.S. consumers will spend an estimated $435 billion on vehicle repair and maintenance this year. The average U.S. vehicle is now 12.8 years old — the oldest on record — and needs more frequent service. Industry-wide average appointment wait is 3.2 days, and some dealership backlogs run four weeks or more. Roughly 967,000 technicians serve 270,300 independent repair shops nationally, against a Bureau of Labor Statistics-projected shortfall of 68,000 technicians a year for the next decade. This isn't a cyclical gap — it's a multi-year structural trend, and shops already see it in their own booking calendars.",
+  "roviq.dealership_heading": "Extending dealership diagnostic capacity",
+  "roviq.dealership_body":
+    "Beyond repair-bay overflow, most dealerships face a distinct, often larger constraint: diagnostic throughput itself — a multi-day wait just to find out what's wrong, before repair even enters the picture. Roviq's technicians function as an extension of a dealership's own diagnostic capacity, reaching into the customer's driveway on the dealership's behalf. Our technicians carry professional-grade diagnostic equipment, not OEM-certified factory tools — so any case needing certified warranty determination still routes straight back to the dealership, exactly like every other warranty and OEM job. Customers rotate through the network over time, not permanently to whichever partner handled one job: warranty and OEM work always comes back, and as a dealership's own capacity opens up, the network routes business their way too.",
+  "roviq.playbook_heading": "A validated, well-capitalized category",
   "roviq.playbook_body":
-    "None of the individual mechanics here are new — real-time dispatch is Uber, on-demand fulfillment is Uber Eats, ranked marketplace supply is Amazon, driver-partner economics are Lyft, asset access without ownership is Hertz and Turo, and a single membership that gets better as it covers more of your life is Amazon Prime. What's new is applying that combined playbook end to end in auto services, where dispatch has historically meant a phone call and a guess.",
+    "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $90M+ raised), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a certification and referral directory, acquired by Yelp for roughly $80 million) have collectively raised over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Roviq is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
   "roviq.dispatch_image": "",
 
   // ---------- STATION ----------
@@ -242,11 +261,15 @@ export const DEFAULT_CONTENT = {
   "about.hero_heading": "About",
   "about.founder_heading": "Why we're building this",
   "about.founder_body":
-    "Roviq and Roviq Station both come from the same instinct: that the businesses people rely on for their vehicles are more fragmented than they need to be, and that fragmentation is a solvable design problem, not a fact of life. That instinct has roots in a Ukrainian upbringing where resourcefulness wasn't optional, and in years spent building ASCEND and 12 Rays before turning fully to Roviq. The throughline across all of it is the same: build the core system once, and let it serve more people through more doors than a single-purpose product ever could.",
+    "Roviq is built and led by Oleksandr Dmytruk, based in Portland, Oregon. Roviq and Roviq Station both come from the same instinct: that the businesses people rely on for their vehicles are more fragmented than they need to be, and that fragmentation is a solvable design problem, not a fact of life. That instinct has roots in a Ukrainian upbringing where resourcefulness wasn't optional, a postgraduate background in Information Systems and Technology, and hands-on experience designing and deploying a full working platform from concept to production — the ASCEND card system, including its data structure, live application logic, and deployment. The throughline across all of it is the same: build the core system once, and let it serve more people through more doors than a single-purpose product ever could.",
+  "about.team_heading": "The team",
+  "about.team_body":
+    "Roviq is not a solo build. Eric serves as Chief Technology Officer, owning technical architecture and build execution — apps, databases, and infrastructure across all five platform experiences and Roviq Core. Alex is Co-Founder, bringing entrepreneurial and operating experience that complements the founder's product and technical background. This structure means Roviq is no longer a single-founder dependency for either the product or the business side.",
   "about.contact_heading": "Get in touch",
   "about.contact_body":
     "For partnership, investment, or press inquiries, reach out directly — we read every message ourselves.",
-  "about.contact_email": "admytruk79@gmail.com",
+  "about.contact_email": "admytruk@proton.me",
+  "about.contact_phone": "360-865-8192",
   "about.image_founder": ""
 };
 
