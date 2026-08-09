@@ -28,10 +28,18 @@ const SPREADS = [
   { key: 'five', count: 5, label: 'Five Card Draw', sub: 'A fuller arc across the phases.', free: false },
   { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false },
   { key: 'seasonal', count: 4, label: 'Seasonal Attunement', sub: 'A four-direction reading tuned to where you are in the yearly cycle.', free: false },
+  { key: 'octave', count: 8, label: 'The Octave', sub: 'Do, re, mi... where a process actually completes, or quietly drifts.', free: false },
 ];
 const POSITIONS = {
   three: ['Grounded In', 'Moving Through', 'Opening Toward'],
   five: ['Foundation', 'Friction', 'Turning Point', 'Integration', 'Emerging Direction'],
+  // The Octave — Gurdjieff's Law of Seven. A process moves through 8 steps,
+  // do-re-mi-fa-sol-la-ti-do, but the interval between mi-fa and between
+  // ti-do is too small to bridge on its own momentum; without an outside
+  // "shock" entering right at that gap, the process quietly drifts off its
+  // original line. Positions 4 and 8 are that shock -- see pickOctave().
+  octave: ['The Impulse', 'First Movement', 'Where It Starts to Waver', 'The Outside Force',
+           'Renewed Momentum', 'Sustained Effort', 'The Threshold', 'The Higher Octave'],
 };
 const HUES = { 1: 238, 2: 266, 3: 294, 4: 322, 5: 38 };
 const WILDCARD_HUE = 85; // distinct warm gold — not one of the 5 phase hues
@@ -186,8 +194,7 @@ function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 
 // ── RESONANCE ENGINE ────────────────────────────────────────────────────
 // Deterministic, explainable weighted-random draw logic — no AI, no
-// network, nothing beyond arithmetic over a local history log. Three
-// pieces:
+// network, nothing beyond arithmetic over a local history log. Five pieces:
 //  1. Recency weighting — a card drawn recently is less likely to come up
 //     again until the weighting window (RECENCY_WINDOW draws) passes.
 //  2. Phase-fairness weighting — phases under-represented relative to their
@@ -198,6 +205,14 @@ function spreadByKey(key) { return SPREADS.find(s => s.key === key); }
 //     from each phase in ascending order instead of leaving coverage to
 //     chance, so the spread actually delivers the structure its label
 //     promises every time.
+//  4. Breath-category tilt — cards whose breath pattern is "grounding"
+//     (longer exhale) are weighted up slightly at night, "expansive"
+//     (longer inhale) cards by day, tying Day/Night mode to what actually
+//     gets drawn instead of just how the screen looks.
+//  5. Quality diversity — within one multi-card draw, a tested_quality
+//     that's already appeared is avoided on later picks when an
+//     alternative exists, so a spread reads as several distinct angles
+//     rather than the same lesson twice by coincidence.
 // Falls back to neutral weights (equivalent to the old pure Math.random())
 // whenever there's no history yet — first launch, cleared storage, or a
 // failed localStorage write all degrade to the same safe default.
@@ -258,6 +273,31 @@ function phaseFairnessWeight(bucketKey, history) {
   return Math.max(0.5, Math.min(1.8, ratio));
 }
 
+// Reuses parseBreathPhases/breathCategoryFor (defined below, function
+// declarations are hoisted) to classify ANY card's breath pattern purely
+// for weighting purposes -- no separate tagging needed. Grounding cards
+// (longer exhale) lean in at night, expansive cards (longer inhale) lean
+// in by day; natural-rhythm cards and balance cards stay neutral.
+function breathTiltWeight(card) {
+  const phases = parseBreathPhases(card);
+  if (!phases) return 1;
+  const category = breathCategoryFor(phases);
+  const eff = effectiveThemeMode();
+  if (eff === 'night' && category === 'grounding') return 1.15;
+  if (eff === 'day' && category === 'expansive') return 1.15;
+  return 1;
+}
+
+// Wraps a weight function so any card whose tested_quality is already in
+// `usedQualities` gets zeroed out -- unless doing so would zero out every
+// remaining card, in which case it backs off entirely. Phase/wildcard
+// representation always wins over quality uniqueness when they conflict.
+function withQualityAvoidance(entries, baseWeightFn, usedQualities) {
+  const anyFresh = entries.some(c => !usedQualities.has(c.tested_quality));
+  if (!anyFresh) return baseWeightFn;
+  return c => (usedQualities.has(c.tested_quality) ? 0 : baseWeightFn(c));
+}
+
 // Picks one card out of `entries` (mutates it via splice) using the given
 // per-card weight function. Falls back to uniform if every weight is 0.
 function weightedSplicePick(entries, weightFn) {
@@ -274,7 +314,8 @@ function weightedSplicePick(entries, weightFn) {
 
 function pickSingleWeighted(pool, history) {
   const entries = [...pool];
-  return weightedSplicePick(entries, c => recencyWeight(c.num, history) * phaseFairnessWeight(c.phase == null ? 'wildcard' : c.phase, history));
+  return weightedSplicePick(entries, c =>
+    recencyWeight(c.num, history) * phaseFairnessWeight(c.phase == null ? 'wildcard' : c.phase, history) * breathTiltWeight(c));
 }
 
 // Generic multi-pick with no phase structure (used for Seasonal Attunement,
@@ -282,32 +323,43 @@ function pickSingleWeighted(pool, history) {
 function pickManyWeighted(pool, n, history) {
   const entries = [...pool];
   const picked = [];
+  const usedQualities = new Set();
   for (let i = 0; i < n && entries.length; i++) {
-    picked.push(weightedSplicePick(entries, c => recencyWeight(c.num, history) * phaseFairnessWeight(c.phase == null ? 'wildcard' : c.phase, history)));
+    const base = c => recencyWeight(c.num, history) * phaseFairnessWeight(c.phase == null ? 'wildcard' : c.phase, history) * breathTiltWeight(c);
+    const card = weightedSplicePick(entries, withQualityAvoidance(entries, base, usedQualities));
+    usedQualities.add(card.tested_quality);
+    picked.push(card);
   }
   return picked;
 }
 
 // quota: [[phaseNum, count], ...] in the order they should appear in the
-// reading. Pulls exactly `count` cards from that phase only (recency-
-// weighted, no wildcards) — this is what makes "the full ascent, phase by
-// phase" a guarantee instead of a coincidence.
-function pickPhaseArc(quota, history) {
+// reading. Pulls exactly `count` cards from that phase only (recency- and
+// breath-weighted, no wildcards) — this is what makes "the full ascent,
+// phase by phase" a guarantee instead of a coincidence. usedQualities is
+// shared across the whole draw (caller passes one Set through every phase)
+// so quality diversity holds across phases, not just within one.
+function pickPhaseArc(quota, history, usedQualities) {
+  usedQualities = usedQualities || new Set();
   const picked = [];
   quota.forEach(([phaseNum, count]) => {
     const entries = CARDS.filter(c => c.phase === phaseNum);
     for (let i = 0; i < count && entries.length; i++) {
-      picked.push(weightedSplicePick(entries, c => recencyWeight(c.num, history)));
+      const base = c => recencyWeight(c.num, history) * breathTiltWeight(c);
+      const card = weightedSplicePick(entries, withQualityAvoidance(entries, base, usedQualities));
+      usedQualities.add(card.tested_quality);
+      picked.push(card);
     }
   });
   return picked;
 }
 
 // Picks `n` distinct buckets (the 5 phases + a wildcard bucket) weighted by
-// phase-fairness, then one recency-weighted card from each chosen bucket —
-// guarantees a Three Card Draw reads as three different angles instead of
-// three cards that happen to land in the same phase.
-function pickDiverseBuckets(n, history) {
+// phase-fairness, then one recency/breath-weighted card from each chosen
+// bucket — guarantees a Three Card Draw reads as three different angles
+// instead of three cards that happen to land in the same phase.
+function pickDiverseBuckets(n, history, usedQualities) {
+  usedQualities = usedQualities || new Set();
   const buckets = [1, 2, 3, 4, 5, 'wildcard'];
   const remaining = [...buckets];
   const pickedBuckets = [];
@@ -316,8 +368,63 @@ function pickDiverseBuckets(n, history) {
   }
   return pickedBuckets.map(b => {
     const entries = b === 'wildcard' ? [...WILDCARD_CARDS] : CARDS.filter(c => c.phase === b);
-    return weightedSplicePick(entries, c => recencyWeight(c.num, history));
+    const base = c => recencyWeight(c.num, history) * breathTiltWeight(c);
+    const card = weightedSplicePick(entries, withQualityAvoidance(entries, base, usedQualities));
+    usedQualities.add(card.tested_quality);
+    return card;
   });
+}
+
+// Law of Three (Gurdjieff): every phenomenon arises from an active force,
+// a passive/resisting force, and a third reconciling force. Every card's
+// grounded_supported/grounded_resisted pair already IS an active/passive
+// pole -- no new tagging needed. Reorders 3 already-picked cards (from
+// pickDiverseBuckets) into that triad: a Wildcard, if present, is the
+// disruptive/resisting force and takes the middle position; the remaining
+// cards fill the outer positions in ascending phase order (lower phase =
+// the initiating/active position, higher phase = the reconciling one).
+function orderTriad(cards) {
+  const wildcardIdx = cards.findIndex(c => c.isWildcard);
+  if (wildcardIdx === -1) {
+    return [...cards].sort((a, b) => a.phase - b.phase);
+  }
+  const wildcard = cards[wildcardIdx];
+  const others = cards.filter((_, i) => i !== wildcardIdx).sort((a, b) => a.phase - b.phase);
+  return [others[0], wildcard, others[1]];
+}
+
+// The Octave (Gurdjieff's Law of Seven): a process moves through 8 steps,
+// do-re-mi-fa-sol-la-ti-do, but the gap between mi-fa and between ti-do is
+// too small to bridge on its own momentum -- without an outside "shock"
+// entering right at that gap, the process drifts off its original line.
+// The Wildcard deck is already, everywhere else in this app, defined as
+// outside the five-phase structure -- so positions 4 (fa) and 8 (the
+// higher do) are guaranteed Wildcards, the structural shock. The other 6
+// steps pull from the core phases in ascending order (do-re-mi, then
+// sol-la-ti), with the 6th slot -- the one phase that has to double up --
+// assigned to whichever phase is currently most under-represented in the
+// user's own history, so even the "extra" slot isn't arbitrary.
+function pickOctave(history) {
+  const usedQualities = new Set();
+  const basePhases = [1, 2, 3, 4, 5];
+  let extraPhase = basePhases[0], bestWeight = -Infinity;
+  basePhases.forEach(p => {
+    const w = phaseFairnessWeight(p, history);
+    if (w > bestWeight) { bestWeight = w; extraPhase = p; }
+  });
+  const counts = {};
+  basePhases.forEach(p => { counts[p] = 1; });
+  counts[extraPhase] += 1;
+  const quota = Object.keys(counts).map(Number).sort((a, b) => a - b).map(p => [p, counts[p]]);
+  const phaseCards = pickPhaseArc(quota, history, usedQualities); // 6 cards, ascending phase order
+
+  const wildcardPool = [...WILDCARD_CARDS];
+  const wcBase = c => recencyWeight(c.num, history) * breathTiltWeight(c);
+  const fa = weightedSplicePick(wildcardPool, withQualityAvoidance(wildcardPool, wcBase, usedQualities));
+  usedQualities.add(fa.tested_quality);
+  const higherDo = weightedSplicePick(wildcardPool, withQualityAvoidance(wildcardPool, wcBase, usedQualities));
+
+  return [phaseCards[0], phaseCards[1], phaseCards[2], fa, phaseCards[3], phaseCards[4], phaseCards[5], higherDo];
 }
 
 // ── STATE ────────────────────────────────────────────────────────────────
@@ -531,10 +638,15 @@ function drawFor(key) {
     // "The full ascent, phase by phase" — every phase represented in
     // ascending order; Phase 1 (only 8 cards) gets 1 slot, the rest get 2.
     picked = pickPhaseArc([[1, 1], [2, 2], [3, 2], [4, 2], [5, 2]], history);
+  } else if (key === 'octave') {
+    // Gurdjieff's Law of Seven — see pickOctave() for the full mechanism.
+    picked = pickOctave(history);
   } else if (key === 'three') {
-    // Three distinct phases (or a wildcard) instead of three independent
-    // random picks that can accidentally land on near-duplicate angles.
-    picked = pickDiverseBuckets(3, history);
+    // Three distinct phases (or a wildcard), then reordered into Gurdjieff's
+    // Law of Three: active force / resisting force / reconciling force.
+    // See orderTriad() — every card's supported/resisted pair already IS
+    // that active/passive polarity, this just puts them in the right seats.
+    picked = orderTriad(pickDiverseBuckets(3, history));
   } else if (s.count === 1) {
     picked = [pickSingleWeighted([...CARDS, ...WILDCARD_CARDS], history)];
   } else {
