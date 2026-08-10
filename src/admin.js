@@ -152,8 +152,8 @@ export async function handleAdminLogin(request, env) {
     });
   }
   const form = await request.formData();
-  const password = form.get("password") || "";
-  if (!timingSafeEqual(String(password), env.ADMIN_PASSWORD)) {
+  const password = String(form.get("password") || "");
+  if (!password || !env.ADMIN_PASSWORD || !timingSafeEqual(password, env.ADMIN_PASSWORD)) {
     return new Response(renderLoginPage("Incorrect password."), {
       status: 401,
       headers: { "content-type": "text/html;charset=UTF-8" }
