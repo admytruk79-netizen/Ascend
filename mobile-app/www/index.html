@@ -103,6 +103,18 @@
     animation: unfold .4s cubic-bezier(.4,0,.2,1);
   }
 
+  /* One-shot: Home's very first appearance, right after BEGIN, unfolds as a
+     ring expanding from the button itself rather than the standard fade+lift
+     every other screen uses -- a single deliberate flourish at the entry
+     point, not a treatment applied everywhere. */
+  @keyframes circleReveal {
+    from { clip-path: circle(0px at var(--reveal-x, 50%) var(--reveal-y, 20%)); }
+    to   { clip-path: circle(150% at var(--reveal-x, 50%) var(--reveal-y, 20%)); }
+  }
+  .screen.screen-circle-reveal {
+    animation: circleReveal .6s cubic-bezier(.4,0,.2,1);
+  }
+
   @keyframes logoPulse {
     0%, 100% { box-shadow: 0 0 34px rgba(var(--gold-rgb),calc(.25 * var(--glow))); transform: scale(1); }
     50% { box-shadow: 0 0 64px rgba(var(--gold-rgb),calc(.45 * var(--glow))); transform: scale(1.05); }

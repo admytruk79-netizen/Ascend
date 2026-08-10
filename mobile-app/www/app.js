@@ -621,7 +621,23 @@ function openSavedCard(num) {
   render();
 }
 
+// Set right before the intro->home transition so renderHome() can play a
+// one-shot circular reveal expanding from wherever BEGIN actually was on
+// screen; null the rest of the time so every later trip to Home (e.g. BACK
+// from a fresh draw) gets the plain, standard .screen fade instead.
+let introRevealOrigin = null;
+
 function beginFromIntro() {
+  const btn = document.getElementById('beginBtn');
+  const screenEl = document.getElementById('screen');
+  if (btn && screenEl) {
+    const btnRect = btn.getBoundingClientRect();
+    const screenRect = screenEl.getBoundingClientRect();
+    introRevealOrigin = {
+      x: (btnRect.left + btnRect.width / 2 - screenRect.left) + 'px',
+      y: (btnRect.top + btnRect.height / 2 - screenRect.top) + 'px',
+    };
+  }
   goHome();
 }
 
@@ -826,6 +842,16 @@ function renderHome(root) {
       <div class="spread-list">${rows}</div>
       ${!isSubscribed() ? '<div style="text-align:center;margin-top:22px;"><button class="link-dim" id="restoreBtn">Already a member? Restore purchase</button></div>' : ''}
     </div>`;
+
+  if (introRevealOrigin) {
+    const screenDiv = root.querySelector('.screen.home');
+    if (screenDiv) {
+      screenDiv.style.setProperty('--reveal-x', introRevealOrigin.x);
+      screenDiv.style.setProperty('--reveal-y', introRevealOrigin.y);
+      screenDiv.classList.add('screen-circle-reveal');
+    }
+    introRevealOrigin = null;
+  }
 
   document.getElementById('savedEntryBtn').addEventListener('click', goToSavedCards);
   document.getElementById('journalEntryBtn').addEventListener('click', goToJournalHistory);
