@@ -900,6 +900,11 @@ function spiritPanelHtml(current) {
 // — they get a soft, unstructured pulse with no visible numbers instead.
 const NATURAL_BREATH_CARDS = new Set([36, 77, 79, 83, 90, 108]);
 const BREATH_AUTO_CYCLES = 3; // full cycles played automatically before settling into "replay"
+// A few cards' printed counts include a very brief beat (e.g. a 1-second
+// exhale) as part of their specific rhythm. True to the card on paper, but
+// on screen a 1-second phase reads as a glitch, not a breath. Floor every
+// displayed/animated phase here so nothing ever feels rushed or skipped.
+const MIN_BREATH_PHASE_SECONDS = 3;
 
 function parseBreathPhases(card) {
   if (NATURAL_BREATH_CARDS.has(card.num)) return null;
@@ -912,7 +917,7 @@ function parseBreathPhases(card) {
   else if (nums.length === 3) names = ['Inhale', 'Hold', 'Exhale'];
   else if (nums.length === 4) names = ['Inhale', 'Hold', 'Exhale', 'Hold'];
   else names = nums.map((_, i) => (i === nums.length - 1 ? 'Exhale' : (i % 2 === 0 ? 'Inhale' : 'Hold')));
-  return nums.map((seconds, i) => ({ name: names[i] || 'Hold', seconds }));
+  return nums.map((seconds, i) => ({ name: names[i] || 'Hold', seconds: Math.max(MIN_BREATH_PHASE_SECONDS, seconds) }));
 }
 
 // Stage 1b: subtle per-category tone/motion, derived straight from the
