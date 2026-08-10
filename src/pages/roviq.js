@@ -12,9 +12,16 @@ export function roviqPage(c) {
   return `
 <section class="hero section--tight">
   <div class="container">
-    <span class="eyebrow">${escapeHtml(c["roviq.hero_eyebrow"])}</span>
-    <h1>${escapeHtml(c["roviq.hero_heading"])}</h1>
-    <p class="lead">${escapeHtml(c["roviq.hero_sub"])}</p>
+    <div class="grid grid--2" style="align-items:center;">
+      <div>
+        <span class="eyebrow">${escapeHtml(c["roviq.hero_eyebrow"])}</span>
+        <h1>${escapeHtml(c["roviq.hero_heading"])}</h1>
+        <p class="lead">${escapeHtml(c["roviq.hero_sub"])}</p>
+      </div>
+      <div style="text-align:center;">
+        <img src="/brand/roviq-lockup.png" alt="Roviq — Auto repair, made simple." style="max-width:280px; width:100%; margin:0 auto; border-radius:12px;">
+      </div>
+    </div>
   </div>
 </section>
 

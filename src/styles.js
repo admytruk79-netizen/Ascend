@@ -66,8 +66,10 @@ img { max-width: 100%; display: block; }
 .wordmark {
   color: #fff; font-size: 1.3rem; text-decoration: none; margin: 0;
   letter-spacing: 0.03em;
+  display: inline-flex; align-items: center; gap: 0.5rem;
 }
 .wordmark span { color: var(--gold); }
+.wordmark-icon { width: 28px; height: 28px; border-radius: 7px; display: block; }
 nav.site-nav { display: flex; gap: 1.6rem; align-items: center; flex-wrap: wrap; }
 nav.site-nav a {
   color: #D9E2F3; text-decoration: none; font-size: 0.92rem; font-weight: 600;

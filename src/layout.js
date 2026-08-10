@@ -66,6 +66,7 @@ export function renderPage({ title, description, activePath, body }) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description || "")}">
+<link rel="icon" href="/brand/roviq-icon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>${CSS}</style>
@@ -73,7 +74,7 @@ export function renderPage({ title, description, activePath, body }) {
 <body>
 <header class="site-header">
   <div class="container">
-    <a href="/" class="wordmark">ROVI<span>Q</span></a>
+    <a href="/" class="wordmark"><img src="/brand/roviq-icon.png" alt="" class="wordmark-icon">ROVI<span>Q</span></a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">&#9776;</button>
     <nav class="site-nav" id="siteNav">
       ${NAV_LINKS.map(
