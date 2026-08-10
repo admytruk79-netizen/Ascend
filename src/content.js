@@ -58,6 +58,8 @@ export const CONTENT_SECTIONS = [
       { key: "roviq.ask_body", label: "The Ask intro body", type: "textarea" },
       { key: "roviq.ask_funds", label: "Use of funds (Line item — $Amount, one per line)", type: "textarea" },
       { key: "roviq.ask_milestones", label: "Milestones this unlocks (one per line)", type: "textarea" },
+      { key: "roviq.stack_heading", label: "Tech stack heading", type: "text" },
+      { key: "roviq.stack_body", label: "Tech stack list (Layer — Tool, one per line)", type: "textarea" },
       { key: "roviq.dispatch_image", label: "Dispatch/map image", type: "image" }
     ]
   },
@@ -179,7 +181,7 @@ export const DEFAULT_CONTENT = {
   "roviq.dispatch_body":
     "Every job passes through the same diagnostic-first sequence, moving across the five apps in order. Critically, once a job needs a shop, the customer — not an automated matching algorithm — sees the diagnostic findings and picks where the work gets done, from a short list of eligible partners.",
   "roviq.dispatch_steps":
-    "Entry (Customer App): a customer submits a request with an urgency level — warning light, dead battery, tire trouble, and similar\nDiagnosis (Diagnostic App): a technician claims the request, diagnoses on-site, and logs findings\nTriage: simple jobs (battery, tire) are handled directly; jobs needing a shop move to the next step\nShop choice (Customer App): the customer sees the findings alongside eligible shops (distance, rating, job types) and picks one\nAcceptance (Shop Partner App): the chosen shop accepts, and provides a loaner if the vehicle must stay\nParts, if needed (Parts Vendor App): additional parts are sourced through the vendor layer and added as their own line item\nTowing or valet, as an alternate path (Tow Truck App): a non-drivable vehicle or a premium-tier driven transfer routes through a separate, real-time layer instead",
+    "Entry (Customer App): a customer submits a request with an urgency level — warning light, dead battery, tire trouble, and similar\nDiagnosis (Diagnostic App): a technician claims the request, diagnoses on-site, and logs findings\nTriage: simple jobs (battery, tire) are handled directly; jobs needing a shop move to the next step\nShop choice (Customer App): the customer sees the findings alongside a ranked shortlist of eligible shops — filtered by job-type match and distance, then ranked by current load, response time, on-time rate, and rating — and picks one\nAcceptance (Shop Partner App): the chosen shop accepts, and provides a loaner if the vehicle must stay\nParts, if needed (Parts Vendor App): additional parts are sourced through the vendor layer and added as their own line item\nTowing or valet, as an alternate path (Tow Truck App): a non-drivable vehicle or a premium-tier driven transfer routes through a separate, real-time layer instead",
   "roviq.frontend_customer_body":
     "Booking, diagnostic intake, choosing a shop once diagnosis is complete, live status, and payment — optimized for speed and zero friction.",
   "roviq.frontend_diagnostic_body":
@@ -219,6 +221,9 @@ export const DEFAULT_CONTENT = {
     "Customer + Diagnostic apps (incl. AI triage) — $24,000\nPricing engine + Stripe Connect + technician payout — $16,000\nShop Partner app + matching — $12,000\nParts Vendor app + add-to-order — $11,000\nDiagnostic tool, equipment + labor-guide license — $5,000\nLoaner vehicle pool + insurance — $13,000\nMarketing & promotion — $9,000\nPartner & customer acquisition incentives — $5,000\nFounder runway (12 months) — $40,000\nLegal, cap table & operating buffer — $15,000\nTotal — $150,000",
   "roviq.ask_milestones":
     "All five apps live in the Portland metro, AI diagnostic triage in production\n5+ active partner shops signed and referring\nParts vendor layer live and tracking wrong-part / delay metrics\nDefined referral and parts volume within 12 months",
+  "roviq.stack_heading": "Built on proven technology, not custom infrastructure",
+  "roviq.stack_body":
+    "Frontend — React (Next.js), one shared component library across all four customer-facing apps.\nBackend / API — Node.js (Express), built as a modular monolith rather than microservices — well-defined internal modules for assessment, AI triage, matching, and state, called directly by API handlers, simple to build and debug at this stage. Every app reads and writes through this one layer; no app ever talks to another app directly.\nDatabase — PostgreSQL, a single instance and the single source of truth for all five apps, with every state transition logged to an event table, not just overwritten.\nAuth — JWT (Passport.js / Auth.js): unauthenticated for the customer flow in MVP, login-gated for every partner and vendor app.\nNotifications — Twilio (SMS), Postmark / SendGrid (email).\nPayments — Stripe, invoicing first, Connect later.\nHosting — Vercel (frontend) plus Railway / Render (backend and database) — low-ops, appropriate to MVP scale, with event-driven infrastructure and a job queue treated as a real-time-dispatch-triggered upgrade, not a default.",
   "roviq.dispatch_image": "",
 
   // ---------- STATION ----------

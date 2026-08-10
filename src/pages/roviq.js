@@ -107,6 +107,14 @@ export function roviqPage(c) {
   </div>
 </section>
 
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">How it's actually built</span>
+    <h2>${escapeHtml(c["roviq.stack_heading"])}</h2>
+    ${renderBullets(c["roviq.stack_body"])}
+  </div>
+</section>
+
 <section class="section section--cream-alt">
   <div class="container">
     <span class="eyebrow">Investment case</span>
