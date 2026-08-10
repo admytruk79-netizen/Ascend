@@ -81,11 +81,29 @@ account and is wired into `wrangler.toml` (`id = "0a3a91e8fa63462eae8cf3f2e77e8a
    npx wrangler deploy
    ```
 
-To deploy from CI instead, see `.github/workflows/deploy.yml` — it runs on
-push to `main` and expects `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
-as repository secrets (the same two the original `wrangler.toml` already
-referenced). Admin secrets (`ADMIN_PASSWORD`, `SESSION_SECRET`) are set once
-directly against the Cloudflare account, not through CI.
+### Deploying from CI (no local CLI needed)
+
+`.github/workflows/deploy.yml` deploys with Wrangler on every push to `main`
+(pinned to Wrangler 3.114.17, the version this project was tested against).
+It needs two **repository** secrets, set once under the repo's
+**Settings → Secrets and variables → Actions**:
+
+- `CLOUDFLARE_API_TOKEN` — an API token with Workers Scripts: Edit permission
+- `CLOUDFLARE_ACCOUNT_ID` — found on any Workers page in the Cloudflare dashboard
+
+These are separate from the two Worker secrets above (`ADMIN_PASSWORD`,
+`SESSION_SECRET`), which are set directly against the Cloudflare account —
+either via `wrangler secret put`, or in the dashboard under the deployed
+Worker's **Settings → Variables and Secrets** (mark both **Encrypt**).
+
+To deploy from a branch other than `main` (e.g. before merging), open the
+**Actions** tab → **Deploy Roviq / Roviq Station Worker** → **Run workflow**
+and pick the branch — the workflow also listens for `workflow_dispatch`, so
+this works without touching `main` first.
+
+Alternatively, skip Actions entirely: **Workers & Pages → Create → Import a
+repository** in the Cloudflare dashboard connects this repo directly and
+deploys from `wrangler.toml` on every push, no GitHub secrets required.
 
 ## Using `/admin`
 
