@@ -1,4 +1,4 @@
-import { richText, renderList, renderBullets, mediaBlock, escapeHtml } from "../layout.js";
+import { richText, renderList, renderBullets, renderStats, mediaBlock, escapeHtml } from "../layout.js";
 
 const FRONT_ENDS = [
   { key: "customer", title: "Customer App", accent: "navy" },
@@ -74,6 +74,7 @@ export function roviqPage(c) {
   <div class="container">
     <span class="eyebrow">How Roviq makes money</span>
     <h2>${escapeHtml(c["roviq.revenue_heading"])}</h2>
+    ${renderStats(c["roviq.revenue_stats"])}
     ${richText(c["roviq.revenue_body"])}
   </div>
 </section>
@@ -82,6 +83,7 @@ export function roviqPage(c) {
   <div class="container">
     <span class="eyebrow">The opportunity</span>
     <h2>${escapeHtml(c["roviq.market_heading"])}</h2>
+    ${renderStats(c["roviq.market_stats"])}
     ${richText(c["roviq.market_body"])}
     <div class="callout">
       <span class="eyebrow">${escapeHtml(c["roviq.whynow_heading"])}</span>
@@ -126,6 +128,7 @@ export function roviqPage(c) {
   <div class="container">
     <span class="eyebrow">Investment case</span>
     <h2>${escapeHtml(c["roviq.ask_heading"])}</h2>
+    ${renderStats(c["roviq.ask_stats"])}
     ${richText(c["roviq.ask_body"])}
     <div class="grid grid--2" style="margin-top:1.5rem; align-items:start;">
       <div>

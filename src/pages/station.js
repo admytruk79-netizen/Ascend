@@ -1,4 +1,4 @@
-import { richText, mediaBlock, diagramImage, renderBullets, escapeHtml } from "../layout.js";
+import { richText, mediaBlock, diagramImage, renderBullets, renderStats, escapeHtml } from "../layout.js";
 
 const SERVICES = [
   { key: "fuel", title: "Fuel", accent: "gold" },
@@ -42,6 +42,7 @@ export function stationPage(c) {
   <div class="container">
     <span class="eyebrow">Why now</span>
     <h2>${escapeHtml(c["station.market_heading"])}</h2>
+    ${renderStats(c["station.market_stats"])}
     ${richText(c["station.market_body"])}
     <div class="callout">
       <span class="eyebrow">${escapeHtml(c["station.proof_heading"])}</span>

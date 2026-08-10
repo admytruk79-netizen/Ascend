@@ -43,10 +43,12 @@ export const CONTENT_SECTIONS = [
       { key: "roviq.assetlight_body", label: "Asset-light model body", type: "textarea" },
       { key: "roviq.pullquote", label: "Pull quote", type: "text" },
       { key: "roviq.revenue_heading", label: "Revenue model heading", type: "text" },
+      { key: "roviq.revenue_stats", label: "Revenue stat tiles (VALUE | label, one per line)", type: "textarea" },
       { key: "roviq.revenue_body", label: "Revenue model body", type: "textarea" },
       { key: "roviq.whynow_heading", label: "Why now heading", type: "text" },
       { key: "roviq.whynow_body", label: "Why now list (one per line)", type: "textarea" },
       { key: "roviq.market_heading", label: "Market opportunity heading", type: "text" },
+      { key: "roviq.market_stats", label: "Market stat tiles (VALUE | label, one per line)", type: "textarea" },
       { key: "roviq.market_body", label: "Market opportunity body", type: "textarea" },
       { key: "roviq.dealership_heading", label: "Dealership partnerships heading", type: "text" },
       { key: "roviq.dealership_body", label: "Dealership partnerships body", type: "textarea" },
@@ -55,6 +57,7 @@ export const CONTENT_SECTIONS = [
       { key: "roviq.competitors_heading", label: "Competitive landscape heading", type: "text" },
       { key: "roviq.competitors_body", label: "Competitive landscape body", type: "textarea" },
       { key: "roviq.ask_heading", label: "The Ask heading", type: "text" },
+      { key: "roviq.ask_stats", label: "The Ask stat tiles (VALUE | label, one per line)", type: "textarea" },
       { key: "roviq.ask_body", label: "The Ask intro body", type: "textarea" },
       { key: "roviq.ask_funds", label: "Use of funds (Line item — $Amount, one per line)", type: "textarea" },
       { key: "roviq.ask_milestones", label: "Milestones this unlocks (one per line)", type: "textarea" },
@@ -74,6 +77,7 @@ export const CONTENT_SECTIONS = [
       { key: "station.concept_heading", label: "Concept heading", type: "text" },
       { key: "station.concept_body", label: "Concept body", type: "textarea" },
       { key: "station.market_heading", label: "Market & consumer psyche heading", type: "text" },
+      { key: "station.market_stats", label: "Market stat tiles (VALUE | label, one per line)", type: "textarea" },
       { key: "station.market_body", label: "Market & consumer psyche body", type: "textarea" },
       { key: "station.proof_heading", label: "Local proof point heading", type: "text" },
       { key: "station.proof_body", label: "Local proof point body (Krays Coffee)", type: "textarea" },
@@ -197,12 +201,16 @@ export const DEFAULT_CONTENT = {
     "Uber — Never owned a single vehicle; legal name is Uber Technologies Inc., a technology company, not a transportation company.\nUber — Expansion required software and driver/rider acquisition, not fleet capital.\nRoviq — Owns zero repair bays, zero vehicles.\nRoviq — Loaner fleet sourced from shop, dealership, and fleet-partner inventory, tiered by economy, standard, and luxury, not purchased outright.\nRoviq — A coordination and technology layer connecting customers, shops, and mobile technicians.\nRoviq — Expansion into a new metro requires partner and customer acquisition, not owned real estate or payroll.",
   "roviq.pullquote": "Uber didn't own a single car. We don't own a single repair bay.",
   "roviq.revenue_heading": "Three revenue streams, not one referral fee",
+  "roviq.revenue_stats":
+    "$89–$129 | Flat diagnostic visit fee, platform-set on every dispatch\n20–30% | Parts markup on Platform-Priced shop jobs\n$99–$499/mo | Self-Priced shop subscription tiers",
   "roviq.revenue_body":
     "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then $99–$499/month by tier). Platform-Priced shops accept jobs at a Roviq-calculated price once a firm diagnosis exists and keep 100% of the labor, while Roviq's margin comes from a 20–30% markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee of $89–$129, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
   "roviq.whynow_heading": "Why now",
   "roviq.whynow_body":
     "Structural, not cyclical — the technician shortage is a multi-year trend, not a post-pandemic blip.\nPartners are motivated today — 59% of shops report the shortage is already hurting their business; they need a solution now.\nThe category is proven, the niche is open — mobile-first competitors validated the market, but no dominant hub-and-spoke player has captured it yet.",
   "roviq.market_heading": "A structural, well-documented pain point",
+  "roviq.market_stats":
+    "2.27M | Portland metro population — the initial target market\n$435B | U.S. vehicle repair & maintenance spend this year\n$3.9B | North American mobile mechanic market (2025)\n12.8 yrs | Average U.S. vehicle age — oldest on record",
   "roviq.market_body":
     "Portland metro's population is approximately 2.27 million — the initial target market, the same sequencing Uber used in San Francisco before national and global expansion. U.S. consumers will spend an estimated $435 billion on vehicle repair and maintenance this year, within a North American mobile mechanic services market valued at roughly $3.9 billion in 2025. The average U.S. vehicle is now 12.8 years old — the oldest on record — and needs more frequent service. Industry-wide average appointment wait is 3.2 days, and some dealership backlogs run four weeks or more. Roughly 967,000 technicians serve 270,300 independent repair shops nationally, against a Bureau of Labor Statistics-projected shortfall of 68,000 technicians a year for the next decade. This isn't a cyclical gap — it's a multi-year structural trend, and shops already see it in their own booking calendars.",
   "roviq.dealership_heading": "Extending dealership diagnostic capacity",
@@ -215,6 +223,8 @@ export const DEFAULT_CONTENT = {
   "roviq.competitors_body":
     "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $50.8M raised, acquired 2022), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a directory connecting customers to 2,000+ certified shops, no diagnostic or dispatch layer, acquired by Yelp for roughly $80 million) have collectively raised well over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Roviq is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
   "roviq.ask_heading": "The ask",
+  "roviq.ask_stats":
+    "$150K | Current pre-seed ask\n~$1.0M | Illustrative Year 1 revenue\n~$2.6M | Illustrative Year 2 revenue",
   "roviq.ask_body":
     "Roviq is raising a $150,000 pre-seed round, funding the full project through Phase D2 — all five apps, AI diagnostic triage, the loaner fleet, marketing, founder runway, and a 12-month operating buffer, with the technical and business co-founders now leading execution alongside the founder.",
   "roviq.ask_funds":
@@ -236,6 +246,8 @@ export const DEFAULT_CONTENT = {
   "station.concept_body":
     "Roviq Station borrows the look, materials, and hospitality standard of a premium brand — glass architecture, curated retail, real sit-down seating, genuine coffee and food craft — but prices it at mainstream convenience-store levels, not boutique-café or wine-bar levels. The luxury is in the experience and design language, not the price tag; the accessibility is what makes it a daily habit rather than an occasional treat. Roviq Station is a fully independent US brand: no OKKO license, no SOCAR license, no franchise or trademark dependency on either company. OKKO and SOCAR are existing registered brands (Galnaftogaz/OKKO Group and the State Oil Company of Azerbaijan) used strictly as strategic reference models — OKKO for its hospitality/food/wine playbook, SOCAR for its premium-fuel and acquisition-led entry playbook. Their names, marks, and identities are not used commercially anywhere in Roviq Station's branding.",
   "station.market_heading": "Why now: the US market already agrees",
+  "station.market_stats":
+    "$817.5B | US convenience-store industry sales (2025)\n152,000 | US locations — 23rd straight year of growth\n28.5% | Foodservice share of in-store sales\n58% | Would bypass a closer competitor for a signature food item",
   "station.market_body":
     "US convenience-store industry sales reached $817.5B across roughly 152,000 locations in 2025 — a 23rd consecutive year of in-store sales growth. Foodservice now represents about 28.5% of in-store sales, and 58% of consumers say they'd bypass a closer competitor for a brand with a signature food item. A direct copy of the Ukrainian format won't fit US expectations, though: speed stays non-negotiable for the fast-lane customer — pump, grab-and-go, pay, leave — and every slower feature in this plan (sit-down café, wine, motor court, dwell-time features) is opt-in for a customer already choosing to spend time, never a change to what the fast lane owes the rushed customer. If the two ever compete for the same path or staff attention, the fast lane wins. Self-service defaults (pay-at-pump, self-checkout, app ordering), a branded loyalty app, and larger to-go formats are expected, not novel. Alcohol is regulated state-by-state, not nationally, so site selection has to be filtered by state ABC law before any wine program is finalized.",
   "station.proof_heading": "A real-world proof point, ten minutes from Portland",

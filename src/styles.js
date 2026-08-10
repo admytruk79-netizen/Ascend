@@ -185,6 +185,39 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
   max-width: 40rem; font-style: italic;
 }
 
+/* Stat tiles — headline numbers pulled out of paragraphs, pitch-deck style.
+   Value is always the sans body face at display size, never the serif. */
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem; margin-top: 1.5rem;
+}
+.stat-tile {
+  background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--gold);
+  border-radius: 8px; padding: 1.25rem 1.35rem;
+}
+.stat-tile:nth-child(3n+2) { border-left-color: var(--teal); }
+.stat-tile:nth-child(3n+3) { border-left-color: var(--rust); }
+.stat-value {
+  font-family: 'Inter', sans-serif; font-weight: 800; font-size: 2rem;
+  color: var(--navy); line-height: 1.1; letter-spacing: -0.01em;
+}
+.stat-label { font-size: 0.85rem; color: #555; margin-top: 0.4rem; }
+.section--navy .stat-tile { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+.section--navy .stat-tile:nth-child(3n+1) { border-left-color: var(--gold-light); }
+.section--navy .stat-value { color: #fff; }
+.section--navy .stat-label { color: #C9D4EA; }
+
+/* Scroll-reveal — progressive enhancement only; .js is added by an inline
+   script, so content stays fully visible with JS disabled or slow to load. */
+.js main section:not(.hero) {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.js main section.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .js main section:not(.hero) { opacity: 1; transform: none; transition: none; }
+}
+
 .steps { counter-reset: step; list-style: none; margin: 0; padding: 0; }
 .steps li {
   counter-increment: step;
@@ -228,7 +261,7 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
 .admin-field { margin-bottom: 1.5rem; }
 .admin-field label { display: block; font-weight: 700; margin-bottom: 0.4rem; color: var(--navy); }
 .admin-field .field-key { color: #999; font-weight: 400; font-size: 0.78rem; }
-.admin-field input[type=text], .admin-field textarea {
+.admin-field input[type=text], .admin-field input[type=email], .admin-field textarea {
   width: 100%; padding: 0.65rem; border: 1px solid var(--line); border-radius: 6px;
   font-family: inherit; font-size: 0.95rem;
 }

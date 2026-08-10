@@ -27,6 +27,21 @@ export function renderList(str) {
   return `<ol class="steps">${lines.map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ol>`;
 }
 
+// Renders "VALUE | label" entries (one per line) as a stat-tile grid —
+// the pulled-out-of-the-paragraph headline numbers pattern used throughout
+// pitch decks: bold sans value, sentence-case label underneath.
+export function renderStats(str) {
+  const lines = String(str ?? "").split("\n").map((l) => l.trim()).filter(Boolean);
+  return `<div class="stat-grid">${lines
+    .map((l) => {
+      const idx = l.indexOf("|");
+      const value = idx === -1 ? l : l.slice(0, idx).trim();
+      const label = idx === -1 ? "" : l.slice(idx + 1).trim();
+      return `<div class="stat-tile"><div class="stat-value">${escapeHtml(value)}</div><div class="stat-label">${escapeHtml(label)}</div></div>`;
+    })
+    .join("")}</div>`;
+}
+
 // Renders "Label — rest of line" entries (one per line) as a bulleted list
 // with the label bolded, e.g. a competitor benchmark or a glossary.
 export function renderBullets(str) {
@@ -70,6 +85,7 @@ export function renderPage({ title, description, activePath, body }) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>${CSS}</style>
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 <header class="site-header">
@@ -96,6 +112,23 @@ ${body}
 document.getElementById('navToggle').addEventListener('click', function () {
   document.getElementById('siteNav').classList.toggle('open');
 });
+if ('IntersectionObserver' in window) {
+  var revealObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('main section:not(.hero)').forEach(function (el) {
+    revealObserver.observe(el);
+  });
+} else {
+  document.querySelectorAll('main section').forEach(function (el) {
+    el.classList.add('is-visible');
+  });
+}
 </script>
 </body>
 </html>`;
