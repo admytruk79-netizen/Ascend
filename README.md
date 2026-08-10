@@ -71,39 +71,30 @@ npm run dev                       # wrangler dev, KV simulated locally
 The KV namespace `ROVIQ_CONTENT` already exists in the connected Cloudflare
 account and is wired into `wrangler.toml` (`id = "0a3a91e8fa63462eae8cf3f2e77e8a22"`).
 
-1. Set the two secrets once, against the real environment:
-   ```bash
-   npx wrangler secret put ADMIN_PASSWORD
-   npx wrangler secret put SESSION_SECRET   # any long random string
-   ```
-2. Deploy:
-   ```bash
-   npx wrangler deploy
-   ```
+**Primary path — Cloudflare's own Git integration:** in the Cloudflare
+dashboard, **Workers & Pages → Create → Import a repository**, connect this
+repo, confirm the branch is the one you want live (usually `main`), and
+deploy. Cloudflare then rebuilds and redeploys automatically on every push
+to that branch — no GitHub secrets, no local CLI. This is what's currently
+running the live deployment. Set the two Worker secrets once the Worker
+exists, under its **Settings → Variables and Secrets** (mark both
+**Encrypt**):
 
-### Deploying from CI (no local CLI needed)
+- `ADMIN_PASSWORD` — the `/admin` login password
+- `SESSION_SECRET` — any long random string, signs the admin session cookie
 
-`.github/workflows/deploy.yml` deploys with Wrangler on every push to `main`
-(pinned to Wrangler 3.114.17, the version this project was tested against).
-It needs two **repository** secrets, set once under the repo's
-**Settings → Secrets and variables → Actions**:
+**Alternative — local CLI**, if you'd rather deploy by hand:
+```bash
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put SESSION_SECRET
+npx wrangler deploy
+```
 
-- `CLOUDFLARE_API_TOKEN` — an API token with Workers Scripts: Edit permission
-- `CLOUDFLARE_ACCOUNT_ID` — found on any Workers page in the Cloudflare dashboard
-
-These are separate from the two Worker secrets above (`ADMIN_PASSWORD`,
-`SESSION_SECRET`), which are set directly against the Cloudflare account —
-either via `wrangler secret put`, or in the dashboard under the deployed
-Worker's **Settings → Variables and Secrets** (mark both **Encrypt**).
-
-To deploy from a branch other than `main` (e.g. before merging), open the
-**Actions** tab → **Deploy Roviq / Roviq Station Worker** → **Run workflow**
-and pick the branch — the workflow also listens for `workflow_dispatch`, so
-this works without touching `main` first.
-
-Alternatively, skip Actions entirely: **Workers & Pages → Create → Import a
-repository** in the Cloudflare dashboard connects this repo directly and
-deploys from `wrangler.toml` on every push, no GitHub secrets required.
+**Alternative — GitHub Actions** (`.github/workflows/deploy.yml`): manual-only
+(`workflow_dispatch`), so it won't run or fail in the background unless you
+trigger it from the **Actions** tab. Needs `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` as **repository** secrets first — separate from the
+two Worker secrets above.
 
 ## Using `/admin`
 

@@ -1,13 +1,13 @@
 name: Deploy Roviq / Roviq Station Worker
 
+# Manual-only. Cloudflare's own Git integration (Workers Builds) already
+# deploys this repo automatically on every push to main — see the "ascend"
+# Worker in the dashboard. This workflow is a CLI-based alternative for
+# anyone who'd rather deploy via GitHub Actions instead; it needs
+# CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repo secrets before it
+# will succeed (README has details). It no longer runs on push so it can't
+# fail silently in the background if those secrets are never set.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "wrangler.toml"
-      - "package.json"
-      - ".github/workflows/deploy.yml"
   workflow_dispatch: {}
 
 jobs:
