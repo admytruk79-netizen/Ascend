@@ -41,6 +41,10 @@ const POSITIONS = {
   octave: ['The Impulse', 'First Movement', 'Where It Starts to Waver', 'The Outside Force',
            'Renewed Momentum', 'Sustained Effort', 'The Threshold', 'The Higher Octave'],
 };
+// The literal do-re-mi-fa-sol-la-ti-do steps, shown alongside the octave's
+// poetic position names so the Law of Seven structure is visible, not just
+// implied by the card itself.
+const OCTAVE_NOTES = ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Ti', "Do'"];
 const HUES = { 1: 238, 2: 266, 3: 294, 4: 322, 5: 38 };
 const WILDCARD_HUE = 85; // distinct warm gold — not one of the 5 phase hues
 
@@ -1083,6 +1087,7 @@ function renderReading(root) {
   const current = drawnCards[cardIndex];
   const positions = spreadKey === 'seasonal' ? SEASONS[selectedSeason].positions : POSITIONS[spreadKey];
   const position = positions ? positions[cardIndex] : null;
+  const octaveNote = spreadKey === 'octave' ? OCTAVE_NOTES[cardIndex] : null;
   const showThread = drawnCards.length > 1;
 
   const threadDots = showThread ? drawnCards.map((c, i) => {
@@ -1102,7 +1107,7 @@ function renderReading(root) {
       ${showThread ? `<div class="thread-row">${threadDots}</div>` : ''}
       <div class="reading-meta">
         <button class="save-star-btn ${saved ? 'saved' : ''}" id="saveStarBtn" aria-label="Save card">${saved ? '&#9733;' : '&#9734;'}</button>
-        ${position ? `<div class="reading-position">${position}</div>` : ''}
+        ${position ? `<div class="reading-position">${octaveNote ? `<span class="reading-position-note">${octaveNote}</span>` : ''}${position}</div>` : ''}
         <div class="reading-num-row">
           <span class="reading-num-dot" style="background:${phaseColor}"></span>
           <div class="reading-num">${current.isWildcard ? 'WILDCARD' : '№ ' + current.num + ' &middot; ' + phaseNameFor(current.phase)}</div>
