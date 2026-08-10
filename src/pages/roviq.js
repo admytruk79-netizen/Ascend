@@ -1,4 +1,4 @@
-import { richText, renderList, mediaBlock, escapeHtml } from "../layout.js";
+import { richText, renderList, renderBullets, mediaBlock, escapeHtml } from "../layout.js";
 
 const FRONT_ENDS = [
   { key: "customer", title: "Customer App", accent: "navy" },
@@ -54,6 +54,15 @@ export function roviqPage(c) {
   </div>
 </section>
 
+<section class="section section--navy">
+  <div class="container">
+    <span class="eyebrow">${escapeHtml(c["roviq.assetlight_heading"])}</span>
+    <h2>The same shape as Uber — without owning the fleet</h2>
+    ${renderBullets(c["roviq.assetlight_body"])}
+    <p class="pullquote">&ldquo;${escapeHtml(c["roviq.pullquote"])}&rdquo;</p>
+  </div>
+</section>
+
 <section class="section section--cream-alt">
   <div class="container">
     <span class="eyebrow">How Roviq makes money</span>
@@ -67,6 +76,10 @@ export function roviqPage(c) {
     <span class="eyebrow">The opportunity</span>
     <h2>${escapeHtml(c["roviq.market_heading"])}</h2>
     ${richText(c["roviq.market_body"])}
+    <div class="callout">
+      <span class="eyebrow">${escapeHtml(c["roviq.whynow_heading"])}</span>
+      ${renderBullets(c["roviq.whynow_body"])}
+    </div>
   </div>
 </section>
 
@@ -78,11 +91,37 @@ export function roviqPage(c) {
   </div>
 </section>
 
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">Not one borrowed model — six, recombined</span>
+    <h2>${escapeHtml(c["roviq.playbook_heading"])}</h2>
+    ${renderBullets(c["roviq.playbook_body"])}
+  </div>
+</section>
+
 <section class="section section--navy">
   <div class="container">
     <span class="eyebrow">Why this works</span>
-    <h2>${escapeHtml(c["roviq.playbook_heading"])}</h2>
-    ${richText(c["roviq.playbook_body"])}
+    <h2>${escapeHtml(c["roviq.competitors_heading"])}</h2>
+    ${richText(c["roviq.competitors_body"])}
+  </div>
+</section>
+
+<section class="section section--cream-alt">
+  <div class="container">
+    <span class="eyebrow">Investment case</span>
+    <h2>${escapeHtml(c["roviq.ask_heading"])}</h2>
+    ${richText(c["roviq.ask_body"])}
+    <div class="grid grid--2" style="margin-top:1.5rem; align-items:start;">
+      <div>
+        <h3>Use of funds</h3>
+        ${renderBullets(c["roviq.ask_funds"])}
+      </div>
+      <div>
+        <h3>Milestones this unlocks</h3>
+        ${renderBullets(c["roviq.ask_milestones"])}
+      </div>
+    </div>
   </div>
 </section>
 `;

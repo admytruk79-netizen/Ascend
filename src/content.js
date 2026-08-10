@@ -39,14 +39,25 @@ export const CONTENT_SECTIONS = [
       { key: "roviq.frontend_shop_body", label: "Shop Partner app body", type: "textarea" },
       { key: "roviq.frontend_vendor_body", label: "Parts Vendor app body", type: "textarea" },
       { key: "roviq.frontend_tow_body", label: "Tow Truck app body", type: "textarea" },
+      { key: "roviq.assetlight_heading", label: "Asset-light model heading", type: "text" },
+      { key: "roviq.assetlight_body", label: "Asset-light model body", type: "textarea" },
+      { key: "roviq.pullquote", label: "Pull quote", type: "text" },
       { key: "roviq.revenue_heading", label: "Revenue model heading", type: "text" },
       { key: "roviq.revenue_body", label: "Revenue model body", type: "textarea" },
+      { key: "roviq.whynow_heading", label: "Why now heading", type: "text" },
+      { key: "roviq.whynow_body", label: "Why now list (one per line)", type: "textarea" },
       { key: "roviq.market_heading", label: "Market opportunity heading", type: "text" },
       { key: "roviq.market_body", label: "Market opportunity body", type: "textarea" },
       { key: "roviq.dealership_heading", label: "Dealership partnerships heading", type: "text" },
       { key: "roviq.dealership_body", label: "Dealership partnerships body", type: "textarea" },
-      { key: "roviq.playbook_heading", label: "Competitive landscape heading", type: "text" },
-      { key: "roviq.playbook_body", label: "Competitive landscape body", type: "textarea" },
+      { key: "roviq.playbook_heading", label: "Proven playbook heading", type: "text" },
+      { key: "roviq.playbook_body", label: "Proven playbook list (Source — mechanic, one per line)", type: "textarea" },
+      { key: "roviq.competitors_heading", label: "Competitive landscape heading", type: "text" },
+      { key: "roviq.competitors_body", label: "Competitive landscape body", type: "textarea" },
+      { key: "roviq.ask_heading", label: "The Ask heading", type: "text" },
+      { key: "roviq.ask_body", label: "The Ask intro body", type: "textarea" },
+      { key: "roviq.ask_funds", label: "Use of funds (Line item — $Amount, one per line)", type: "textarea" },
+      { key: "roviq.ask_milestones", label: "Milestones this unlocks (one per line)", type: "textarea" },
       { key: "roviq.dispatch_image", label: "Dispatch/map image", type: "image" }
     ]
   },
@@ -176,21 +187,38 @@ export const DEFAULT_CONTENT = {
   "roviq.frontend_shop_body":
     "Job acceptance, scheduling, and payout tracking — showing a shop only the jobs a customer actually chose them for, not an open pool every shop competes over.",
   "roviq.frontend_vendor_body":
-    "Receives part orders tied to a specific job, confirms cost and delivery time, and updates fulfillment status.",
+    "Receives part orders tied to a specific job, confirms cost and delivery time, and updates fulfillment status — turning a documented industry cost center (wrong parts and delivery delays cost a mid-size shop an estimated $2,000–$6,000 a month) into tracked, actionable metrics.",
   "roviq.frontend_tow_body":
     "A genuinely separate, real-time layer — because towing is GPS-tracked and urgent-by-definition, closer to a rideshare driver app than a shop dashboard. Covers both towing a non-drivable vehicle and valet (a driver takes the customer's own car to the shop instead), primarily for premium and luxury-tier customers.",
+  "roviq.assetlight_heading": "Asset-light, like Uber",
+  "roviq.assetlight_body":
+    "Uber — Never owned a single vehicle; legal name is Uber Technologies Inc., a technology company, not a transportation company.\nUber — Expansion required software and driver/rider acquisition, not fleet capital.\nRoviq — Owns zero repair bays, zero vehicles.\nRoviq — Loaner fleet sourced from shop, dealership, and fleet-partner inventory, tiered by economy, standard, and luxury, not purchased outright.\nRoviq — A coordination and technology layer connecting customers, shops, and mobile technicians.\nRoviq — Expansion into a new metro requires partner and customer acquisition, not owned real estate or payroll.",
+  "roviq.pullquote": "Uber didn't own a single car. We don't own a single repair bay.",
   "roviq.revenue_heading": "Three revenue streams, not one referral fee",
   "roviq.revenue_body":
-    "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then roughly $99–$499/month by tier). Platform-Priced shops accept jobs at a Roviq-calculated price once a firm diagnosis exists, keep 100% of the labor, while Roviq's margin comes from a markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
+    "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then $99–$499/month by tier). Platform-Priced shops accept jobs at a Roviq-calculated price once a firm diagnosis exists and keep 100% of the labor, while Roviq's margin comes from a 20–30% markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee of $89–$129, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
+  "roviq.whynow_heading": "Why now",
+  "roviq.whynow_body":
+    "Structural, not cyclical — the technician shortage is a multi-year trend, not a post-pandemic blip.\nPartners are motivated today — 59% of shops report the shortage is already hurting their business; they need a solution now.\nThe category is proven, the niche is open — mobile-first competitors validated the market, but no dominant hub-and-spoke player has captured it yet.",
   "roviq.market_heading": "A structural, well-documented pain point",
   "roviq.market_body":
-    "Portland metro's population is approximately 2.27 million, and U.S. consumers will spend an estimated $435 billion on vehicle repair and maintenance this year. The average U.S. vehicle is now 12.8 years old — the oldest on record — and needs more frequent service. Industry-wide average appointment wait is 3.2 days, and some dealership backlogs run four weeks or more. Roughly 967,000 technicians serve 270,300 independent repair shops nationally, against a Bureau of Labor Statistics-projected shortfall of 68,000 technicians a year for the next decade. This isn't a cyclical gap — it's a multi-year structural trend, and shops already see it in their own booking calendars.",
+    "Portland metro's population is approximately 2.27 million — the initial target market, the same sequencing Uber used in San Francisco before national and global expansion. U.S. consumers will spend an estimated $435 billion on vehicle repair and maintenance this year, within a North American mobile mechanic services market valued at roughly $3.9 billion in 2025. The average U.S. vehicle is now 12.8 years old — the oldest on record — and needs more frequent service. Industry-wide average appointment wait is 3.2 days, and some dealership backlogs run four weeks or more. Roughly 967,000 technicians serve 270,300 independent repair shops nationally, against a Bureau of Labor Statistics-projected shortfall of 68,000 technicians a year for the next decade. This isn't a cyclical gap — it's a multi-year structural trend, and shops already see it in their own booking calendars.",
   "roviq.dealership_heading": "Extending dealership diagnostic capacity",
   "roviq.dealership_body":
     "Beyond repair-bay overflow, most dealerships face a distinct, often larger constraint: diagnostic throughput itself — a multi-day wait just to find out what's wrong, before repair even enters the picture. Roviq's technicians function as an extension of a dealership's own diagnostic capacity, reaching into the customer's driveway on the dealership's behalf. Our technicians carry professional-grade diagnostic equipment, not OEM-certified factory tools — so any case needing certified warranty determination still routes straight back to the dealership, exactly like every other warranty and OEM job. Customers rotate through the network over time, not permanently to whichever partner handled one job: warranty and OEM work always comes back, and as a dealership's own capacity opens up, the network routes business their way too.",
-  "roviq.playbook_heading": "A validated, well-capitalized category",
+  "roviq.playbook_heading": "A proven playbook, recombined",
   "roviq.playbook_body":
-    "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $90M+ raised), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a certification and referral directory, acquired by Yelp for roughly $80 million) have collectively raised over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Roviq is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
+    "Uber — Platform sets the price and takes a margin: the diagnostic visit fee (always platform-priced) and Platform-Priced shop mode use a fixed price and standardized labor payout, with Roviq keeping the spread.\nUber Eats — Shelf-and-bin pickup guidance, no staff needed: a technician walks into the parts hub already knowing exactly which shelf and bin holds the part their job needs.\nAmazon — Consignment fulfillment, vendor-owned until sold: parts hub inventory stays the vendor's property until a technician marks a part used, no transaction and no capital cost until then.\nLyft — Reliability-based ranking feeds dispatch: partner performance and on-time rate directly drive the shop-ranking algorithm, so reliability is enforced by the matching logic, not just reported.\nHertz / Turo — A rental supply chain plugged into dispatch: Fleet Partners supply tiered loaner inventory at scale, the same rental-supply pattern, without Roviq owning or buying a fleet.\nAmazon Prime — Same-day fetch or scheduled, promised-time delivery: loaner vehicles reuse the same driver-dispatch and promised-completion infrastructure as tow and valet.",
+  "roviq.competitors_heading": "A validated, well-capitalized category",
+  "roviq.competitors_body":
+    "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $50.8M raised, acquired 2022), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a directory connecting customers to 2,000+ certified shops, no diagnostic or dispatch layer, acquired by Yelp for roughly $80 million) have collectively raised well over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Roviq is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
+  "roviq.ask_heading": "The ask",
+  "roviq.ask_body":
+    "Roviq is raising a $150,000 pre-seed round, funding the full project through Phase D2 — all five apps, AI diagnostic triage, the loaner fleet, marketing, founder runway, and a 12-month operating buffer, with the technical and business co-founders now leading execution alongside the founder.",
+  "roviq.ask_funds":
+    "Customer + Diagnostic apps (incl. AI triage) — $24,000\nPricing engine + Stripe Connect + technician payout — $16,000\nShop Partner app + matching — $12,000\nParts Vendor app + add-to-order — $11,000\nDiagnostic tool, equipment + labor-guide license — $5,000\nLoaner vehicle pool + insurance — $13,000\nMarketing & promotion — $9,000\nPartner & customer acquisition incentives — $5,000\nFounder runway (12 months) — $40,000\nLegal, cap table & operating buffer — $15,000\nTotal — $150,000",
+  "roviq.ask_milestones":
+    "All five apps live in the Portland metro, AI diagnostic triage in production\n5+ active partner shops signed and referring\nParts vendor layer live and tracking wrong-part / delay metrics\nDefined referral and parts volume within 12 months",
   "roviq.dispatch_image": "",
 
   // ---------- STATION ----------

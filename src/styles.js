@@ -167,7 +167,7 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
 
 .bullets { list-style: none; margin: 1rem 0 0; padding: 0; }
 .bullets li {
-  padding-left: 1.3rem; position: relative; margin-bottom: 0.85rem; color: var(--ink);
+  padding-left: 1.3rem; position: relative; margin-bottom: 0.85rem;
 }
 .bullets li::before {
   content: ""; position: absolute; left: 0; top: 0.55em;
@@ -176,6 +176,11 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
 .callout {
   background: #fff; border-left: 4px solid var(--teal);
   border-radius: 6px; padding: 1.5rem; margin-top: 1.5rem;
+}
+.pullquote {
+  font-family: 'Cinzel', serif; font-size: 1.5rem; line-height: 1.4;
+  color: var(--gold-light); text-align: center; margin: 2rem auto 0;
+  max-width: 40rem; font-style: italic;
 }
 
 .steps { counter-reset: step; list-style: none; margin: 0; padding: 0; }
