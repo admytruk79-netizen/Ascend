@@ -137,12 +137,33 @@
     font: 600 10px/1 'Inter', sans-serif; letter-spacing: 2.5px; color: rgba(var(--text-rgb),.4);
     text-transform: uppercase; margin-bottom: 14px;
   }
-  .spread-list { display: flex; flex-direction: column; gap: 10px; }
+  /* Spine + rib layout: a single vertical line runs the height of the
+     list (the "spine"); each spread connects to it with a short tick and a
+     small joint dot (the "rib"). Reading order stays a plain top-to-bottom
+     list -- nothing rotates or staggers -- so this adds thematic identity
+     (echoes The Octave / ascending-column) without costing scannability.
+     Phone-only: on the tablet 2-column grid a single spine can't reach the
+     right column without looking broken, so it's turned off at that
+     breakpoint (see the tablet media query) and the grid stands on its
+     own frosted-card look instead. */
+  .spread-list { display: flex; flex-direction: column; gap: 10px; position: relative; padding-left: 24px; }
+  .spread-list::before {
+    content: ''; position: absolute; left: 10px; top: 4px; bottom: 4px; width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(var(--gold-rgb),.45) 6%, rgba(var(--gold-rgb),.45) 94%, transparent);
+  }
   .spread-card {
     position: relative; border-radius: 12px; background: var(--frost-bg); border: 1px solid var(--frost-border);
     overflow: hidden; transition: border-color .3s ease, background .3s ease;
     backdrop-filter: blur(var(--frost-blur)); -webkit-backdrop-filter: blur(var(--frost-blur));
     box-shadow: inset 0 1px 0 var(--frost-highlight);
+  }
+  .spread-card::before {
+    content: ''; position: absolute; left: -14px; top: 23px; width: 14px; height: 1px;
+    background: rgba(var(--gold-rgb),.45); pointer-events: none;
+  }
+  .spread-card::after {
+    content: ''; position: absolute; left: -17px; top: 20px; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 6px rgba(var(--gold-rgb),calc(.5 * var(--glow))); pointer-events: none;
   }
   .spread-card.expanded { border-color: rgba(var(--gold-rgb),.4); background: var(--frost-bg-strong); }
   .spread-row {
@@ -153,7 +174,10 @@
   .spread-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
   .spread-row-body { flex: 1; }
   .spread-row-title { font: 500 15px/1.2 'Cormorant Garamond', serif; color: var(--text); }
-  .spread-row-sub { font: 11px/1.4 'Inter', sans-serif; color: rgba(var(--text-rgb),.45); margin-top: 3px; }
+  .spread-row-sub {
+    font: 11px/1.4 'Inter', sans-serif; color: rgba(var(--text-rgb),.45); margin-top: 3px; min-height: 2.8em;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  }
   .spread-tag { font: 600 9px/1 'Inter', sans-serif; letter-spacing: 1px; white-space: nowrap; }
   .spread-expand { display: grid; transition: grid-template-rows .45s cubic-bezier(.4,0,.2,1); grid-template-rows: 0fr; }
   .spread-expand.open { grid-template-rows: 1fr; }
@@ -440,7 +464,12 @@
      doesn't stretch its row-mate to match. */
   @media (min-width: 768px) {
     #app { max-width: 640px; }
-    .spread-list { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 10px; }
+    /* Spine + rib is phone-only -- a single vertical line can't reach a
+       second column without looking broken, so it's turned off here and
+       the grid stands on the plain frosted-card look instead. */
+    .spread-list { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 10px; padding-left: 0; }
+    .spread-list::before { display: none; }
+    .spread-card::before, .spread-card::after { display: none; }
   }
 </style>
 </head>
