@@ -166,7 +166,7 @@ export const DEFAULT_CONTENT = {
   "home.throughline_heading": "Same architecture, applied twice.",
   "home.throughline_body":
     "Roviq Core is one backend feeding many digital front ends. Roviq Station is one physical location housing many services. Neither is a bundle bolted together after the fact — both were designed from the center outward, so every new front end or every new service line inherits the same routing logic, the same brand, and the same operating discipline.",
-  "home.image_roviq": "",
+  "home.image_roviq": "/photos/dispatch_app_mockup.jpg",
   "home.image_station": "/photos/station_hero.jpg",
 
   // ---------- ROVIQ ----------
@@ -224,7 +224,7 @@ export const DEFAULT_CONTENT = {
   "roviq.stack_heading": "Built on proven technology, not custom infrastructure",
   "roviq.stack_body":
     "Frontend — React (Next.js), one shared component library across all four customer-facing apps.\nBackend / API — Node.js (Express), built as a modular monolith rather than microservices — well-defined internal modules for assessment, AI triage, matching, and state, called directly by API handlers, simple to build and debug at this stage. Every app reads and writes through this one layer; no app ever talks to another app directly.\nDatabase — PostgreSQL, a single instance and the single source of truth for all five apps, with every state transition logged to an event table, not just overwritten.\nAuth — JWT (Passport.js / Auth.js): unauthenticated for the customer flow in MVP, login-gated for every partner and vendor app.\nNotifications — Twilio (SMS), Postmark / SendGrid (email).\nPayments — Stripe, invoicing first, Connect later.\nHosting — Vercel (frontend) plus Railway / Render (backend and database) — low-ops, appropriate to MVP scale, with event-driven infrastructure and a job queue treated as a real-time-dispatch-triggered upgrade, not a default.",
-  "roviq.dispatch_image": "",
+  "roviq.dispatch_image": "/photos/dispatch_app_mockup.jpg",
 
   // ---------- STATION ----------
   "station.hero_eyebrow": "Roviq Station",
