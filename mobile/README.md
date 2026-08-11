@@ -11,7 +11,9 @@ product context — this README only covers getting the code running.
   (`assets/cards/*.webp`, mapped in `src/data/cardImages.ts`) and manifest
   metadata (mechanism mood-tag `category` + `acuteRecommended` per card in
   `src/data/cardManifest.ts`) both came from the user directly, since Canva
-  export is blocked by this environment's network policy.
+  export is blocked by this environment's network policy. **Deliberately
+  42, not the spec's 11** — an explicit user decision for more variety;
+  don't "fix" this back down to 11 to match §2/§4/§13 literally.
 - P2: Session mechanics — double-tap on Home starts a session on the
   Primary Anchor (`src/session/startSession.ts` is the single entry point;
   P6's "Test trigger" button calls the same function with `triggerSource:
