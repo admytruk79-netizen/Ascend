@@ -164,7 +164,7 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
   padding: 1.25rem; overflow-x: auto;
 }
-.diagram-frame svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.diagram-frame svg, .diagram-frame img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 .diagram-caption { text-align: center; font-size: 0.85rem; color: #555; margin-top: 0.75rem; }
 
 .bullets { list-style: none; margin: 1rem 0 0; padding: 0; }
