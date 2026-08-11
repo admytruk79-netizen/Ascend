@@ -137,7 +137,7 @@ export function renderAdminDashboard(content, flash) {
     <h2 style="margin-bottom:0;">Content admin</h2>
     <form method="POST" action="/admin/logout"><button type="submit" class="btn btn--outline" style="color:var(--navy); border-color:var(--navy);">Log out</button></form>
   </div>
-  <p style="color:#666; font-size:0.9rem;">Edit any block below and save. Changes are written to the CONTENT KV namespace and go live immediately — no redeploy needed. Leave an image field blank to show a labeled placeholder.</p>
+  <p style="color:#666; font-size:0.9rem;">Edit any block below and save. Changes are written to the CONTENT KV namespace and go live immediately — no redeploy needed. Leave an image field blank to use the site's default photo for that slot (or a labeled placeholder, if there is no default yet).</p>
   ${flash === "saved" ? `<div class="flash flash--ok">Saved. The live site now reflects these changes.</div>` : ""}
   <form method="POST" action="/admin/save">
     ${sections}
@@ -311,7 +311,12 @@ export async function loadAllContent(env) {
     keys.map(async (key) => {
       if (!env.CONTENT) return;
       const stored = await env.CONTENT.get(`content:${key}`);
-      if (stored !== null && stored !== undefined) result[key] = stored;
+      // An empty string in KV means "never explicitly set" (e.g. a blanket
+      // save wrote every field, including ones the admin never touched) --
+      // treat it as unset so DEFAULT_CONTENT updates aren't silently
+      // shadowed forever. A real (non-empty) DEFAULT_CONTENT value can
+      // still be intentionally cleared by saving actual whitespace.
+      if (stored !== null && stored !== undefined && stored !== "") result[key] = stored;
     })
   );
   return result;

@@ -133,7 +133,8 @@ two Worker secrets above.
    - **Image fields** take a direct image URL, or tap **Upload image** to
      pick a JPG/PNG/WebP from your device — it uploads straight to R2 and
      fills the URL field in automatically. A live preview updates either
-     way. Leave blank to keep the labeled placeholder.
+     way. Leave blank to use the site's default photo for that slot (or a
+     labeled placeholder, if there's no default).
 4. Click **Save changes**. Writes go straight to the `CONTENT` KV namespace
    and are live on the public site immediately, with no rebuild or redeploy.
 5. **Log out** clears the session cookie. Sessions otherwise expire after 12
