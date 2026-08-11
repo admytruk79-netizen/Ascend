@@ -149,10 +149,11 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
 .media {
   border-radius: 10px; overflow: hidden; background: #E9E2CC;
   border: 1px solid var(--line);
-}
-.media img { width: 100%; height: 100%; object-fit: cover; }
-.media-placeholder {
   aspect-ratio: 4 / 3;
+}
+.media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.media-placeholder {
+  width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center; text-align: center;
   padding: 1.5rem;
   background: repeating-linear-gradient(135deg, #EFE9D8, #EFE9D8 10px, #E7DFC8 10px, #E7DFC8 20px);
