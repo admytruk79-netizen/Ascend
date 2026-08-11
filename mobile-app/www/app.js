@@ -505,7 +505,7 @@ let currentJournalId = null; // ties Save-Entry on Synthesis to one entry per dr
 
 let savedCardNums = loadSavedCards();
 let subscribed = false;
-let screen = 'intro'; // intro | home | reading | synthesis | saved | journal — always opens on intro
+let screen = 'splash'; // splash | intro | home | reading | synthesis | saved | journal — always opens on splash
 let expandedKey = null; // which spread row is expanded inline on Home
 let pendingUnlockKey = null; // spread waiting on a verified purchase before drawing
 let spreadKey = null;
@@ -626,17 +626,26 @@ function openSavedCard(num) {
 // screen; null the rest of the time so every later trip to Home (e.g. BACK
 // from a fresh draw) gets the plain, standard .screen fade instead.
 let introRevealOrigin = null;
+// The app always opens on the intro screen, every launch -- without this
+// flag the ripple would replay on every single BEGIN tap for the life of
+// the install, not just the first time someone ever opens the app.
+const INTRO_REVEAL_SEEN_KEY = 'ascend_intro_reveal_seen';
+function hasSeenIntroReveal() { try { return localStorage.getItem(INTRO_REVEAL_SEEN_KEY) === 'true'; } catch (e) { return false; } }
+function markIntroRevealSeen() { try { localStorage.setItem(INTRO_REVEAL_SEEN_KEY, 'true'); } catch (e) {} }
 
 function beginFromIntro() {
-  const btn = document.getElementById('beginBtn');
-  const screenEl = document.getElementById('screen');
-  if (btn && screenEl) {
-    const btnRect = btn.getBoundingClientRect();
-    const screenRect = screenEl.getBoundingClientRect();
-    introRevealOrigin = {
-      x: (btnRect.left + btnRect.width / 2 - screenRect.left) + 'px',
-      y: (btnRect.top + btnRect.height / 2 - screenRect.top) + 'px',
-    };
+  if (!hasSeenIntroReveal()) {
+    const btn = document.getElementById('beginBtn');
+    const screenEl = document.getElementById('screen');
+    if (btn && screenEl) {
+      const btnRect = btn.getBoundingClientRect();
+      const screenRect = screenEl.getBoundingClientRect();
+      introRevealOrigin = {
+        x: (btnRect.left + btnRect.width / 2 - screenRect.left) + 'px',
+        y: (btnRect.top + btnRect.height / 2 - screenRect.top) + 'px',
+      };
+    }
+    markIntroRevealSeen();
   }
   goHome();
 }
@@ -757,6 +766,7 @@ function render() {
   applyThemeMode();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
   const root = document.getElementById('screen');
+  if (screen === 'splash') return renderSplash(root);
   if (screen === 'intro') return renderIntro(root);
   if (screen === 'home') return renderHome(root);
   if (screen === 'revealing') return renderRevealing(root);
@@ -764,6 +774,26 @@ function render() {
   if (screen === 'synthesis') return renderSynthesis(root);
   if (screen === 'saved') return renderSavedCards(root);
   if (screen === 'journal') return renderJournalHistory(root);
+}
+
+// A brief, wordless splash — just the mark, opening outward from center via
+// the same circular-reveal treatment BEGIN uses elsewhere — plays once on
+// every cold start, then settles into the real Intro screen (tagline, body
+// copy, BEGIN) automatically. No tap, no dismiss button: it's motion, not a
+// gate. The actual "choose to begin" moment stays on Intro/BEGIN, unchanged.
+let splashTimer = null;
+const SPLASH_DURATION_MS = 800;
+function renderSplash(root) {
+  root.innerHTML = `
+    <div class="screen splash screen-circle-reveal" style="--reveal-x:50%; --reveal-y:50%;">
+      <div class="intro-logo"><img src="ascend-logo.png" alt=""></div>
+      <div class="intro-mark">ASCEND KEYS</div>
+    </div>`;
+  if (splashTimer) clearTimeout(splashTimer);
+  splashTimer = setTimeout(() => {
+    splashTimer = null;
+    if (screen === 'splash') { screen = 'intro'; render(); }
+  }, SPLASH_DURATION_MS);
 }
 
 function renderIntro(root) {
