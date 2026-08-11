@@ -1,8 +1,8 @@
 name: Deploy Roviq / Roviq Station Worker
 
-# Manual-only. Cloudflare's own Git integration (Workers Builds) already
-# deploys this repo automatically on every push to main — see the "ascend"
-# Worker in the dashboard. This workflow is a CLI-based alternative for
+# Manual-only. Cloudflare's own deploy integration already deploys this
+# repo automatically on every push to main — see the "roviq-site" Worker
+# in the dashboard. This workflow is a CLI-based alternative for
 # anyone who'd rather deploy via GitHub Actions instead; it needs
 # CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repo secrets before it
 # will succeed (README has details). It no longer runs on push so it can't
