@@ -1,4 +1,5 @@
 import { richText, mediaBlock, mediaFull, diagramImage, renderBullets, renderStats, escapeHtml } from "../layout.js";
+import { STATION_IMAGES } from "../../content/station-images.js";
 
 const SERVICES = [
   { key: "fuel", title: "Fuel", accent: "gold" },
@@ -19,7 +20,7 @@ export function stationPage(c) {
         <p class="lead" style="font-family:'Cinzel', serif; color: var(--gold-light); font-size:1.2rem;">${escapeHtml(c["station.tagline"])}</p>
         <p class="lead">${escapeHtml(c["station.hero_sub"])}</p>
       </div>
-      ${mediaFull(c["station.image_hero"], "Roviq Station forecourt — multi-fuel, café & market, EV charging")}
+      ${mediaFull(STATION_IMAGES["hero-forecourt"].file, STATION_IMAGES["hero-forecourt"].alt)}
     </div>
   </div>
 </section>
@@ -30,10 +31,7 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.concept_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>${richText(c["station.concept_body"])}</div>
-      ${mediaFull(c["station.image_competitor_ref"], "Reference board: OKKO, café hospitality, forecourt, motor court, and swap-station influences")}
-    </div>
-    <div style="margin-top:1.5rem;">
-      ${mediaFull(c["station.image_hero_secondary"], "Roviq Station forecourt at dusk")}
+      ${mediaFull(STATION_IMAGES["forecourt-secondary"].file, STATION_IMAGES["forecourt-secondary"].alt)}
     </div>
     <div style="margin-top:2rem;">
       ${diagramImage("/diagrams/socar_layout.png", "SOCAR-style premium forecourt reference layout", "Reference model: SOCAR-style premium forecourt — mechanics only, not the brand.")}
@@ -76,7 +74,7 @@ export function stationPage(c) {
     </div>
     <div class="grid grid--2" style="margin-top:2rem;">
       ${mediaFull(c["station.image_fuel"], "Roviq Station pricing board and fuel canopy detail")}
-      ${mediaBlock(c["station.image_ev"], "EV charging", "EV charging bay photo")}
+      ${mediaBlock(STATION_IMAGES["ev-charging"].file, STATION_IMAGES["ev-charging"].alt, "EV charging bay photo")}
     </div>
   </div>
 </section>
@@ -91,7 +89,7 @@ export function stationPage(c) {
       ${diagramImage("/diagrams/interior_layout.png", "Roviq Station interior zoning schematic", "Interior layout — fast lane kept separate from sit-down café flow.")}
     </div>
     <div style="margin-top:1.5rem;">
-      ${mediaFull(c["station.image_cafe"], "Roviq Station interior — coffee bar and grab-and-go market")}
+      ${mediaFull(STATION_IMAGES["interior-cafe"].file, STATION_IMAGES["interior-cafe"].alt)}
       <p class="diagram-caption">The interior in practice — coffee bar and fresh grab-and-go on the left, fast lane kept to the right, matching the zoning diagram above.</p>
     </div>
   </div>
@@ -164,21 +162,21 @@ export function stationPage(c) {
       <h3>Motor Court <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_motor_court_body"])}</p>
       ${diagramImage("/diagrams/motor_court_layout.png", "Motor court expansion module layout", "Motor court concept — boutique lodging arranged around the shared forecourt.")}
-      ${mediaBlock(c["station.image_motor_court"], "Motor court reference", "Route 66 boutique motor-court revival photo")}
+      ${mediaBlock(STATION_IMAGES["motorcourt"].file, STATION_IMAGES["motorcourt"].alt, "Route 66 boutique motor-court revival photo")}
     </div>
 
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Post Station <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_post_station_body"])}</p>
       ${diagramImage("/diagrams/post_station_layout.png", "Post Station battery-swap module layout", "Post Station concept — a battery-swap bay layered onto the existing forecourt, named for the 19th-century relay stations that swapped a tired horse for a fresh one.")}
-      ${mediaBlock(c["station.image_battery_swap"], "Battery swap reference", "NIO / Ample battery-swap station photo")}
+      ${mediaBlock(STATION_IMAGES["swap-station"].file, STATION_IMAGES["swap-station"].alt, "NIO / Ample battery-swap station photo")}
     </div>
 
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Vehicle Relay <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_vehicle_relay_body"])}</p>
       ${diagramImage("/diagrams/vehicle_relay.png", "Vehicle relay concept diagram", "Vehicle relay concept — a corridor of 3+ stations acting as custody hand-off points, logged in Roviq Core.")}
-      ${mediaBlock(c["station.image_vehicle_relay"], "Relay station reference", "Relay-station reference — a modern take on the 19th-century post/relay stagecoach stop")}
+      ${mediaBlock(STATION_IMAGES["relay-station"].file, STATION_IMAGES["relay-station"].alt, "Relay-station reference — a modern take on the 19th-century post/relay stagecoach stop")}
     </div>
   </div>
 </section>
