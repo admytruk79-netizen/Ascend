@@ -301,7 +301,7 @@ export const DEFAULT_CONTENT = {
     "The more literal version of the historic analog: stagecoach lines swapped entire teams, and sometimes the coach itself, at fixed relay stations. Applied today, a traveler drops off a Roviq rental EV at one station and picks up a different, fully-charged one at the next — the same Hertz/Turo-style one-way rental logic already in Roviq's own platform strategy, applied to a fixed physical corridor. The honest risk, shared by every one-way rental network including U-Haul: vehicles pile up at popular destinations and run short at popular origins, requiring paid repositioning. This requires 3+ Roviq Station sites on one fixed corridor before it's viable at all — the natural first candidate is the I-5 Pacific Northwest spine (Seattle–Portland–Eugene) — and should be modeled and piloted separately from the core fuel/café/wine business.",
   "station.image_hero": "/photos/station_forecourt_dusk.jpg",
   "station.image_cafe": "/photos/station_interior_cafe.jpg",
-  "station.image_ev": "",
+  "station.image_ev": "/photos/station_ev_charging.jpg",
   "station.image_fuel": "/photos/station_forecourt_reference.jpg",
   "station.image_okko": "/photos/reference_board.jpg",
   "station.image_socar": "",
