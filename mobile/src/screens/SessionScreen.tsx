@@ -190,7 +190,7 @@ export default function SessionScreen({ route, navigation }: Props) {
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(breathScale, {
-          toValue: 1.25,
+          toValue: 1.12,
           duration: 4000,
           useNativeDriver: true,
         }),
