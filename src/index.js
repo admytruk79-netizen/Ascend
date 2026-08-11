@@ -9,6 +9,7 @@ import {
   handleAdminLogin,
   handleAdminLogout,
   handleAdminSave,
+  handleAdminResetField,
   loadAllContent
 } from "./admin.js";
 
@@ -54,6 +55,7 @@ export default {
       if (path === "/admin/login" && method === "POST") return handleAdminLogin(request, env);
       if (path === "/admin/logout" && method === "POST") return handleAdminLogout(request, env);
       if (path === "/admin/save" && method === "POST") return handleAdminSave(request, env);
+      if (path === "/admin/reset-field" && method === "POST") return handleAdminResetField(request, env);
 
       const page = PAGES[path];
       if (page && method === "GET") {

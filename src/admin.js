@@ -98,16 +98,28 @@ export function renderAdminDashboard(content, flash) {
           <textarea name="${field.key}">${escapeHtml(value)}</textarea>
         </div>`;
       }
+      const isDefault = value === (DEFAULT_CONTENT[field.key] ?? "");
+      const resetButton = isDefault ? "" : `
+          <button type="submit" form="reset-${field.key}" class="btn btn--outline" style="padding:0.3rem 0.7rem; font-size:0.78rem; color:#a33; border-color:#a33;">Reset to default</button>
+          <form id="reset-${field.key}" method="POST" action="/admin/reset-field" style="display:none;">
+            <input type="hidden" name="key" value="${escapeHtml(field.key)}">
+          </form>`;
       if (field.type === "image") {
         return `<div class="admin-field">
           <label>${escapeHtml(field.label)} <span class="field-key">${field.key}</span></label>
-          <input type="text" name="${field.key}" value="${escapeHtml(value)}" placeholder="https://example.com/photo.jpg">
+          <div style="display:flex; gap:0.6rem; align-items:center;">
+            <input type="text" name="${field.key}" value="${escapeHtml(value)}" placeholder="https://example.com/photo.jpg" style="flex:1;">
+            ${resetButton}
+          </div>
           <div style="max-width:220px; margin-top:0.6rem;">${mediaBlock(value, field.label, "No image set")}</div>
         </div>`;
       }
       return `<div class="admin-field">
         <label>${escapeHtml(field.label)} <span class="field-key">${field.key}</span></label>
-        <input type="text" name="${field.key}" value="${escapeHtml(value)}">
+        <div style="display:flex; gap:0.6rem; align-items:center;">
+          <input type="text" name="${field.key}" value="${escapeHtml(value)}" style="flex:1;">
+          ${resetButton}
+        </div>
       </div>`;
     }).join("\n")}
   `).join("\n");
@@ -190,6 +202,22 @@ export async function handleAdminSave(request, env) {
     writes.push(env.CONTENT.put(`content:${key}`, String(value)));
   }
   await Promise.all(writes);
+  return Response.redirect(new URL("/admin?flash=saved", request.url).toString(), 303);
+}
+
+export async function handleAdminResetField(request, env) {
+  const authed = await isAuthed(request, env);
+  if (!authed) {
+    return new Response(renderLoginPage("Session expired — log in again."), {
+      status: 401,
+      headers: { "content-type": "text/html;charset=UTF-8" }
+    });
+  }
+  const form = await request.formData();
+  const key = String(form.get("key") || "");
+  if (Object.prototype.hasOwnProperty.call(DEFAULT_CONTENT, key)) {
+    await env.CONTENT.delete(`content:${key}`);
+  }
   return Response.redirect(new URL("/admin?flash=saved", request.url).toString(), 303);
 }
 
