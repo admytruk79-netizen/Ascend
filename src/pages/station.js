@@ -30,7 +30,7 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.concept_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>${richText(c["station.concept_body"])}</div>
-      ${mediaBlock(c["station.image_okko"], "Reference board: OKKO, café hospitality, forecourt, motor court, and swap-station influences", "Reference mood board")}
+      ${mediaBlock(c["station.image_competitor_ref"], "Reference board: OKKO, café hospitality, forecourt, motor court, and swap-station influences", "Reference mood board")}
     </div>
     <div style="margin-top:2rem;">
       ${diagramImage("/diagrams/socar_layout.png", "SOCAR-style premium forecourt reference layout", "Reference model: SOCAR-style premium forecourt — mechanics only, not the brand.")}
