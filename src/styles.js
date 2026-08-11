@@ -147,11 +147,12 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
 
 /* Image placeholder (used until a real URL is set via /admin) */
 .media {
+  width: 100%;
   border-radius: 10px; overflow: hidden; background: #E9E2CC;
   border: 1px solid var(--line);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
 }
-.media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .media-placeholder {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center; text-align: center;
