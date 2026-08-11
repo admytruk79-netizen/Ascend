@@ -339,7 +339,7 @@ export const DEFAULT_CONTENT = {
   "about.contact_body":
     "For partnership, investment, or press inquiries, reach out directly — we read every message ourselves.",
   "about.contact_email": "admytruk@proton.me",
-  "about.contact_phone": "360-865-8192",
+  "about.contact_phone": "",
   "about.image_founder": ""
 };
 
