@@ -73,6 +73,13 @@ export function diagramImage(src, alt, caption) {
   return `<div class="diagram-frame"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy"></div><p class="diagram-caption">${escapeHtml(caption)}</p>`;
 }
 
+// A pre-composed branded image (its own baked-in text/signage) shown at
+// its native aspect ratio — no object-fit crop-box, so nothing gets cut off.
+export function mediaFull(url, alt) {
+  if (!url) return "";
+  return `<div class="media-full"><img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}" loading="lazy"></div>`;
+}
+
 export function renderPage({ title, description, activePath, body }) {
   return `<!doctype html>
 <html lang="en">

@@ -153,6 +153,10 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
   aspect-ratio: 16 / 9;
 }
 .media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+/* Pre-composed branded reference images — shown whole, no crop-box */
+.media-full { width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.media-full img { display: block; width: 100%; height: auto; }
 .media-placeholder {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center; text-align: center;

@@ -1,4 +1,4 @@
-import { richText, mediaBlock, diagramImage, renderBullets, renderStats, escapeHtml } from "../layout.js";
+import { richText, mediaBlock, mediaFull, diagramImage, renderBullets, renderStats, escapeHtml } from "../layout.js";
 
 const SERVICES = [
   { key: "fuel", title: "Fuel", accent: "gold" },
@@ -19,7 +19,7 @@ export function stationPage(c) {
         <p class="lead" style="font-family:'Cinzel', serif; color: var(--gold-light); font-size:1.2rem;">${escapeHtml(c["station.tagline"])}</p>
         <p class="lead">${escapeHtml(c["station.hero_sub"])}</p>
       </div>
-      ${mediaBlock(c["station.image_hero"], "Roviq Station forecourt", "Station forecourt hero photo")}
+      ${mediaFull(c["station.image_hero"], "Roviq Station forecourt — multi-fuel, café & market, EV charging")}
     </div>
   </div>
 </section>
@@ -30,7 +30,7 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.concept_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>${richText(c["station.concept_body"])}</div>
-      ${mediaBlock(c["station.image_competitor_ref"], "Reference board: OKKO, café hospitality, forecourt, motor court, and swap-station influences", "Reference mood board")}
+      ${mediaFull(c["station.image_hero_secondary"], "Roviq Station forecourt at dusk")}
     </div>
     <div style="margin-top:2rem;">
       ${diagramImage("/diagrams/socar_layout.png", "SOCAR-style premium forecourt reference layout", "Reference model: SOCAR-style premium forecourt — mechanics only, not the brand.")}
@@ -71,10 +71,9 @@ export function stationPage(c) {
         </div>`
       ).join("\n")}
     </div>
-    <div class="grid grid--3" style="margin-top:2rem;">
-      ${mediaBlock(c["station.image_fuel"], "Fuel canopy", "Fuel canopy / forecourt photo")}
+    <div class="grid grid--2" style="margin-top:2rem;">
+      ${mediaFull(c["station.image_fuel"], "Roviq Station pricing board and fuel canopy detail")}
       ${mediaBlock(c["station.image_ev"], "EV charging", "EV charging bay photo")}
-      ${mediaBlock(c["station.image_cafe"], "Café interior", "Café / wine interior photo")}
     </div>
   </div>
 </section>
@@ -87,6 +86,10 @@ export function stationPage(c) {
     <div class="grid grid--2" style="margin-top:1.5rem;">
       ${diagramImage("/diagrams/site_layout.png", "Roviq Station site layout schematic", "Site layout — fuel/EV canopy at the perimeter, café + retail anchoring the center, wash at the rear.")}
       ${diagramImage("/diagrams/interior_layout.png", "Roviq Station interior zoning schematic", "Interior layout — fast lane kept separate from sit-down café flow.")}
+    </div>
+    <div style="margin-top:1.5rem;">
+      ${mediaFull(c["station.image_cafe"], "Roviq Station interior — coffee bar and grab-and-go market")}
+      <p class="diagram-caption">The interior in practice — coffee bar and fresh grab-and-go on the left, fast lane kept to the right, matching the zoning diagram above.</p>
     </div>
   </div>
 </section>
