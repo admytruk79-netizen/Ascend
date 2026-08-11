@@ -74,7 +74,7 @@ export function stationPage(c) {
     </div>
     <div class="grid grid--2" style="margin-top:2rem;">
       ${mediaFull(c["station.image_fuel"], "Roviq Station pricing board and fuel canopy detail")}
-      ${mediaBlock(STATION_IMAGES["ev-charging"].file, STATION_IMAGES["ev-charging"].alt, "EV charging bay photo")}
+      ${mediaFull(STATION_IMAGES["ev-charging"].file, STATION_IMAGES["ev-charging"].alt)}
     </div>
   </div>
 </section>
@@ -103,7 +103,7 @@ export function stationPage(c) {
     <div style="margin-top:1.5rem;">
       ${diagramImage("/diagrams/portland_socar_layout.png", "Portland, Oregon entry site layout", "Portland entry path and the regulatory/tax constraints designed into the plan from day one: attendant-pump law, OLCC wine-and-beer-only retail, no state sales tax.")}
     </div>
-    ${mediaBlock(c["station.image_portland"], "Portland streetscape", "Portland, Oregon streetscape / coffee culture photo")}
+    ${mediaFull(c["station.image_portland"], "Portland streetscape")}
   </div>
 </section>
 
@@ -162,21 +162,21 @@ export function stationPage(c) {
       <h3>Motor Court <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_motor_court_body"])}</p>
       ${diagramImage("/diagrams/motor_court_layout.png", "Motor court expansion module layout", "Motor court concept — boutique lodging arranged around the shared forecourt.")}
-      ${mediaBlock(STATION_IMAGES["motorcourt"].file, STATION_IMAGES["motorcourt"].alt, "Route 66 boutique motor-court revival photo")}
+      ${mediaFull(STATION_IMAGES["motorcourt"].file, STATION_IMAGES["motorcourt"].alt)}
     </div>
 
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Post Station <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_post_station_body"])}</p>
       ${diagramImage("/diagrams/post_station_layout.png", "Post Station battery-swap module layout", "Post Station concept — a battery-swap bay layered onto the existing forecourt, named for the 19th-century relay stations that swapped a tired horse for a fresh one.")}
-      ${mediaBlock(STATION_IMAGES["swap-station"].file, STATION_IMAGES["swap-station"].alt, "NIO / Ample battery-swap station photo")}
+      ${mediaFull(STATION_IMAGES["swap-station"].file, STATION_IMAGES["swap-station"].alt)}
     </div>
 
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Vehicle Relay <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_vehicle_relay_body"])}</p>
       ${diagramImage("/diagrams/vehicle_relay.png", "Vehicle relay concept diagram", "Vehicle relay concept — a corridor of 3+ stations acting as custody hand-off points, logged in Roviq Core.")}
-      ${mediaBlock(STATION_IMAGES["relay-station"].file, STATION_IMAGES["relay-station"].alt, "Relay-station reference — a modern take on the 19th-century post/relay stagecoach stop")}
+      ${mediaFull(STATION_IMAGES["relay-station"].file, STATION_IMAGES["relay-station"].alt)}
     </div>
   </div>
 </section>
