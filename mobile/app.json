@@ -26,7 +26,9 @@
       "permissions": [
         "android.permission.BLUETOOTH_SCAN",
         "android.permission.BLUETOOTH_CONNECT",
-        "android.permission.ACCESS_FINE_LOCATION"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN"
       ]
     },
     "web": {
@@ -37,10 +39,17 @@
         "react-native-ble-plx",
         {
           "isBackgroundEnabled": false,
-          "modes": ["central"],
+          "modes": [
+            "central"
+          ],
           "bluetoothAlwaysPermission": "ASCEND uses Bluetooth to connect to your wearable trigger device."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0b6ef414-8db0-42e7-a5eb-7b6501dffbd0"
+      }
+    }
   }
 }
