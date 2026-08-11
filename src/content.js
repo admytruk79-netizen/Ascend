@@ -305,7 +305,7 @@ export const DEFAULT_CONTENT = {
   "station.image_cafe": "/photos/station_interior_cafe.jpg",
   "station.image_ev": "/photos/station_ev_charging.jpg",
   "station.image_fuel": "/photos/station_pricing_detail.jpg",
-  "station.image_portland": "",
+  "station.image_portland": "/photos/portland_streetscape.jpg",
   "station.image_motor_court": "/photos/motor_court_reference.jpg",
   "station.image_battery_swap": "/photos/swap_station_reference.jpg",
   "station.image_vehicle_relay": "/photos/relay_station_reference.jpg",
