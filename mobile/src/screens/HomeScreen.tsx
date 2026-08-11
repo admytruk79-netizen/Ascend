@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CARD_MANIFEST } from '../data/cardManifest';
 import { CARD_IMAGES } from '../data/cardImages';
 import { getPrimaryAnchorId } from '../storage/cardState';
@@ -68,7 +68,11 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       <Text style={styles.title}>ASCEND</Text>
 
       <View style={styles.anchorCard}>
@@ -126,14 +130,17 @@ export default function HomeScreen({ navigation }: Props) {
       >
         <Text style={styles.entryButtonText}>Settings</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: '#1a1a24',
+  },
+  container: {
+    flexGrow: 1,
     padding: 20,
     justifyContent: 'center',
     gap: 12,
