@@ -1,4 +1,4 @@
-import { richText, mediaBlock, escapeHtml } from "../layout.js";
+import { richText, escapeHtml } from "../layout.js";
 
 export function aboutPage(c) {
   return `
@@ -10,14 +10,9 @@ export function aboutPage(c) {
 
 <section class="section">
   <div class="container">
-    <div class="grid grid--2" style="align-items:start;">
-      <div>
-        <span class="eyebrow">Founder story</span>
-        <h2>${escapeHtml(c["about.founder_heading"])}</h2>
-        ${richText(c["about.founder_body"])}
-      </div>
-      ${mediaBlock(c["about.image_founder"], "Founder", "Founder / story photo")}
-    </div>
+    <span class="eyebrow">Founder story</span>
+    <h2>${escapeHtml(c["about.founder_heading"])}</h2>
+    ${richText(c["about.founder_body"])}
   </div>
 </section>
 
