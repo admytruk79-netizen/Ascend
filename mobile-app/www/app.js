@@ -812,11 +812,14 @@ function renderHome(root) {
   const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
   const priceAmount = price.split('/')[0].trim();
 
-  const rows = SPREADS.map(s => {
+  const rows = SPREADS.map((s, i) => {
     const locked = !s.free && !isSubscribed();
     const expanded = expandedKey === s.key;
     const tag = s.free ? 'FREE' : (isSubscribed() ? 'INCLUDED' : 'MEMBERSHIP');
-    const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'rgba(var(--gold-rgb),.6)' : 'rgba(var(--text-rgb),.45)');
+    // FREE stays gold; INCLUDED (already a member) gets its own teal so the
+    // three tag states -- free / included / membership-locked -- are each
+    // visually distinct rather than INCLUDED reading as a dimmer FREE.
+    const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'var(--teal)' : 'rgba(var(--text-rgb),.45)');
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
     const plural = s.count > 1 ? 'S' : '';
 
@@ -843,7 +846,7 @@ function renderHome(root) {
         </div>`;
 
     return `
-      <div class="spread-card ${expanded ? 'expanded' : ''}" data-key="${s.key}">
+      <div class="spread-card ${expanded ? 'expanded' : ''}" data-key="${s.key}" style="--reveal-delay:${i * 70}ms">
         <div class="spread-row" data-toggle="${s.key}">
           <div class="spread-dots">${dots}</div>
           <div class="spread-row-body">
@@ -882,6 +885,20 @@ function renderHome(root) {
     }
     introRevealOrigin = null;
   }
+
+  // Spread cards fade+lift in as they cross into view, staggered via the
+  // --reveal-delay each row already carries (set above, index * 70ms).
+  // One-shot per card -- once revealed it stays revealed, no re-hiding on
+  // scroll-away.
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  root.querySelectorAll('.spread-card').forEach(el => cardObserver.observe(el));
 
   document.getElementById('savedEntryBtn').addEventListener('click', goToSavedCards);
   document.getElementById('journalEntryBtn').addEventListener('click', goToJournalHistory);

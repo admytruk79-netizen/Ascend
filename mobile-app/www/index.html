@@ -10,6 +10,11 @@
   :root {
     --bg1: #100D11; --bg2: #171219;
     --gold: #C4A84A; --gold-hover: #dcc078; --gold-rgb: 196,168,74;
+    /* Third palette color, scoped to the INCLUDED status tag only (targeted
+       tag-hierarchy fix, not a palette overhaul). Same value in both modes
+       -- it reads fine against both the near-black night background and
+       the cream day one, so it doesn't need a per-mode override like gold. */
+    --teal: #0E7C7B; --teal-rgb: 14,124,123;
     --cream: #F3ECD9; --cream-rgb: 243,236,217;
     --text: var(--cream); --text-rgb: 243,236,217;
     --parchment: #F6F1E4; --ink: #241D0F;
@@ -27,7 +32,10 @@
        reads against an already-light background. */
     --frost-bg: rgba(255,255,255,.045);
     --frost-bg-strong: rgba(255,255,255,.075);
-    --frost-border: rgba(255,255,255,.12);
+    /* .12 measured too faint on OLED-style near-black -- bumped for
+       legibility of the spread card borders specifically; still well
+       under day mode's .75, stays a quiet line rather than a bright one. */
+    --frost-border: rgba(255,255,255,.17);
     --frost-highlight: rgba(255,255,255,.18);
     --frost-blur: 14px;
   }
@@ -168,10 +176,22 @@
   }
   .spread-card {
     position: relative; border-radius: 12px; background: var(--frost-bg); border: 1px solid var(--frost-border);
-    overflow: hidden; transition: border-color .3s ease, background .3s ease;
+    overflow: hidden;
     backdrop-filter: blur(var(--frost-blur)); -webkit-backdrop-filter: blur(var(--frost-blur));
     box-shadow: inset 0 1px 0 var(--frost-highlight);
+    /* Scroll-reveal: hidden until it crosses into view (JS toggles
+       .revealed via IntersectionObserver), then fades + lifts in. Kept
+       slow and unhurried on purpose -- contemplative, not a product-site
+       "feature reveal." --reveal-delay is set per-card inline (index *
+       70ms) so the list cascades rather than popping in at once. */
+    opacity: 0; transform: translateY(14px);
+    transition: opacity .36s ease-out var(--reveal-delay, 0s), transform .36s ease-out var(--reveal-delay, 0s),
+                border-color .3s ease, background .3s ease;
   }
+  .spread-card.revealed { opacity: 1; transform: translateY(0); }
+  /* Night mode: no slide, just an emergence from black -- opacity only. */
+  [data-mode="night"] .spread-card { transform: none; }
+  [data-mode="night"] .spread-card.revealed { transform: none; }
   .spread-card::before {
     content: ''; position: absolute; left: -14px; top: 23px; width: 14px; height: 1px;
     background: rgba(var(--gold-rgb),.45); pointer-events: none;
