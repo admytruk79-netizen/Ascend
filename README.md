@@ -84,16 +84,28 @@ exists, under its **Settings → Variables and Secrets** (mark both
 - `SESSION_SECRET` — any long random string, signs the admin session cookie
 
 **One-time R2 setup for the "Upload image" button in `/admin`:**
-1. In the Cloudflare dashboard, go to **R2** and enable it for the account
-   (accepting R2's terms) if you haven't already — this can't be done via API.
-2. Create a bucket named `roviq-uploads` (or edit the `bucket_name` in
-   `wrangler.toml` to match whatever name you use).
-3. Redeploy. `wrangler.toml` already declares the `UPLOADS` binding, so no
-   further dashboard binding step is needed — Cloudflare's Git integration
-   picks it up from the config on the next build.
 
-Until this is done, manual image URL entry in `/admin` still works exactly
-as before; the Upload button will show an error until the bucket exists.
+R2 is not currently enabled on this Cloudflare account, and the code
+accounts for that: the `[[r2_buckets]]` block in `wrangler.toml` is
+commented out. Leaving it active while the bucket doesn't exist would fail
+Worker deploys entirely (not just the upload feature) — R2 disabled returns
+the same error a missing bucket would, so `wrangler deploy` can't tell them
+apart and refuses to publish. To turn the feature on:
+
+1. In the Cloudflare dashboard, go to **R2** and enable it for the account
+   (accepting R2's terms) — this can't be done via API, an account owner
+   has to click through it.
+2. Create a bucket named `roviq-uploads` (or pick another name and use it
+   in step 3).
+3. In `wrangler.toml`, uncomment the `[[r2_buckets]]` block (and update
+   `bucket_name` if you used a different one).
+4. Redeploy. No further dashboard binding step is needed — Cloudflare's Git
+   integration picks up the binding from the config on the next build.
+
+Until this is done, manual image URL entry in `/admin` works exactly as
+before. The Upload button is visible either way; clicking it before the
+binding is uncommented returns a clear "not configured yet" message
+instead of failing silently.
 
 **Alternative — local CLI**, if you'd rather deploy by hand:
 ```bash
