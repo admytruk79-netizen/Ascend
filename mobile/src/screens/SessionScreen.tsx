@@ -269,9 +269,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.35)',
   },
   closeButton: {
+    // Left, not right — Expo dev-client's own floating dev-tools bubble
+    // defaults to the top-right corner in development builds and visually
+    // collides with a right-aligned close button there, making this button
+    // seem missing/unresponsive while testing. Left avoids the collision.
     position: 'absolute',
     top: 56,
-    right: 20,
+    left: 20,
     zIndex: 1,
     width: 40,
     height: 40,
