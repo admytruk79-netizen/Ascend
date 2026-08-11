@@ -30,6 +30,9 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.concept_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>${richText(c["station.concept_body"])}</div>
+      ${mediaFull(c["station.image_competitor_ref"], "Reference board: OKKO, café hospitality, forecourt, motor court, and swap-station influences")}
+    </div>
+    <div style="margin-top:1.5rem;">
       ${mediaFull(c["station.image_hero_secondary"], "Roviq Station forecourt at dusk")}
     </div>
     <div style="margin-top:2rem;">
