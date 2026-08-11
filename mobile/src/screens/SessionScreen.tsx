@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   Animated,
   AppState,
   AppStateStatus,
   BackHandler,
+  Easing,
   Image,
   StyleSheet,
   Text,
@@ -67,6 +69,26 @@ export default function SessionScreen({ route, navigation }: Props) {
   const backgroundedAtRef = useRef<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // OS-level Reduce Motion (WCAG 2.2): the breathing pacer switches to an
+  // opacity pulse instead of scaling (its motion IS the content, so it
+  // stays rather than being disabled outright), and the session-end fade
+  // is skipped in favor of an instant cut.
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const reduceMotionRef = useRef(false);
+  useEffect(() => {
+    reduceMotionRef.current = reduceMotion;
+  }, [reduceMotion]);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion
+    );
+    return () => subscription.remove();
+  }, []);
+
+  const screenOpacity = useRef(new Animated.Value(1)).current;
+
   const artSource = CARD_IMAGES[cardId];
 
   const clearTick = useCallback(() => {
@@ -101,11 +123,23 @@ export default function SessionScreen({ route, navigation }: Props) {
         interrupted: outcome.interrupted,
       });
 
-      if (navigation.isFocused()) {
+      if (!navigation.isFocused()) return;
+
+      // A slow fade rather than an abrupt cut back to Home — 120 seconds of
+      // calm shouldn't end by snapping straight into a busy interface.
+      // Skipped under Reduce Motion in favor of an instant state change.
+      if (reduceMotionRef.current) {
         navigation.goBack();
+      } else {
+        Animated.timing(screenOpacity, {
+          toValue: 0,
+          duration: 2000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }).start(() => navigation.goBack());
       }
     },
-    [cardId, triggerSource, navigation, clearTick]
+    [cardId, triggerSource, navigation, clearTick, screenOpacity]
   );
 
   const startTick = useCallback(() => {
@@ -185,27 +219,32 @@ export default function SessionScreen({ route, navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Ease-in-out, not linear or bouncy — the pace should read like a breath
+  // actually slowing down, not a UI element bouncing. Under Reduce Motion,
+  // the shape stays still and pulses opacity instead of scaling, since this
+  // animation IS the session's core instruction, not decoration to cut.
   const breathScale = useRef(new Animated.Value(1)).current;
+  const breathOpacity = useRef(new Animated.Value(0.85)).current;
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(breathScale, {
-          toValue: 1.12,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(breathScale, {
-          toValue: 1,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-      ])
-    );
+    const easing = Easing.inOut(Easing.ease);
+    const loop = reduceMotion
+      ? Animated.loop(
+          Animated.sequence([
+            Animated.timing(breathOpacity, { toValue: 0.3, duration: 4000, easing, useNativeDriver: true }),
+            Animated.timing(breathOpacity, { toValue: 0.85, duration: 4000, easing, useNativeDriver: true }),
+          ])
+        )
+      : Animated.loop(
+          Animated.sequence([
+            Animated.timing(breathScale, { toValue: 1.12, duration: 4000, easing, useNativeDriver: true }),
+            Animated.timing(breathScale, { toValue: 1, duration: 4000, easing, useNativeDriver: true }),
+          ])
+        );
     if (!isPaused) {
       loop.start();
     }
     return () => loop.stop();
-  }, [isPaused, breathScale]);
+  }, [isPaused, reduceMotion, breathScale, breathOpacity]);
 
   const onExtend = () => {
     if (isPaused || extendCount >= MAX_EXTENDS) return;
@@ -223,7 +262,7 @@ export default function SessionScreen({ route, navigation }: Props) {
   const countdownLabel = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: screenOpacity }]}>
       {artSource && (
         <Image source={artSource} style={StyleSheet.absoluteFill} resizeMode="cover" />
       )}
@@ -237,7 +276,12 @@ export default function SessionScreen({ route, navigation }: Props) {
         <Text style={styles.countdown}>{countdownLabel}</Text>
         {isPaused && <Text style={styles.pausedLabel}>Paused</Text>}
 
-        <Animated.View style={[styles.breathCircle, { transform: [{ scale: breathScale }] }]} />
+        <Animated.View
+          style={[
+            styles.breathCircle,
+            reduceMotion ? { opacity: breathOpacity } : { transform: [{ scale: breathScale }] },
+          ]}
+        />
         <Text style={styles.breathLabel}>Breathe</Text>
       </View>
 
@@ -253,7 +297,7 @@ export default function SessionScreen({ route, navigation }: Props) {
           {extendCount >= MAX_EXTENDS ? 'Max extended' : `Extend +${EXTEND_SECONDS}s`}
         </Text>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 }
 

@@ -65,7 +65,16 @@ export default function RootNavigator() {
         <Stack.Screen
           name="Session"
           component={SessionScreen}
-          options={{ presentation: 'fullScreenModal', headerShown: false, gestureEnabled: false }}
+          options={{
+            presentation: 'fullScreenModal',
+            headerShown: false,
+            gestureEnabled: false,
+            // A slow fade reads as crossing a threshold into a calm state;
+            // the default slide-up push reads as "navigating a list," which
+            // fights the point of this screen.
+            animation: 'fade',
+            animationDuration: 700,
+          }}
         />
         <Stack.Screen
           name="Settings"
