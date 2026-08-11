@@ -12,9 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { CARD_IMAGES } from '../data/cardImages';
+import { CARD_MANIFEST } from '../data/cardManifest';
 import { recordUse } from '../storage/cardState';
 import { appendSession, generateSessionId } from '../storage/sessionLog';
 
@@ -38,6 +40,21 @@ const PLANNED_SECONDS_DEFAULT = 120;
 const EXTEND_SECONDS = 60;
 const MAX_EXTENDS = 3;
 const BACKGROUND_GRACE_MS = 60_000;
+
+// Subtle per-category tint on the dark overlay — same darkness/alpha as the
+// neutral default, only a faint hue shift, so categories feel distinct
+// without fighting the base calm palette or turning this into five
+// different-looking apps. panic_crisis/anger_friction lean faintly warm
+// (not excited, still muted — never red, per design research), grief_loss
+// leans cooler/deeper, racing_thoughts a touch cool, general_reflective is
+// the unmodified neutral default.
+const CATEGORY_OVERLAY_TINT: Record<string, string> = {
+  panic_crisis: 'rgba(45,22,10,0.35)',
+  anger_friction: 'rgba(40,18,10,0.35)',
+  racing_thoughts: 'rgba(10,16,38,0.35)',
+  grief_loss: 'rgba(6,10,30,0.4)',
+  general_reflective: 'rgba(0,0,0,0.35)',
+};
 
 export default function SessionScreen({ route, navigation }: Props) {
   const { cardId, triggerSource } = route.params;
@@ -90,6 +107,8 @@ export default function SessionScreen({ route, navigation }: Props) {
   const screenOpacity = useRef(new Animated.Value(1)).current;
 
   const artSource = CARD_IMAGES[cardId];
+  const category = CARD_MANIFEST.find((c) => c.id === cardId)?.category;
+  const overlayTint = CATEGORY_OVERLAY_TINT[category ?? ''] ?? CATEGORY_OVERLAY_TINT.general_reflective;
 
   const clearTick = useCallback(() => {
     if (intervalRef.current) {
@@ -103,6 +122,7 @@ export default function SessionScreen({ route, navigation }: Props) {
       if (endedRef.current) return;
       endedRef.current = true;
       clearTick();
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
 
       const actualSeconds = Math.max(
         0,
@@ -155,10 +175,14 @@ export default function SessionScreen({ route, navigation }: Props) {
     }, 1000);
   }, [clearTick, endSession]);
 
-  // Session start: log the anchor use, kick off the countdown.
+  // Session start: log the anchor use, kick off the countdown. A single
+  // light haptic confirms the session actually started — nothing more
+  // elaborate, per design research: layered haptic patterns read as
+  // gamified, which cuts against this app's no-gamification stance.
   useEffect(() => {
     recordUse(cardId);
     startTick();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     return clearTick;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -266,7 +290,7 @@ export default function SessionScreen({ route, navigation }: Props) {
       {artSource && (
         <Image source={artSource} style={StyleSheet.absoluteFill} resizeMode="cover" />
       )}
-      <View style={styles.overlay} />
+      <View style={[styles.overlay, { backgroundColor: overlayTint }]} />
 
       <TouchableOpacity style={styles.closeButton} onPress={onClose} hitSlop={16}>
         <Text style={styles.closeButtonText}>✕</Text>
@@ -309,8 +333,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   overlay: {
+    // backgroundColor comes from CATEGORY_OVERLAY_TINT inline, per-card.
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   closeButton: {
     // Left, not right — Expo dev-client's own floating dev-tools bubble
