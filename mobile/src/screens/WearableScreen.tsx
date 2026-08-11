@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -16,19 +17,28 @@ import { getBleManager } from '../ble/bleManager';
 import { getPairedDevice, setPairedDevice, PairedDevice } from '../storage/bleDevice';
 import { startPrimaryAnchorSession } from '../session/startSession';
 import { RequiresPremium } from '../purchases/RequiresPremium';
+import { connectHeartRateMonitor } from '../wearable/heartRateMonitor';
 
 // Spec §6: BLE trigger device, foreground only — no background scanning or
 // triggering, that's explicitly out of scope for the MVP.
 //
-// What this screen does NOT do: subscribe to a real trigger notification
-// from the paired device. That needs the device's actual GATT service and
-// characteristic UUIDs, which weren't provided (this app was built without
-// a real hardware spec in hand) — see the TODO below for exactly where
-// that would plug in. "Test trigger" below calls the same
-// startPrimaryAnchorSession('wearable') a real characteristic-notification
-// handler would call, so the session-start path itself is fully built and
-// tested; only the "read a real button press off the device" wiring is
-// missing, and it's hardware-specific by nature.
+// Two trigger paths now exist:
+// 1. "Test trigger" — a manual stand-in for a real button-press device.
+//    That needs the device's actual GATT service/characteristic UUIDs,
+//    which weren't provided (this app was built without a real hardware
+//    spec in hand) — see the TODO below for exactly where that plugs in.
+// 2. "Auto-detect heart rate spikes" — a real, working characteristic
+//    subscription (../wearable/heartRateMonitor.ts) against the standard
+//    Bluetooth SIG Heart Rate service, which any GATT-compliant HR strap
+//    or watch exposes with the same UUIDs — no device-specific wiring
+//    needed here, unlike path 1. Gated on both a rolling-baseline spike
+//    (spikeDetector.ts) AND the phone being stationary (motionGate.ts) so
+//    an exercise-driven HR rise doesn't fire it; surfaces a tap-to-confirm
+//    prompt rather than auto-launching the session, since this is a
+//    passive/ambient signal, not a deliberate user action like path 1 or
+//    Home's double-tap.
+// Both call the same startPrimaryAnchorSession('wearable') Home's
+// double-tap uses — no separate session-start path per trigger source.
 //
 // UNTESTABLE in this environment: react-native-ble-plx is a native module
 // (see ../ble/bleManager.ts) that only runs in a custom EAS dev client on
@@ -56,21 +66,41 @@ async function requestBlePermissions(): Promise<boolean> {
   return result === 'granted';
 }
 
+function onHeartRateSpike() {
+  Alert.alert('Elevated heart rate detected', 'Want to open your anchor?', [
+    { text: 'Not now', style: 'cancel' },
+    { text: 'Open anchor', onPress: () => startPrimaryAnchorSession('wearable') },
+  ]);
+}
+
 export default function WearableScreen() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [paired, setPaired] = useState<PairedDevice | null>(null);
+  const [isAutoDetectOn, setIsAutoDetectOn] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const scanTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopMonitorRef = useRef<(() => void) | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       getPairedDevice().then(setPaired);
+      // Spec §6: BLE is foreground-only. Losing focus on this screen — not
+      // just backgrounding the whole app — is treated as leaving the
+      // foreground context for this feature, so the connection and the
+      // toggle both reset rather than silently keep running elsewhere.
+      return () => {
+        stopMonitorRef.current?.();
+        stopMonitorRef.current = null;
+        setIsAutoDetectOn(false);
+      };
     }, [])
   );
 
   useEffect(() => {
     return () => {
       if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
+      stopMonitorRef.current?.();
       try {
         getBleManager().stopDeviceScan();
       } catch {
@@ -79,6 +109,33 @@ export default function WearableScreen() {
       }
     };
   }, []);
+
+  const onToggleAutoDetect = async (next: boolean) => {
+    if (!paired) return;
+
+    if (!next) {
+      stopMonitorRef.current?.();
+      stopMonitorRef.current = null;
+      setIsAutoDetectOn(false);
+      return;
+    }
+
+    setIsConnecting(true);
+    try {
+      const stop = await connectHeartRateMonitor(paired.id, onHeartRateSpike);
+      stopMonitorRef.current = stop;
+      setIsAutoDetectOn(true);
+    } catch (err) {
+      Alert.alert(
+        'Could not connect',
+        err instanceof Error
+          ? err.message
+          : 'Make sure the paired device supports the standard Heart Rate service.'
+      );
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   const onStartScan = async () => {
     const granted = await requestBlePermissions();
@@ -143,6 +200,22 @@ export default function WearableScreen() {
             <TouchableOpacity style={styles.primaryButton} onPress={onTestTrigger}>
               <Text style={styles.primaryButtonText}>Test trigger</Text>
             </TouchableOpacity>
+
+            <View style={styles.autoDetectRow}>
+              <View style={styles.autoDetectTextWrap}>
+                <Text style={styles.autoDetectLabel}>Auto-detect heart rate spikes</Text>
+                <Text style={styles.autoDetectHint}>
+                  Only prompts while you're relatively still — won't fire during
+                  a workout. Requires a device with a standard Heart Rate
+                  sensor. Foreground only.
+                </Text>
+              </View>
+              {isConnecting ? (
+                <ActivityIndicator color="#f2c14e" />
+              ) : (
+                <Switch value={isAutoDetectOn} onValueChange={onToggleAutoDetect} />
+              )}
+            </View>
           </View>
         )}
 
@@ -206,6 +279,25 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#1a1a24',
     fontWeight: '700',
+  },
+  autoDetectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    gap: 12,
+  },
+  autoDetectTextWrap: {
+    flex: 1,
+  },
+  autoDetectLabel: {
+    color: '#e6e6f0',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  autoDetectHint: {
+    color: '#8a8aa0',
+    fontSize: 12,
+    marginTop: 4,
   },
   scanButton: {
     backgroundColor: '#2b2b3a',
