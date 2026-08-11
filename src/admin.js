@@ -105,13 +105,20 @@ export function renderAdminDashboard(content, flash) {
             <input type="hidden" name="key" value="${escapeHtml(field.key)}">
           </form>`;
       if (field.type === "image") {
-        return `<div class="admin-field">
+        return `<div class="admin-field" data-image-field="${escapeHtml(field.key)}">
           <label>${escapeHtml(field.label)} <span class="field-key">${field.key}</span></label>
           <div style="display:flex; gap:0.6rem; align-items:center;">
-            <input type="text" name="${field.key}" value="${escapeHtml(value)}" placeholder="https://example.com/photo.jpg" style="flex:1;">
+            <input type="text" name="${field.key}" value="${escapeHtml(value)}" placeholder="https://example.com/photo.jpg" class="upload-url-input" style="flex:1;">
             ${resetButton}
           </div>
-          <div style="max-width:220px; margin-top:0.6rem;">${mediaBlock(value, field.label, "No image set")}</div>
+          <div style="display:flex; gap:0.6rem; align-items:center; margin-top:0.5rem;">
+            <label class="btn btn--outline" style="cursor:pointer; padding:0.4rem 0.9rem; font-size:0.85rem; color:var(--navy); border-color:var(--navy);">
+              Upload image
+              <input type="file" accept="image/jpeg,image/png,image/webp" class="upload-file-input" style="display:none;">
+            </label>
+            <span class="upload-status" style="font-size:0.8rem; color:#666;"></span>
+          </div>
+          <div class="upload-preview" style="max-width:220px; margin-top:0.6rem;">${mediaBlock(value, field.label, "No image set")}</div>
         </div>`;
       }
       return `<div class="admin-field">
@@ -142,6 +149,32 @@ export function renderAdminDashboard(content, flash) {
     </div>
   </form>
 </div>
+<script>
+(function () {
+  document.querySelectorAll('[data-image-field]').forEach(function (wrap) {
+    var fileInput = wrap.querySelector('.upload-file-input');
+    var urlInput = wrap.querySelector('.upload-url-input');
+    var status = wrap.querySelector('.upload-status');
+    var preview = wrap.querySelector('.upload-preview');
+    fileInput.addEventListener('change', function () {
+      var file = fileInput.files[0];
+      if (!file) return;
+      status.textContent = 'Uploading…';
+      var fd = new FormData();
+      fd.append('file', file);
+      fetch('/admin/upload', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data.ok) { status.textContent = data.error || 'Upload failed.'; return; }
+          urlInput.value = data.url;
+          status.textContent = 'Uploaded — click Save changes below to publish it.';
+          preview.innerHTML = '<div class="media"><img src="' + data.url + '" alt="" loading="lazy"></div>';
+        })
+        .catch(function () { status.textContent = 'Upload failed — check your connection and try again.'; });
+    });
+  });
+})();
+</script>
 `);
 }
 
@@ -219,6 +252,56 @@ export async function handleAdminResetField(request, env) {
     await env.CONTENT.delete(`content:${key}`);
   }
   return Response.redirect(new URL("/admin?flash=saved", request.url).toString(), 303);
+}
+
+const ALLOWED_UPLOAD_TYPES = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp"
+};
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB
+
+export async function handleAdminUpload(request, env) {
+  const authed = await isAuthed(request, env);
+  if (!authed) {
+    return Response.json({ ok: false, error: "Session expired — log in again." }, { status: 401 });
+  }
+  if (!env.UPLOADS) {
+    return Response.json({ ok: false, error: "Image uploads aren't configured yet (missing UPLOADS R2 binding)." }, { status: 500 });
+  }
+  let form;
+  try {
+    form = await request.formData();
+  } catch {
+    return Response.json({ ok: false, error: "No file received." }, { status: 400 });
+  }
+  const file = form.get("file");
+  if (!file || typeof file === "string") {
+    return Response.json({ ok: false, error: "No file received." }, { status: 400 });
+  }
+  const ext = ALLOWED_UPLOAD_TYPES[file.type];
+  if (!ext) {
+    return Response.json({ ok: false, error: "Only JPG, PNG, or WebP images are allowed." }, { status: 400 });
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return Response.json({ ok: false, error: "Image is larger than 8MB." }, { status: 400 });
+  }
+  const key = `uploads/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+  await env.UPLOADS.put(key, file.stream(), { httpMetadata: { contentType: file.type } });
+  return Response.json({ ok: true, url: `/${key}` });
+}
+
+export async function handleUploadedAsset(request, env) {
+  if (!env.UPLOADS) return new Response("Not found", { status: 404 });
+  const url = new URL(request.url);
+  const key = url.pathname.slice(1); // drop leading "/"
+  const object = await env.UPLOADS.get(key);
+  if (!object) return new Response("Not found", { status: 404 });
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set("cache-control", "public, max-age=31536000, immutable");
+  headers.set("etag", object.httpEtag);
+  return new Response(object.body, { headers });
 }
 
 export async function loadAllContent(env) {

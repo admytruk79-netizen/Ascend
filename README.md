@@ -83,6 +83,18 @@ exists, under its **Settings → Variables and Secrets** (mark both
 - `ADMIN_PASSWORD` — the `/admin` login password
 - `SESSION_SECRET` — any long random string, signs the admin session cookie
 
+**One-time R2 setup for the "Upload image" button in `/admin`:**
+1. In the Cloudflare dashboard, go to **R2** and enable it for the account
+   (accepting R2's terms) if you haven't already — this can't be done via API.
+2. Create a bucket named `roviq-uploads` (or edit the `bucket_name` in
+   `wrangler.toml` to match whatever name you use).
+3. Redeploy. `wrangler.toml` already declares the `UPLOADS` binding, so no
+   further dashboard binding step is needed — Cloudflare's Git integration
+   picks it up from the config on the next build.
+
+Until this is done, manual image URL entry in `/admin` still works exactly
+as before; the Upload button will show an error until the bucket exists.
+
 **Alternative — local CLI**, if you'd rather deploy by hand:
 ```bash
 npx wrangler secret put ADMIN_PASSWORD
@@ -106,9 +118,10 @@ two Worker secrets above.
    - **Text fields** are single-line (headlines, taglines).
    - **Textareas** are multi-line body copy. A blank line between two
      paragraphs starts a new `<p>`.
-   - **Image fields** take a direct image URL. A live preview (or the
-     placeholder) updates once you save. Leave blank to keep the labeled
-     placeholder.
+   - **Image fields** take a direct image URL, or tap **Upload image** to
+     pick a JPG/PNG/WebP from your device — it uploads straight to R2 and
+     fills the URL field in automatically. A live preview updates either
+     way. Leave blank to keep the labeled placeholder.
 4. Click **Save changes**. Writes go straight to the `CONTENT` KV namespace
    and are live on the public site immediately, with no rebuild or redeploy.
 5. **Log out** clears the session cookie. Sessions otherwise expire after 12

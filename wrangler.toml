@@ -6,6 +6,12 @@ kv_namespaces = [
   { binding = "CONTENT", id = "0a3a91e8fa63462eae8cf3f2e77e8a22" }
 ]
 
+# Powers the "Upload Image" button in /admin — see README for the
+# one-time setup this needs (enable R2, create the bucket).
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "roviq-uploads"
+
 # Static assets (diagram PNGs, future photos) served alongside the Worker —
 # a single deployable unit, no separate Pages project needed.
 [assets]

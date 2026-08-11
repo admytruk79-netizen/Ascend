@@ -10,6 +10,8 @@ import {
   handleAdminLogout,
   handleAdminSave,
   handleAdminResetField,
+  handleAdminUpload,
+  handleUploadedAsset,
   loadAllContent
 } from "./admin.js";
 
@@ -56,6 +58,8 @@ export default {
       if (path === "/admin/logout" && method === "POST") return handleAdminLogout(request, env);
       if (path === "/admin/save" && method === "POST") return handleAdminSave(request, env);
       if (path === "/admin/reset-field" && method === "POST") return handleAdminResetField(request, env);
+      if (path === "/admin/upload" && method === "POST") return handleAdminUpload(request, env);
+      if (path.startsWith("/uploads/") && method === "GET") return handleUploadedAsset(request, env);
 
       const page = PAGES[path];
       if (page && method === "GET") {
