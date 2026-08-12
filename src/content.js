@@ -173,7 +173,7 @@ export const DEFAULT_CONTENT = {
   "home.image_roviq": "/photos/dispatch_app_mockup.jpg",
   "home.image_station": "/photos/station_hero.jpg",
 
-  // ---------- ROVIQ ----------
+  // ---------- QREMYN ----------
   "roviq.hero_eyebrow": "The platform",
   "roviq.hero_heading": "Qremyn Core",
   "roviq.hero_sub":
