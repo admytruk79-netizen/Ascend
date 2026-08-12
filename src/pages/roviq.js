@@ -19,7 +19,7 @@ export function roviqPage(c) {
         <p class="lead">${escapeHtml(c["roviq.hero_sub"])}</p>
       </div>
       <div style="text-align:center;">
-        <img src="/brand/roviq-lockup.png" alt="Roviq — Auto repair, made simple." style="max-width:280px; width:100%; margin:0 auto; border-radius:12px;">
+        <img src="/brand/roviq-lockup.png" alt="Qremyn — Auto repair, made simple." style="max-width:280px; width:100%; margin:0 auto; border-radius:12px;">
       </div>
     </div>
   </div>
@@ -41,7 +41,7 @@ export function roviqPage(c) {
         ${richText(c["roviq.dispatch_body"])}
         ${renderList(c["roviq.dispatch_steps"])}
       </div>
-      ${mediaBlock(c["roviq.dispatch_image"], "Roviq dispatch flow", "Dispatch map / routing UI mockup")}
+      ${mediaBlock(c["roviq.dispatch_image"], "Qremyn dispatch flow", "Dispatch map / routing UI mockup")}
     </div>
   </div>
 </section>
@@ -72,7 +72,7 @@ export function roviqPage(c) {
 
 <section class="section section--cream-alt">
   <div class="container">
-    <span class="eyebrow">How Roviq makes money</span>
+    <span class="eyebrow">How Qremyn makes money</span>
     <h2>${escapeHtml(c["roviq.revenue_heading"])}</h2>
     ${renderStats(c["roviq.revenue_stats"])}
     ${richText(c["roviq.revenue_body"])}

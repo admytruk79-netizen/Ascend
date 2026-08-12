@@ -70,7 +70,7 @@ export function aboutPage(c) {
     var name = form.name.value.trim();
     var email = form.email.value.trim();
     var message = form.message.value.trim();
-    var subject = encodeURIComponent('Message from ' + name + ' via the Roviq site');
+    var subject = encodeURIComponent('Message from ' + name + ' via the Qremyn site');
     var body = encodeURIComponent(message + '\\n\\n— ' + name + ' (' + email + ')');
     window.location.href = ${JSON.stringify(`mailto:${c["about.contact_email"]}`)} + '?subject=' + subject + '&body=' + body;
     document.getElementById('cf-fallback').style.display = 'block';

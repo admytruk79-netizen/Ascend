@@ -1,4 +1,4 @@
-// Content schema + defaults for the Roviq / Roviq Station site.
+// Content schema + defaults for the Qremyn / Qremyn Station site.
 // Every editable string lives here as a default. At request time, index.js
 // overlays whatever has been saved in the CONTENT KV namespace on top of
 // these defaults, so the site works even before /admin has been touched.
@@ -12,19 +12,19 @@ export const CONTENT_SECTIONS = [
       { key: "home.headline", label: "Headline", type: "text" },
       { key: "home.subheadline", label: "Subheadline", type: "text" },
       { key: "home.intro", label: "Intro paragraph", type: "textarea" },
-      { key: "home.roviq_tagline", label: "Roviq card tagline", type: "text" },
-      { key: "home.roviq_body", label: "Roviq card body", type: "textarea" },
+      { key: "home.roviq_tagline", label: "Qremyn card tagline", type: "text" },
+      { key: "home.roviq_body", label: "Qremyn card body", type: "textarea" },
       { key: "home.station_tagline", label: "Station card tagline", type: "text" },
       { key: "home.station_body", label: "Station card body", type: "textarea" },
       { key: "home.throughline_heading", label: "Throughline heading", type: "text" },
       { key: "home.throughline_body", label: "Throughline body", type: "textarea" },
-      { key: "home.image_roviq", label: "Roviq side image", type: "image" },
+      { key: "home.image_roviq", label: "Qremyn side image", type: "image" },
       { key: "home.image_station", label: "Station side image", type: "image" }
     ]
   },
   {
     id: "roviq",
-    title: "Roviq (platform)",
+    title: "Qremyn (platform)",
     fields: [
       { key: "roviq.hero_eyebrow", label: "Hero eyebrow", type: "text" },
       { key: "roviq.hero_heading", label: "Hero heading", type: "text" },
@@ -68,7 +68,7 @@ export const CONTENT_SECTIONS = [
   },
   {
     id: "station",
-    title: "Roviq Station",
+    title: "Qremyn Station",
     fields: [
       { key: "station.hero_eyebrow", label: "Hero eyebrow", type: "text" },
       { key: "station.hero_heading", label: "Hero heading", type: "text" },
@@ -123,7 +123,7 @@ export const CONTENT_SECTIONS = [
   },
   {
     id: "connection",
-    title: "Roviq × Station",
+    title: "Qremyn × Station",
     fields: [
       { key: "connection.hero_eyebrow", label: "Hero eyebrow", type: "text" },
       { key: "connection.hero_heading", label: "Hero heading", type: "text" },
@@ -157,30 +157,30 @@ export const CONTENT_SECTIONS = [
 export const DEFAULT_CONTENT = {
   // ---------- HOME ----------
   "home.eyebrow": "One brand. Two systems.",
-  "home.headline": "Roviq",
+  "home.headline": "Qremyn",
   "home.subheadline": "One shared backend. Many ways in. One physical hub, built the same way.",
   "home.intro":
-    "Roviq is a dispatch platform for auto services, and Roviq Station is a physical location built on the same idea. Both start from a single core system and branch into the specific experiences people actually need — digital front ends on one side, physical services on the other.",
+    "Qremyn is a dispatch platform for auto services, and Qremyn Station is a physical location built on the same idea. Both start from a single core system and branch into the specific experiences people actually need — digital front ends on one side, physical services on the other.",
   "home.roviq_tagline": "A diagnostic-first dispatch and referral network for auto service.",
   "home.roviq_body":
-    "One backend — Roviq Core — sits behind a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner shops and independent technicians. Five role-based apps share it: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck.",
+    "One backend — Qremyn Core — sits behind a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner shops and independent technicians. Five role-based apps share it: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck.",
   "home.station_tagline": "A Luxury Experience, at an Affordable Price.",
   "home.station_body":
     "One physical location bringing fuel, EV charging, a café, curated wine and retail, and a car wash under a single independent brand — instead of five unrelated stops. Inspired by the OKKO and SOCAR playbooks, built as our own.",
   "home.throughline_heading": "Same architecture, applied twice.",
   "home.throughline_body":
-    "Roviq Core is one backend feeding many digital front ends. Roviq Station is one physical location housing many services. Neither is a bundle bolted together after the fact — both were designed from the center outward, so every new front end or every new service line inherits the same routing logic, the same brand, and the same operating discipline.",
+    "Qremyn Core is one backend feeding many digital front ends. Qremyn Station is one physical location housing many services. Neither is a bundle bolted together after the fact — both were designed from the center outward, so every new front end or every new service line inherits the same routing logic, the same brand, and the same operating discipline.",
   "home.image_roviq": "/photos/dispatch_app_mockup.jpg",
   "home.image_station": "/photos/station_hero.jpg",
 
   // ---------- ROVIQ ----------
   "roviq.hero_eyebrow": "The platform",
-  "roviq.hero_heading": "Roviq Core",
+  "roviq.hero_heading": "Qremyn Core",
   "roviq.hero_sub":
     "A dispatch and referral network for auto service in the Portland metro area — diagnostic-first, with five purpose-built apps sharing one backend and one database.",
   "roviq.core_heading": "The coordination layer, not another repair shop",
   "roviq.core_body":
-    "Roviq's objective isn't to become the largest repair shop in the market — it's to become the coordination layer that sits above every shop and independent technician: the single point of entry customers use, and the system that determines where their business flows. Think of it as Uber or Lyft, but for auto maintenance. The customer doesn't need to know or care which shop or technician handles their car, only that it gets fixed quickly and nearby. Roviq owns the routing intelligence, the data, and the relationships that make the network valuable — at the center are a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner repair shops and independent mobile technicians.",
+    "Qremyn's objective isn't to become the largest repair shop in the market — it's to become the coordination layer that sits above every shop and independent technician: the single point of entry customers use, and the system that determines where their business flows. Think of it as Uber or Lyft, but for auto maintenance. The customer doesn't need to know or care which shop or technician handles their car, only that it gets fixed quickly and nearby. Qremyn owns the routing intelligence, the data, and the relationships that make the network valuable — at the center are a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner repair shops and independent mobile technicians.",
   "roviq.dispatch_heading": "How a job actually moves through the network",
   "roviq.dispatch_body":
     "Every job passes through the same diagnostic-first sequence, moving across the five apps in order. Critically, once a job needs a shop, the customer — not an automated matching algorithm — sees the diagnostic findings and picks where the work gets done, from a short list of eligible partners.",
@@ -198,13 +198,13 @@ export const DEFAULT_CONTENT = {
     "A genuinely separate, real-time layer — because towing is GPS-tracked and urgent-by-definition, closer to a rideshare driver app than a shop dashboard. Covers both towing a non-drivable vehicle and valet (a driver takes the customer's own car to the shop instead), primarily for premium and luxury-tier customers.",
   "roviq.assetlight_heading": "Asset-light, like Uber",
   "roviq.assetlight_body":
-    "Uber — Never owned a single vehicle; legal name is Uber Technologies Inc., a technology company, not a transportation company.\nUber — Expansion required software and driver/rider acquisition, not fleet capital.\nRoviq — Owns zero repair bays, zero vehicles.\nRoviq — Loaner fleet sourced from shop, dealership, and fleet-partner inventory, tiered by economy, standard, and luxury, not purchased outright.\nRoviq — A coordination and technology layer connecting customers, shops, and mobile technicians.\nRoviq — Expansion into a new metro requires partner and customer acquisition, not owned real estate or payroll.",
+    "Uber — Never owned a single vehicle; legal name is Uber Technologies Inc., a technology company, not a transportation company.\nUber — Expansion required software and driver/rider acquisition, not fleet capital.\nQremyn — Owns zero repair bays, zero vehicles.\nQremyn — Loaner fleet sourced from shop, dealership, and fleet-partner inventory, tiered by economy, standard, and luxury, not purchased outright.\nQremyn — A coordination and technology layer connecting customers, shops, and mobile technicians.\nQremyn — Expansion into a new metro requires partner and customer acquisition, not owned real estate or payroll.",
   "roviq.pullquote": "Uber didn't own a single car. We don't own a single repair bay.",
   "roviq.revenue_heading": "Three revenue streams, not one referral fee",
   "roviq.revenue_stats":
     "$89–$129 | Flat diagnostic visit fee, platform-set on every dispatch\n20–30% | Parts markup on Platform-Priced shop jobs\n$99–$499/mo | Self-Priced shop subscription tiers",
   "roviq.revenue_body":
-    "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then $99–$499/month by tier). Platform-Priced shops accept jobs at a Roviq-calculated price once a firm diagnosis exists and keep 100% of the labor, while Roviq's margin comes from a 20–30% markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee of $89–$129, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
+    "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then $99–$499/month by tier). Platform-Priced shops accept jobs at a Qremyn-calculated price once a firm diagnosis exists and keep 100% of the labor, while Qremyn's margin comes from a 20–30% markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee of $89–$129, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
   "roviq.whynow_heading": "Why now",
   "roviq.whynow_body":
     "Structural, not cyclical — the technician shortage is a multi-year trend, not a post-pandemic blip.\nPartners are motivated today — 59% of shops report the shortage is already hurting their business; they need a solution now.\nThe category is proven, the niche is open — mobile-first competitors validated the market, but no dominant hub-and-spoke player has captured it yet.",
@@ -215,18 +215,18 @@ export const DEFAULT_CONTENT = {
     "Portland metro's population is approximately 2.27 million — the initial target market, the same sequencing Uber used in San Francisco before national and global expansion. U.S. consumers will spend an estimated $435 billion on vehicle repair and maintenance this year, within a North American mobile mechanic services market valued at roughly $3.9 billion in 2025. The average U.S. vehicle is now 12.8 years old — the oldest on record — and needs more frequent service. Industry-wide average appointment wait is 3.2 days, and some dealership backlogs run four weeks or more. Roughly 967,000 technicians serve 270,300 independent repair shops nationally, against a Bureau of Labor Statistics-projected shortfall of 68,000 technicians a year for the next decade. This isn't a cyclical gap — it's a multi-year structural trend, and shops already see it in their own booking calendars.",
   "roviq.dealership_heading": "Extending dealership diagnostic capacity",
   "roviq.dealership_body":
-    "Beyond repair-bay overflow, most dealerships face a distinct, often larger constraint: diagnostic throughput itself — a multi-day wait just to find out what's wrong, before repair even enters the picture. Roviq's technicians function as an extension of a dealership's own diagnostic capacity, reaching into the customer's driveway on the dealership's behalf. Our technicians carry professional-grade diagnostic equipment, not OEM-certified factory tools — so any case needing certified warranty determination still routes straight back to the dealership, exactly like every other warranty and OEM job. Customers rotate through the network over time, not permanently to whichever partner handled one job: warranty and OEM work always comes back, and as a dealership's own capacity opens up, the network routes business their way too.",
+    "Beyond repair-bay overflow, most dealerships face a distinct, often larger constraint: diagnostic throughput itself — a multi-day wait just to find out what's wrong, before repair even enters the picture. Qremyn's technicians function as an extension of a dealership's own diagnostic capacity, reaching into the customer's driveway on the dealership's behalf. Our technicians carry professional-grade diagnostic equipment, not OEM-certified factory tools — so any case needing certified warranty determination still routes straight back to the dealership, exactly like every other warranty and OEM job. Customers rotate through the network over time, not permanently to whichever partner handled one job: warranty and OEM work always comes back, and as a dealership's own capacity opens up, the network routes business their way too.",
   "roviq.playbook_heading": "A proven playbook, recombined",
   "roviq.playbook_body":
-    "Uber — Platform sets the price and takes a margin: the diagnostic visit fee (always platform-priced) and Platform-Priced shop mode use a fixed price and standardized labor payout, with Roviq keeping the spread.\nUber Eats — Shelf-and-bin pickup guidance, no staff needed: a technician walks into the parts hub already knowing exactly which shelf and bin holds the part their job needs.\nAmazon — Consignment fulfillment, vendor-owned until sold: parts hub inventory stays the vendor's property until a technician marks a part used, no transaction and no capital cost until then.\nLyft — Reliability-based ranking feeds dispatch: partner performance and on-time rate directly drive the shop-ranking algorithm, so reliability is enforced by the matching logic, not just reported.\nHertz / Turo — A rental supply chain plugged into dispatch: Fleet Partners supply tiered loaner inventory at scale, the same rental-supply pattern, without Roviq owning or buying a fleet.\nAmazon Prime — Same-day fetch or scheduled, promised-time delivery: loaner vehicles reuse the same driver-dispatch and promised-completion infrastructure as tow and valet.",
+    "Uber — Platform sets the price and takes a margin: the diagnostic visit fee (always platform-priced) and Platform-Priced shop mode use a fixed price and standardized labor payout, with Qremyn keeping the spread.\nUber Eats — Shelf-and-bin pickup guidance, no staff needed: a technician walks into the parts hub already knowing exactly which shelf and bin holds the part their job needs.\nAmazon — Consignment fulfillment, vendor-owned until sold: parts hub inventory stays the vendor's property until a technician marks a part used, no transaction and no capital cost until then.\nLyft — Reliability-based ranking feeds dispatch: partner performance and on-time rate directly drive the shop-ranking algorithm, so reliability is enforced by the matching logic, not just reported.\nHertz / Turo — A rental supply chain plugged into dispatch: Fleet Partners supply tiered loaner inventory at scale, the same rental-supply pattern, without Qremyn owning or buying a fleet.\nAmazon Prime — Same-day fetch or scheduled, promised-time delivery: loaner vehicles reuse the same driver-dispatch and promised-completion infrastructure as tow and valet.",
   "roviq.competitors_heading": "A validated, well-capitalized category",
   "roviq.competitors_body":
-    "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $50.8M raised, acquired 2022), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a directory connecting customers to 2,000+ certified shops, no diagnostic or dispatch layer, acquired by Yelp for roughly $80 million) have collectively raised well over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Roviq is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
+    "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $50.8M raised, acquired 2022), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a directory connecting customers to 2,000+ certified shops, no diagnostic or dispatch layer, acquired by Yelp for roughly $80 million) have collectively raised well over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Qremyn is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
   "roviq.ask_heading": "The ask",
   "roviq.ask_stats":
     "$150K | Current pre-seed ask\n~$1.0M | Illustrative Year 1 revenue\n~$2.6M | Illustrative Year 2 revenue",
   "roviq.ask_body":
-    "Roviq is raising a $150,000 pre-seed round, funding the full project through Phase D2 — all five apps, AI diagnostic triage, the loaner fleet, marketing, founder runway, and a 12-month operating buffer, with the technical and business co-founders now leading execution alongside the founder.",
+    "Qremyn is raising a $150,000 pre-seed round, funding the full project through Phase D2 — all five apps, AI diagnostic triage, the loaner fleet, marketing, founder runway, and a 12-month operating buffer, with the technical and business co-founders now leading execution alongside the founder.",
   "roviq.ask_funds":
     "Customer + Diagnostic apps (incl. AI triage) — $24,000\nPricing engine + Stripe Connect + technician payout — $16,000\nShop Partner app + matching — $12,000\nParts Vendor app + add-to-order — $11,000\nDiagnostic tool, equipment + labor-guide license — $5,000\nLoaner vehicle pool + insurance — $13,000\nMarketing & promotion — $9,000\nPartner & customer acquisition incentives — $5,000\nFounder runway (12 months) — $40,000\nLegal, cap table & operating buffer — $15,000\nTotal — $150,000",
   "roviq.ask_milestones":
@@ -237,14 +237,14 @@ export const DEFAULT_CONTENT = {
   "roviq.dispatch_image": "/photos/dispatch_app_mockup.jpg",
 
   // ---------- STATION ----------
-  "station.hero_eyebrow": "Roviq Station",
+  "station.hero_eyebrow": "Qremyn Station",
   "station.hero_heading": "One stop. Every service you actually need.",
   "station.tagline": "A Luxury Experience, at an Affordable Price.",
   "station.hero_sub":
-    "Roviq Station adapts OKKO's Ukrainian \"filling complex\" model — full-service fuel plus a genuine café, curated wine, and retail — for the US market: European-style hospitality and curation, delivered inside a footprint that fits US site economics, drive-through expectations, and state-by-state alcohol law.",
+    "Qremyn Station adapts OKKO's Ukrainian \"filling complex\" model — full-service fuel plus a genuine café, curated wine, and retail — for the US market: European-style hospitality and curation, delivered inside a footprint that fits US site economics, drive-through expectations, and state-by-state alcohol law.",
   "station.concept_heading": "The concept",
   "station.concept_body":
-    "Roviq Station borrows the look, materials, and hospitality standard of a premium brand — glass architecture, curated retail, real sit-down seating, genuine coffee and food craft — but prices it at mainstream convenience-store levels, not boutique-café or wine-bar levels. The luxury is in the experience and design language, not the price tag; the accessibility is what makes it a daily habit rather than an occasional treat. Roviq Station is a fully independent US brand: no OKKO license, no SOCAR license, no franchise or trademark dependency on either company. OKKO and SOCAR are existing registered brands (Galnaftogaz/OKKO Group and the State Oil Company of Azerbaijan) used strictly as strategic reference models — OKKO for its hospitality/food/wine playbook, SOCAR for its premium-fuel and acquisition-led entry playbook. Their names, marks, and identities are not used commercially anywhere in Roviq Station's branding.",
+    "Qremyn Station borrows the look, materials, and hospitality standard of a premium brand — glass architecture, curated retail, real sit-down seating, genuine coffee and food craft — but prices it at mainstream convenience-store levels, not boutique-café or wine-bar levels. The luxury is in the experience and design language, not the price tag; the accessibility is what makes it a daily habit rather than an occasional treat. Qremyn Station is a fully independent US brand: no OKKO license, no SOCAR license, no franchise or trademark dependency on either company. OKKO and SOCAR are existing registered brands (Galnaftogaz/OKKO Group and the State Oil Company of Azerbaijan) used strictly as strategic reference models — OKKO for its hospitality/food/wine playbook, SOCAR for its premium-fuel and acquisition-led entry playbook. Their names, marks, and identities are not used commercially anywhere in Qremyn Station's branding.",
   "station.market_heading": "Why now: the US market already agrees",
   "station.market_stats":
     "$817.5B | US convenience-store industry sales (2025)\n152,000 | US locations — 23rd straight year of growth\n28.5% | Foodservice share of in-store sales\n58% | Would bypass a closer competitor for a signature food item",
@@ -252,7 +252,7 @@ export const DEFAULT_CONTENT = {
     "US convenience-store industry sales reached $817.5B across roughly 152,000 locations in 2025 — a 23rd consecutive year of in-store sales growth. Foodservice now represents about 28.5% of in-store sales, and 58% of consumers say they'd bypass a closer competitor for a brand with a signature food item. A direct copy of the Ukrainian format won't fit US expectations, though: speed stays non-negotiable for the fast-lane customer — pump, grab-and-go, pay, leave — and every slower feature in this plan (sit-down café, wine, motor court, dwell-time features) is opt-in for a customer already choosing to spend time, never a change to what the fast lane owes the rushed customer. If the two ever compete for the same path or staff attention, the fast lane wins. Self-service defaults (pay-at-pump, self-checkout, app ordering), a branded loyalty app, and larger to-go formats are expected, not novel. Alcohol is regulated state-by-state, not nationally, so site selection has to be filtered by state ABC law before any wine program is finalized.",
   "station.proof_heading": "A real-world proof point, ten minutes from Portland",
   "station.proof_body":
-    "Krays Coffee, a Ukrainian-owned café in an ordinary Vancouver, WA strip mall, has built a 4.4–4.5-star following doing the opposite of fast-and-generic: real sit-down seating, Eastern European sweet breads and pastries, local-artist wall displays, and an unhurried atmosphere customers say is worth a 15–20 minute wait. This validates three things directly: American customers will choose sit-down European-café hospitality over speed when the experience earns it; an authentic Ukrainian heritage story is a genuine asset here, not something to downplay; and unglamorous real estate doesn't cap what the concept can become if the hospitality is real. Roviq Station's takeaway: budget for genuine sit-down seating, lean into the founder's Ukrainian heritage in the brand story, and don't over-index site selection on \"perfect\" real estate.",
+    "Krays Coffee, a Ukrainian-owned café in an ordinary Vancouver, WA strip mall, has built a 4.4–4.5-star following doing the opposite of fast-and-generic: real sit-down seating, Eastern European sweet breads and pastries, local-artist wall displays, and an unhurried atmosphere customers say is worth a 15–20 minute wait. This validates three things directly: American customers will choose sit-down European-café hospitality over speed when the experience earns it; an authentic Ukrainian heritage story is a genuine asset here, not something to downplay; and unglamorous real estate doesn't cap what the concept can become if the hospitality is real. Qremyn Station's takeaway: budget for genuine sit-down seating, lean into the founder's Ukrainian heritage in the brand story, and don't over-index site selection on \"perfect\" real estate.",
   "station.benchmark_heading": "Competitive benchmark",
   "station.benchmark_body":
     "Wawa — custom hoagies and top-ranked customer satisfaction; proof food quality plus service builds loyalty beyond fuel\nQuikTrip (QT) — clean stores, extensive fresh food; the benchmark for operational execution and site cleanliness\nBuc-ee's — massive travel-center format, brand-as-destination; shows US appetite for a c-store as \"a stop worth choosing\"\nCasey's — signature food (breakfast pizza), rural density; proprietary food items create a loyalty barrier competitors can't copy\n7-Eleven — scale leader, Slurpee/brand icon items; sets the baseline convenience bar nationally",
@@ -277,7 +277,7 @@ export const DEFAULT_CONTENT = {
     "Directional, industry-pattern ranges to frame planning discussions — not a projection for any specific site, and not financial or investment advice. Per site, annually: fuel gross margin $250K–$450K (thin per-gallon margin, driven by volume); in-store (food, wine, retail) gross margin $300K–$650K; EV charging $20K–$80K (currently more differentiator than profit center); car wash $80K–$200K (often the single most profitable module per square foot); build-out cost for a new site $3.5M–$7M+ (highly variable by land cost, canopy size, and market). Actual figures depend heavily on land cost, fuel volume, local competition, and state alcohol law, and should be built from real site-level data before any capital commitment.",
   "station.risks_heading": "Key risks",
   "station.risks_body":
-    "Trademark/brand risk if the OKKO or SOCAR name were ever used without a formal license — which is why Roviq Station uses neither. Alcohol licensing complexity varies enough by state and county that the wine program may need to be a market-by-market variable, not a fixed standard. New-build fuel sites carry high capital intensity — land, environmental (UST) permitting, and construction can run well past initial estimates, part of why the Portland pilot is acquisition-led instead. And entrenched, well-capitalized competitors (Wawa, QT, Buc-ee's) already occupy the \"food + fuel done well\" position in many strong markets, so pilot site selection needs genuine white space, not a head-on fight.",
+    "Trademark/brand risk if the OKKO or SOCAR name were ever used without a formal license — which is why Qremyn Station uses neither. Alcohol licensing complexity varies enough by state and county that the wine program may need to be a market-by-market variable, not a fixed standard. New-build fuel sites carry high capital intensity — land, environmental (UST) permitting, and construction can run well past initial estimates, part of why the Portland pilot is acquisition-led instead. And entrenched, well-capitalized competitors (Wawa, QT, Buc-ee's) already occupy the \"food + fuel done well\" position in many strong markets, so pilot site selection needs genuine white space, not a head-on fight.",
   "station.roadmap_heading": "The staged roadmap",
   "station.roadmap_body":
     "Everything in this plan collapses into three strategic tiers. Tier 1 is the actual business and must be proven before anything else is funded. Tier 2 is cheap, low-risk upside that layers directly onto a working pilot. Tier 3 is a set of genuine moonshots — each interesting, none assumed into the base case, each requiring its own validation before capital commitment.",
@@ -286,19 +286,19 @@ export const DEFAULT_CONTENT = {
     "Stages 0–2, months 0–15. Stage 0: lock the brand, select the Portland/Oregon corridor, run the state regulatory screen. Stage 1: acquire or JV an existing site (SOCAR-style entry), reconstruct the forecourt, build out café plus curated wine/retail plus standard EV charging, staff to Multnomah County's attendant requirement. Stage 2: run the single site 6–12 months, measuring food/wine attach rate, EV utilization, and labor cost — the go/no-go checkpoint for everything else.",
   "station.tier2_heading": "Tier 2 — Low-capex layer",
   "station.tier2_body":
-    "Stages 3–5, months 12–24, additive to a working pilot. Stage 3: bolt on the Roviq Core tie-ins (parts locker, tow staging, diagnostic drop-off) — cheap relative to the pilot build. Stage 4: add the SOCAR-style premium fuel bay and VIP loyalty program once base traffic is proven. Stage 5: replicate the now-proven format at a second site, ideally on the same I-5 corridor.",
+    "Stages 3–5, months 12–24, additive to a working pilot. Stage 3: bolt on the Qremyn Core tie-ins (parts locker, tow staging, diagnostic drop-off) — cheap relative to the pilot build. Stage 4: add the SOCAR-style premium fuel bay and VIP loyalty program once base traffic is proven. Stage 5: replicate the now-proven format at a second site, ideally on the same I-5 corridor.",
   "station.tier3_heading": "Tier 3 — Moonshot",
   "station.tier3_body":
     "Stages 6–8, 24+ months, each its own business case. Stage 6: motor court — boutique lodging, only at a genuine destination/road-trip site. Stage 7: battery swap — fleet-focused, most realistically via an Ample-style partnership rather than in-house tech. Stage 8: vehicle relay network — only viable once 3+ sites exist on one corridor, explicitly the last-mover module in the whole plan. Fund and de-risk Tier 1 completely before spending real capital on Tier 2, and treat every Tier 3 module as a separate pitch with its own numbers.",
   "station.expansion_heading": "Expansion concepts",
   "station.expansion_body":
-    "Three Tier 3 concepts extend the Roviq Station idea past the first site. Each is presented on its own with its own diagram, and each is explicitly later-stage — none of these are part of the funded Tier 1 pilot.",
+    "Three Tier 3 concepts extend the Qremyn Station idea past the first site. Each is presented on its own with its own diagram, and each is explicitly later-stage — none of these are part of the funded Tier 1 pilot.",
   "station.expansion_motor_court_body":
     "A boutique motor-court revival, timed with Route 66's centennial and the live 2026 trend of restored properties appearing in the MICHELIN Guide as legitimate boutique stays. EV dwell time is the enabler: a 20–30 minute charge is currently dead time at every competitor's site; a small motor court (10–20 rooms around a courtyard) turns that same dwell time into an overnight-stay opportunity instead of losing the traveler the moment charging finishes. It also reframes Oregon's attendant-service requirement as authentic branding — uniformed attendants and windshield service read as genuine \"golden age full service,\" not compliance overhead. This is a Phase 3+ concept, evaluated only at a genuine destination/road-trip site, not part of the initial pilot.",
   "station.expansion_post_station_body":
-    "\"Post Station\" — named for 19th-century relay stations that swapped a tired horse for a fresh one rather than resting it for hours. Applied to EVs: exchange a depleted battery for a charged one in minutes instead of a 20–40 minute charge. This is proven at scale in China — NIO operates roughly 9,000 charging and swap facilities, completed its 100-millionth swap in February 2026, and swaps average about 3 minutes — and exists in the US today at smaller scale via Ample, a Shell Ventures/Repsol-backed startup already pairing swap stations with a Repsol fuel retail forecourt in Madrid. Honest constraint: no major US consumer EV currently ships swap-ready from the factory, so a Roviq Station swap bay would realistically serve fleet, rideshare, and delivery vehicles first — a fleet-focused module and a long-term option, not a near-term mass-market feature.",
+    "\"Post Station\" — named for 19th-century relay stations that swapped a tired horse for a fresh one rather than resting it for hours. Applied to EVs: exchange a depleted battery for a charged one in minutes instead of a 20–40 minute charge. This is proven at scale in China — NIO operates roughly 9,000 charging and swap facilities, completed its 100-millionth swap in February 2026, and swaps average about 3 minutes — and exists in the US today at smaller scale via Ample, a Shell Ventures/Repsol-backed startup already pairing swap stations with a Repsol fuel retail forecourt in Madrid. Honest constraint: no major US consumer EV currently ships swap-ready from the factory, so a Qremyn Station swap bay would realistically serve fleet, rideshare, and delivery vehicles first — a fleet-focused module and a long-term option, not a near-term mass-market feature.",
   "station.expansion_vehicle_relay_body":
-    "The more literal version of the historic analog: stagecoach lines swapped entire teams, and sometimes the coach itself, at fixed relay stations. Applied today, a traveler drops off a Roviq rental EV at one station and picks up a different, fully-charged one at the next — the same Hertz/Turo-style one-way rental logic already in Roviq's own platform strategy, applied to a fixed physical corridor. The honest risk, shared by every one-way rental network including U-Haul: vehicles pile up at popular destinations and run short at popular origins, requiring paid repositioning. This requires 3+ Roviq Station sites on one fixed corridor before it's viable at all — the natural first candidate is the I-5 Pacific Northwest spine (Seattle–Portland–Eugene) — and should be modeled and piloted separately from the core fuel/café/wine business.",
+    "The more literal version of the historic analog: stagecoach lines swapped entire teams, and sometimes the coach itself, at fixed relay stations. Applied today, a traveler drops off a Qremyn rental EV at one station and picks up a different, fully-charged one at the next — the same Hertz/Turo-style one-way rental logic already in Qremyn's own platform strategy, applied to a fixed physical corridor. The honest risk, shared by every one-way rental network including U-Haul: vehicles pile up at popular destinations and run short at popular origins, requiring paid repositioning. This requires 3+ Qremyn Station sites on one fixed corridor before it's viable at all — the natural first candidate is the I-5 Pacific Northwest spine (Seattle–Portland–Eugene) — and should be modeled and piloted separately from the core fuel/café/wine business.",
   "station.image_hero": "/photos/station_forecourt_reference.jpg",
   "station.image_hero_secondary": "/photos/station_hero_v2.jpg",
   "station.image_competitor_ref": "/photos/reference_board.jpg",
@@ -312,29 +312,29 @@ export const DEFAULT_CONTENT = {
 
   // ---------- CONNECTION ----------
   "connection.hero_eyebrow": "Where they meet",
-  "connection.hero_heading": "Roviq × Roviq Station",
+  "connection.hero_heading": "Qremyn × Qremyn Station",
   "connection.hero_sub":
-    "Roviq Core is one backend feeding many digital front ends. Roviq Station is one hub housing many physical services. They're the same idea, and on the ground, they connect directly.",
+    "Qremyn Core is one backend feeding many digital front ends. Qremyn Station is one hub housing many physical services. They're the same idea, and on the ground, they connect directly.",
   "connection.parallel_heading": "One hub, many services — twice",
   "connection.parallel_body":
-    "Roviq Station isn't a separate idea from the Roviq auto-marketplace platform — it's the same architecture, applied physically. Roviq Core runs one shared backend with multiple role-based front ends (Customer, Diagnostic, Shop Partner, Parts Vendor, Tow Truck), none of which talk to each other directly; Core does all routing, ranking, and state transitions. Roviq Station is the physical equivalent: one location, multiple services (fuel, EV charging, café, wine/retail, car wash), aggregated under one operating system rather than built as five unrelated stops. This is a strategic option, not a requirement — Roviq Station stands on its own as a business even without these integrations; they're upside, not a dependency.",
+    "Qremyn Station isn't a separate idea from the Qremyn auto-marketplace platform — it's the same architecture, applied physically. Qremyn Core runs one shared backend with multiple role-based front ends (Customer, Diagnostic, Shop Partner, Parts Vendor, Tow Truck), none of which talk to each other directly; Core does all routing, ranking, and state transitions. Qremyn Station is the physical equivalent: one location, multiple services (fuel, EV charging, café, wine/retail, car wash), aggregated under one operating system rather than built as five unrelated stops. This is a strategic option, not a requirement — Qremyn Station stands on its own as a business even without these integrations; they're upside, not a dependency.",
   "connection.tiein_tow_body":
-    "Roviq Station can serve as a designated drop-off/staging point for Roviq-dispatched tow jobs — a physical node the routing logic already knows how to send vehicles to.",
+    "Qremyn Station can serve as a designated drop-off/staging point for Qremyn-dispatched tow jobs — a physical node the routing logic already knows how to send vehicles to.",
   "connection.tiein_parts_body":
-    "The site's retail footprint can host a Roviq parts-locker pickup point — the same unmanned, badge-access, Amazon-Locker-style pattern already scoped for the parts hub — turning a café visit into a parts pickup errand.",
+    "The site's retail footprint can host a Qremyn parts-locker pickup point — the same unmanned, badge-access, Amazon-Locker-style pattern already scoped for the parts hub — turning a café visit into a parts pickup errand.",
   "connection.tiein_diagnostic_body":
-    "Roviq Station's EV bays and wash bay are natural dwell-time slots for a Tier 1 diagnose-and-route visit, with the café as the waiting area instead of a folding chair in a service bay.",
+    "Qremyn Station's EV bays and wash bay are natural dwell-time slots for a Tier 1 diagnose-and-route visit, with the café as the waiting area instead of a folding chair in a service bay.",
   "connection.tiein_custody_body":
-    "Roviq Station can act as a hand-off point for ROVIC vehicle custody transfers, consistent with its role as a trusted, staffed physical location — naming it Roviq Station rather than a standalone brand keeps the physical and digital businesses legible as one ecosystem.",
+    "Qremyn Station can act as a hand-off point for ROVIC vehicle custody transfers, consistent with its role as a trusted, staffed physical location — naming it Qremyn Station rather than a standalone brand keeps the physical and digital businesses legible as one ecosystem.",
 
   // ---------- ABOUT ----------
   "about.hero_heading": "About",
   "about.founder_heading": "Why we're building this",
   "about.founder_body":
-    "Roviq is built and led by Oleksandr Dmytruk, based in Portland, Oregon. Roviq and Roviq Station both come from the same instinct: that the businesses people rely on for their vehicles are more fragmented than they need to be, and that fragmentation is a solvable design problem, not a fact of life. That instinct comes from a combination of a postgraduate diploma in Information Systems and Technology, hands-on experience in real estate and property management, and a systems-thinking approach to how physical operations and software fit together. It's also backed by direct experience building a new system from scratch — designing and deploying a full working platform, the ASCEND card system, including its data structure, live application logic, and deployment, with nothing like it to copy from. The throughline across all of it is the same: build the core system once, and let it serve more people through more doors than a single-purpose product ever could.",
+    "Qremyn is built and led by Oleksandr Dmytruk, based in Portland, Oregon. Qremyn and Qremyn Station both come from the same instinct: that the businesses people rely on for their vehicles are more fragmented than they need to be, and that fragmentation is a solvable design problem, not a fact of life. That instinct comes from a combination of a postgraduate diploma in Information Systems and Technology, hands-on experience in real estate and property management, and a systems-thinking approach to how physical operations and software fit together. It's also backed by direct experience building a new system from scratch — designing and deploying a full working platform, the ASCEND card system, including its data structure, live application logic, and deployment, with nothing like it to copy from. The throughline across all of it is the same: build the core system once, and let it serve more people through more doors than a single-purpose product ever could.",
   "about.team_heading": "The team",
   "about.team_body":
-    "Roviq is not a solo build. Eric serves as Chief Technology Officer (CTO), owning technical architecture and build execution — apps, databases, and infrastructure across all five platform experiences and Roviq Core. Alex serves as Chief Financial Officer (CFO), bringing entrepreneurial and operating experience that complements the founder's product and technical background. This structure means Roviq is no longer a single-founder dependency for the product, technical, or financial side.",
+    "Qremyn is not a solo build. Eric serves as Chief Technology Officer (CTO), owning technical architecture and build execution — apps, databases, and infrastructure across all five platform experiences and Qremyn Core. Alex serves as Chief Financial Officer (CFO), bringing entrepreneurial and operating experience that complements the founder's product and technical background. This structure means Qremyn is no longer a single-founder dependency for the product, technical, or financial side.",
   "about.contact_heading": "Get in touch",
   "about.contact_body":
     "For partnership, investment, or press inquiries, reach out directly — we read every message ourselves.",
