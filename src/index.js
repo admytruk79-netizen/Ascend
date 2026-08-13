@@ -1,6 +1,6 @@
 import { renderPage } from "./layout.js";
 import { homePage } from "./pages/home.js";
-import { qremynPage } from "./pages/qremyn.js";
+import { roviqPage } from "./pages/roviq.js";
 import { stationPage } from "./pages/station.js";
 import { connectionPage } from "./pages/connection.js";
 import { aboutPage } from "./pages/about.js";
@@ -21,8 +21,8 @@ const PAGES = {
     title: "Qremyn & Qremyn Station — One system, two forms",
     description: "Qremyn Core is one backend feeding role-based apps for auto services. Qremyn Station is one physical hub bringing fuel, EV charging, café, retail, and wash together. Same architecture, applied twice."
   },
-  "/qremyn": {
-    render: qremynPage,
+  "/roviq": {
+    render: roviqPage,
     title: "Qremyn — Real-time dispatch for auto services",
     description: "Qremyn Core routes tow, diagnostic, and parts jobs in real time across five role-based apps: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck."
   },
@@ -31,7 +31,7 @@ const PAGES = {
     title: "Qremyn Station — A Luxury Experience, at an Affordable Price",
     description: "Fuel, EV charging, café, curated wine and retail, and a car wash — one independent brand, one location, staged across a clear Tier 1/2/3 roadmap."
   },
-  "/qremyn-x-station": {
+  "/roviq-x-station": {
     render: connectionPage,
     title: "Qremyn × Qremyn Station — Where the platform meets the hub",
     description: "One backend, many front ends. One hub, many services. How Qremyn and Qremyn Station connect on the ground."
