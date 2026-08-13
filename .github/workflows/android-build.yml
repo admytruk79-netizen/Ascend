@@ -62,15 +62,15 @@ jobs:
           prerelease: true
           files: mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
 
-  # Signed release bundle (.aab) for Play Console. Manual trigger only — this
-  # needs a real upload keystore, so it doesn't make sense to run on every
-  # push. Requires four repo secrets to be set first (Settings -> Secrets and
+  # Signed release bundle (.aab) for Play Console. Runs on every push now
+  # (previously workflow_dispatch-only, which meant two kinds of runs were
+  # interleaved in the Actions list and it was easy to open the wrong one
+  # and see release show as skipped). One run per push, both jobs, always.
+  # Requires four repo secrets to be set first (Settings -> Secrets and
   # variables -> Actions): ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
   # ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD. See mobile-app/README.md for how
-  # to generate the keystore and encode it. Run via the Actions tab -> this
-  # workflow -> "Run workflow".
+  # to generate the keystore and encode it.
   release:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     defaults:
       run:
