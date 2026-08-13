@@ -844,6 +844,15 @@ function renderIntro(root) {
   document.getElementById('beginBtn').addEventListener('click', beginFromIntro);
 }
 
+// Home's row list is rebuilt from scratch on every render() (toggling a
+// row's expand state included), which would otherwise reset every card's
+// scroll-reveal to hidden and replay the fade-in each time -- the whole
+// list visibly "reloading" on every tap. Tracked here, outside renderHome,
+// so it survives across re-renders: once a card has been revealed, it's
+// rendered already-visible from then on, and only cards genuinely being
+// seen for the first time (e.g. still below the fold) still animate in.
+const revealedSpreadKeys = new Set();
+
 function renderHome(root) {
   const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
   const priceAmount = price.split('/')[0].trim();
@@ -894,8 +903,9 @@ function renderHome(root) {
           ${CARDS.length === 0 ? '<div class="locked-fineprint" style="color:#e0a0a0;margin-top:8px;">Card data failed to load.</div>' : ''}
         </div>`;
 
+    const alreadyRevealed = revealedSpreadKeys.has(s.key);
     return `
-      <div class="spread-card ${expanded ? 'expanded' : ''}" data-key="${s.key}" style="--reveal-delay:${i * 70}ms">
+      <div class="spread-card ${expanded ? 'expanded' : ''} ${alreadyRevealed ? 'revealed' : ''}" data-key="${s.key}" style="--reveal-delay:${i * 70}ms">
         <div class="spread-row" data-toggle="${s.key}">
           <div class="spread-dots">${dots}</div>
           <div class="spread-row-body">
@@ -937,17 +947,20 @@ function renderHome(root) {
 
   // Spread cards fade+lift in as they cross into view, staggered via the
   // --reveal-delay each row already carries (set above, index * 70ms).
-  // One-shot per card -- once revealed it stays revealed, no re-hiding on
-  // scroll-away.
+  // One-shot per card -- once revealed it stays revealed (recorded in
+  // revealedSpreadKeys), no re-hiding on scroll-away and no replay on a
+  // later re-render. Cards already known-revealed render pre-visible above
+  // and don't need observing again.
   const cardObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('revealed');
+        revealedSpreadKeys.add(entry.target.getAttribute('data-key'));
         cardObserver.unobserve(entry.target);
       }
     });
   }, { threshold: 0.15 });
-  root.querySelectorAll('.spread-card').forEach(el => cardObserver.observe(el));
+  root.querySelectorAll('.spread-card:not(.revealed)').forEach(el => cardObserver.observe(el));
 
   document.getElementById('savedEntryBtn').addEventListener('click', goToSavedCards);
   document.getElementById('journalEntryBtn').addEventListener('click', goToJournalHistory);
