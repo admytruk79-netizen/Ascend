@@ -18,28 +18,28 @@ import {
 const PAGES = {
   "/": {
     render: homePage,
-    title: "Qremyn & Qremyn Station — One system, two forms",
-    description: "Qremyn Core is one backend feeding role-based apps for auto services. Qremyn Station is one physical hub bringing fuel, EV charging, café, retail, and wash together. Same architecture, applied twice."
+    title: "Roviq & Roviq Station — One system, two forms",
+    description: "Roviq Core is one backend feeding role-based apps for auto services. Roviq Station is one physical hub bringing fuel, EV charging, café, retail, and wash together. Same architecture, applied twice."
   },
   "/roviq": {
     render: roviqPage,
-    title: "Qremyn — Real-time dispatch for auto services",
-    description: "Qremyn Core routes tow, diagnostic, and parts jobs in real time across five role-based apps: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck."
+    title: "Roviq — Real-time dispatch for auto services",
+    description: "Roviq Core routes tow, diagnostic, and parts jobs in real time across five role-based apps: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck."
   },
   "/station": {
     render: stationPage,
-    title: "Qremyn Station — A Luxury Experience, at an Affordable Price",
+    title: "Roviq Station — A Luxury Experience, at an Affordable Price",
     description: "Fuel, EV charging, café, curated wine and retail, and a car wash — one independent brand, one location, staged across a clear Tier 1/2/3 roadmap."
   },
   "/roviq-x-station": {
     render: connectionPage,
-    title: "Qremyn × Qremyn Station — Where the platform meets the hub",
-    description: "One backend, many front ends. One hub, many services. How Qremyn and Qremyn Station connect on the ground."
+    title: "Roviq × Roviq Station — Where the platform meets the hub",
+    description: "One backend, many front ends. One hub, many services. How Roviq and Roviq Station connect on the ground."
   },
   "/about": {
     render: aboutPage,
-    title: "About — Qremyn & Qremyn Station",
-    description: "The founder story behind Qremyn and Qremyn Station, and how to get in touch."
+    title: "About — Roviq & Roviq Station",
+    description: "The founder story behind Roviq and Roviq Station, and how to get in touch."
   }
 };
 

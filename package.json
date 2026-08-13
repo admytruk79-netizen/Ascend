@@ -2,7 +2,7 @@
   "name": "roviq-station-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Qremyn + Qremyn Station marketing/investor site (Cloudflare Worker + KV)",
+  "description": "Roviq + Roviq Station marketing/investor site (Cloudflare Worker + KV)",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",

@@ -24,12 +24,12 @@ export function connectionPage(c) {
     <div class="grid grid--2" style="margin-top:2rem;">
       <div class="card card--accent-navy">
         <span class="eyebrow">Digital</span>
-        <h3>Qremyn Core</h3>
+        <h3>Roviq Core</h3>
         <p>One backend routes every job — tow, diagnostic, parts — to the right role-based front end in real time.</p>
       </div>
       <div class="card card--accent-teal">
         <span class="eyebrow">Physical</span>
-        <h3>Qremyn Station</h3>
+        <h3>Roviq Station</h3>
         <p>One hub routes every visitor — fuel, EV, café, retail, wash — to the right service under one roof.</p>
       </div>
     </div>

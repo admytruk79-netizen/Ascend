@@ -2,9 +2,9 @@ import { CSS } from "./styles.js";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/roviq", label: "Qremyn" },
-  { href: "/station", label: "Qremyn Station" },
-  { href: "/roviq-x-station", label: "Qremyn × Station" },
+  { href: "/roviq", label: "Roviq" },
+  { href: "/station", label: "Roviq Station" },
+  { href: "/roviq-x-station", label: "Roviq × Station" },
   { href: "/about", label: "About" }
 ];
 
@@ -97,7 +97,7 @@ export function renderPage({ title, description, activePath, body }) {
 <body>
 <header class="site-header">
   <div class="container">
-    <a href="/" class="wordmark"><img src="/brand/roviq-icon.png" alt="" class="wordmark-icon">QREMYN</a>
+    <a href="/" class="wordmark"><img src="/brand/roviq-icon.png" alt="" class="wordmark-icon">ROVIQ</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">&#9776;</button>
     <nav class="site-nav" id="siteNav">
       ${NAV_LINKS.map(
@@ -111,7 +111,7 @@ ${body}
 </main>
 <footer class="site-footer">
   <div class="container">
-    <div>&copy; ${new Date().getFullYear()} Qremyn. Qremyn Station is an independent brand — not affiliated with or licensed by OKKO or SOCAR.</div>
+    <div>&copy; ${new Date().getFullYear()} Roviq. Roviq Station is an independent brand — not affiliated with or licensed by OKKO or SOCAR.</div>
     <div><a href="/about">Contact</a> &middot; <a href="/admin">Admin</a></div>
   </div>
 </footer>
