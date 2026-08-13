@@ -14,14 +14,14 @@ export function homePage(c) {
 <section class="split-hero">
   <a href="/roviq" class="split-card split-card--roviq">
     <span class="tag">The platform</span>
-    <h2>Roviq</h2>
+    <h2>Qremyn</h2>
     <p>${escapeHtml(c["home.roviq_tagline"])}</p>
     <p>${escapeHtml(c["home.roviq_body"])}</p>
     <div class="cta-row"><span class="btn btn--gold">Explore the platform &rarr;</span></div>
   </a>
   <a href="/station" class="split-card split-card--station">
     <span class="tag">The physical hub</span>
-    <h2>Roviq Station</h2>
+    <h2>Qremyn Station</h2>
     <p>${escapeHtml(c["home.station_tagline"])}</p>
     <p>${escapeHtml(c["home.station_body"])}</p>
     <div class="cta-row"><span class="btn btn--gold">Explore the station &rarr;</span></div>
@@ -39,8 +39,8 @@ export function homePage(c) {
         </div>
       </div>
       <div class="grid grid--2" style="gap:1rem;">
-        ${mediaBlock(c["home.image_roviq"], "Roviq platform", "Dispatch / app mockup photo")}
-        ${mediaBlock(c["home.image_station"], "Roviq Station", "Station forecourt photo")}
+        ${mediaBlock(c["home.image_roviq"], "Qremyn platform", "Dispatch / app mockup photo")}
+        ${mediaBlock(c["home.image_station"], "Qremyn Station", "Station forecourt photo")}
       </div>
     </div>
   </div>

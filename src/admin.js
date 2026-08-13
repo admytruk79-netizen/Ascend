@@ -72,7 +72,7 @@ function shell(title, bodyHtml) {
 }
 
 export function renderLoginPage(error) {
-  return shell("Admin login — Roviq", `
+  return shell("Admin login — Qremyn", `
 <div class="admin-login card">
   <h2>Admin login</h2>
   ${error ? `<div class="flash flash--err">${escapeHtml(error)}</div>` : ""}
@@ -131,7 +131,7 @@ export function renderAdminDashboard(content, flash) {
     }).join("\n")}
   `).join("\n");
 
-  return shell("Admin — Roviq", `
+  return shell("Admin — Qremyn", `
 <div class="admin-shell">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2 style="margin-bottom:0;">Content admin</h2>

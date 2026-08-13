@@ -1,4 +1,4 @@
-name: Deploy Roviq / Roviq Station Worker
+name: Deploy Qremyn / Qremyn Station Worker
 
 # Manual-only. Cloudflare's own deploy integration already deploys this
 # repo automatically on every push to main — see the "roviq-site" Worker

@@ -54,7 +54,7 @@ export function stationPage(c) {
 
 <section class="section">
   <div class="container">
-    <span class="eyebrow">Where Roviq Station fits</span>
+    <span class="eyebrow">Where Qremyn Station fits</span>
     <h2>${escapeHtml(c["station.benchmark_heading"])}</h2>
     ${renderBullets(c["station.benchmark_body"])}
   </div>
@@ -73,7 +73,7 @@ export function stationPage(c) {
       ).join("\n")}
     </div>
     <div class="grid grid--2" style="margin-top:2rem;">
-      ${mediaFull(c["station.image_fuel"], "Roviq Station pricing board and fuel canopy detail")}
+      ${mediaFull(c["station.image_fuel"], "Qremyn Station pricing board and fuel canopy detail")}
       ${mediaFull(STATION_IMAGES["ev-charging"].file, STATION_IMAGES["ev-charging"].alt)}
     </div>
   </div>
@@ -85,8 +85,8 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.layout_heading"])}</h2>
     ${richText(c["station.layout_body"])}
     <div class="grid grid--2" style="margin-top:1.5rem;">
-      ${diagramImage("/diagrams/site_layout.png", "Roviq Station site layout schematic", "Site layout — fuel/EV canopy at the perimeter, café + retail anchoring the center, wash at the rear.")}
-      ${diagramImage("/diagrams/interior_layout.png", "Roviq Station interior zoning schematic", "Interior layout — fast lane kept separate from sit-down café flow.")}
+      ${diagramImage("/diagrams/site_layout.png", "Qremyn Station site layout schematic", "Site layout — fuel/EV canopy at the perimeter, café + retail anchoring the center, wash at the rear.")}
+      ${diagramImage("/diagrams/interior_layout.png", "Qremyn Station interior zoning schematic", "Interior layout — fast lane kept separate from sit-down café flow.")}
     </div>
     <div style="margin-top:1.5rem;">
       ${mediaFull(STATION_IMAGES["interior-cafe"].file, STATION_IMAGES["interior-cafe"].alt)}
@@ -130,7 +130,7 @@ export function stationPage(c) {
     <h2>${escapeHtml(c["station.roadmap_heading"])}</h2>
     ${richText(c["station.roadmap_body"])}
     <div style="margin: 1.5rem 0 2rem;">
-      ${diagramImage("/diagrams/master_roadmap.png", "Roviq Station master staged roadmap", "Master staged roadmap — Tier 1 core pilot, Tier 2 low-capex layer, Tier 3 moonshot, laid out month by month.")}
+      ${diagramImage("/diagrams/master_roadmap.png", "Qremyn Station master staged roadmap", "Master staged roadmap — Tier 1 core pilot, Tier 2 low-capex layer, Tier 3 moonshot, laid out month by month.")}
     </div>
     <div class="tier-columns">
       <div class="tier tier--1">
@@ -175,7 +175,7 @@ export function stationPage(c) {
     <div class="card card--accent-rust" style="margin-top:1.5rem;">
       <h3>Vehicle Relay <span class="tag-inline tag-inline--tier3">Tier 3</span></h3>
       <p>${escapeHtml(c["station.expansion_vehicle_relay_body"])}</p>
-      ${diagramImage("/diagrams/vehicle_relay.png", "Vehicle relay concept diagram", "Vehicle relay concept — a corridor of 3+ stations acting as custody hand-off points, logged in Roviq Core.")}
+      ${diagramImage("/diagrams/vehicle_relay.png", "Vehicle relay concept diagram", "Vehicle relay concept — a corridor of 3+ stations acting as custody hand-off points, logged in Qremyn Core.")}
       ${mediaFull(STATION_IMAGES["relay-station"].file, STATION_IMAGES["relay-station"].alt)}
     </div>
   </div>

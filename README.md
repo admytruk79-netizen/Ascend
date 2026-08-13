@@ -1,6 +1,6 @@
-# Roviq + Roviq Station
+# Qremyn + Qremyn Station
 
-A single Cloudflare Worker that serves the Roviq / Roviq Station marketing &
+A single Cloudflare Worker that serves the Qremyn / Qremyn Station marketing &
 investor site, with all copy and images editable at runtime through a
 password-gated `/admin` panel backed by Workers KV — no redeploy needed to
 change text or swap a photo.
@@ -9,8 +9,8 @@ change text or swap a photo.
 
 | Route | Content |
 |---|---|
-| `/` | Split hero: Roviq (platform) vs. Roviq Station (physical hub) |
-| `/roviq` | Roviq Core, the tow-dispatch flagship example, the 5 role-based apps |
+| `/` | Split hero: Qremyn (platform) vs. Qremyn Station (physical hub) |
+| `/roviq` | Qremyn Core, the tow-dispatch flagship example, the 5 role-based apps |
 | `/station` | Concept, service mix, site/interior layout, Portland entry, staged roadmap, Tier 3 expansion concepts |
 | `/roviq-x-station` | The one-backend/one-hub parallel and concrete tie-ins |
 | `/about` | Founder story + contact |
@@ -52,7 +52,7 @@ so the site renders correctly even before `/admin` has ever been touched.
   are 175–330KB, down from multi-megabyte source PNGs) and is wired in as
   the default value for the matching `station.image_*` / `home.image_*`
   keys in `src/content.js`. A few slots (EV close-up, SOCAR-specific photo,
-  Portland streetscape, Roviq platform/dispatch UI mockup) have no matching
+  Portland streetscape, Qremyn platform/dispatch UI mockup) have no matching
   source image yet and intentionally render a labeled placeholder — swap
   those in via `/admin` rather than guessing at a stock URL. Every image
   field, including the ones with a default photo, stays editable at
@@ -124,8 +124,8 @@ two Worker secrets above.
 
 1. Go to `https://<your-worker>.workers.dev/admin`.
 2. Log in with the password set via `ADMIN_PASSWORD`.
-3. Every page's content is grouped into sections (Home, Roviq, Roviq Station,
-   Roviq × Station, About). Each field shows its editable value and its
+3. Every page's content is grouped into sections (Home, Qremyn, Qremyn Station,
+   Qremyn × Station, About). Each field shows its editable value and its
    underlying key.
    - **Text fields** are single-line (headlines, taglines).
    - **Textareas** are multi-line body copy. A blank line between two
