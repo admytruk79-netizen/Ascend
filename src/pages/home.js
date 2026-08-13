@@ -12,11 +12,11 @@ export function homePage(c) {
 </section>
 
 <section class="split-hero">
-  <a href="/roviq" class="split-card split-card--roviq">
+  <a href="/qremyn" class="split-card split-card--qremyn">
     <span class="tag">The platform</span>
     <h2>Qremyn</h2>
-    <p>${escapeHtml(c["home.roviq_tagline"])}</p>
-    <p>${escapeHtml(c["home.roviq_body"])}</p>
+    <p>${escapeHtml(c["home.qremyn_tagline"])}</p>
+    <p>${escapeHtml(c["home.qremyn_body"])}</p>
     <div class="cta-row"><span class="btn btn--gold">Explore the platform &rarr;</span></div>
   </a>
   <a href="/station" class="split-card split-card--station">
@@ -35,11 +35,11 @@ export function homePage(c) {
     <div class="grid grid--2" style="align-items:center; margin-top:2rem;">
       <div>${richText(c["home.throughline_body"])}
         <div class="cta-row">
-          <a href="/roviq-x-station" class="btn btn--outline">See how they connect &rarr;</a>
+          <a href="/qremyn-x-station" class="btn btn--outline">See how they connect &rarr;</a>
         </div>
       </div>
       <div class="grid grid--2" style="gap:1rem;">
-        ${mediaBlock(c["home.image_roviq"], "Qremyn platform", "Dispatch / app mockup photo")}
+        ${mediaBlock(c["home.image_qremyn"], "Qremyn platform", "Dispatch / app mockup photo")}
         ${mediaBlock(c["home.image_station"], "Qremyn Station", "Station forecourt photo")}
       </div>
     </div>

@@ -10,9 +10,9 @@ change text or swap a photo.
 | Route | Content |
 |---|---|
 | `/` | Split hero: Qremyn (platform) vs. Qremyn Station (physical hub) |
-| `/roviq` | Qremyn Core, the tow-dispatch flagship example, the 5 role-based apps |
+| `/qremyn` | Qremyn Core, the tow-dispatch flagship example, the 5 role-based apps |
 | `/station` | Concept, service mix, site/interior layout, Portland entry, staged roadmap, Tier 3 expansion concepts |
-| `/roviq-x-station` | The one-backend/one-hub parallel and concrete tie-ins |
+| `/qremyn-x-station` | The one-backend/one-hub parallel and concrete tie-ins |
 | `/about` | Founder story + contact |
 | `/admin` | Password-gated content editor |
 
@@ -68,7 +68,7 @@ npm run dev                       # wrangler dev, KV simulated locally
 
 ## Deploying
 
-The KV namespace `ROVIQ_CONTENT` already exists in the connected Cloudflare
+The KV namespace `CONTENT` already exists in the connected Cloudflare
 account and is wired into `wrangler.toml` (`id = "0a3a91e8fa63462eae8cf3f2e77e8a22"`).
 
 **Primary path — Cloudflare's own Git integration:** in the Cloudflare
@@ -95,7 +95,7 @@ apart and refuses to publish. To turn the feature on:
 1. In the Cloudflare dashboard, go to **R2** and enable it for the account
    (accepting R2's terms) — this can't be done via API, an account owner
    has to click through it.
-2. Create a bucket named `roviq-uploads` (or pick another name and use it
+2. Create a bucket named `qremyn-uploads` (or pick another name and use it
    in step 3).
 3. In `wrangler.toml`, uncomment the `[[r2_buckets]]` block (and update
    `bucket_name` if you used a different one).

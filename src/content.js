@@ -12,58 +12,58 @@ export const CONTENT_SECTIONS = [
       { key: "home.headline", label: "Headline", type: "text" },
       { key: "home.subheadline", label: "Subheadline", type: "text" },
       { key: "home.intro", label: "Intro paragraph", type: "textarea" },
-      { key: "home.roviq_tagline", label: "Qremyn card tagline", type: "text" },
-      { key: "home.roviq_body", label: "Qremyn card body", type: "textarea" },
+      { key: "home.qremyn_tagline", label: "Qremyn card tagline", type: "text" },
+      { key: "home.qremyn_body", label: "Qremyn card body", type: "textarea" },
       { key: "home.station_tagline", label: "Station card tagline", type: "text" },
       { key: "home.station_body", label: "Station card body", type: "textarea" },
       { key: "home.throughline_heading", label: "Throughline heading", type: "text" },
       { key: "home.throughline_body", label: "Throughline body", type: "textarea" },
-      { key: "home.image_roviq", label: "Qremyn side image", type: "image" },
+      { key: "home.image_qremyn", label: "Qremyn side image", type: "image" },
       { key: "home.image_station", label: "Station side image", type: "image" }
     ]
   },
   {
-    id: "roviq",
+    id: "qremyn",
     title: "Qremyn (platform)",
     fields: [
-      { key: "roviq.hero_eyebrow", label: "Hero eyebrow", type: "text" },
-      { key: "roviq.hero_heading", label: "Hero heading", type: "text" },
-      { key: "roviq.hero_sub", label: "Hero subheading", type: "text" },
-      { key: "roviq.core_heading", label: "Core section heading", type: "text" },
-      { key: "roviq.core_body", label: "Core section body", type: "textarea" },
-      { key: "roviq.dispatch_heading", label: "Dispatch example heading", type: "text" },
-      { key: "roviq.dispatch_body", label: "Dispatch example intro", type: "textarea" },
-      { key: "roviq.dispatch_steps", label: "Dispatch steps (one per line)", type: "textarea" },
-      { key: "roviq.frontend_customer_body", label: "Customer app body", type: "textarea" },
-      { key: "roviq.frontend_diagnostic_body", label: "Diagnostic app body", type: "textarea" },
-      { key: "roviq.frontend_shop_body", label: "Shop Partner app body", type: "textarea" },
-      { key: "roviq.frontend_vendor_body", label: "Parts Vendor app body", type: "textarea" },
-      { key: "roviq.frontend_tow_body", label: "Tow Truck app body", type: "textarea" },
-      { key: "roviq.assetlight_heading", label: "Asset-light model heading", type: "text" },
-      { key: "roviq.assetlight_body", label: "Asset-light model body", type: "textarea" },
-      { key: "roviq.pullquote", label: "Pull quote", type: "text" },
-      { key: "roviq.revenue_heading", label: "Revenue model heading", type: "text" },
-      { key: "roviq.revenue_stats", label: "Revenue stat tiles (VALUE | label, one per line)", type: "textarea" },
-      { key: "roviq.revenue_body", label: "Revenue model body", type: "textarea" },
-      { key: "roviq.whynow_heading", label: "Why now heading", type: "text" },
-      { key: "roviq.whynow_body", label: "Why now list (one per line)", type: "textarea" },
-      { key: "roviq.market_heading", label: "Market opportunity heading", type: "text" },
-      { key: "roviq.market_stats", label: "Market stat tiles (VALUE | label, one per line)", type: "textarea" },
-      { key: "roviq.market_body", label: "Market opportunity body", type: "textarea" },
-      { key: "roviq.dealership_heading", label: "Dealership partnerships heading", type: "text" },
-      { key: "roviq.dealership_body", label: "Dealership partnerships body", type: "textarea" },
-      { key: "roviq.playbook_heading", label: "Proven playbook heading", type: "text" },
-      { key: "roviq.playbook_body", label: "Proven playbook list (Source — mechanic, one per line)", type: "textarea" },
-      { key: "roviq.competitors_heading", label: "Competitive landscape heading", type: "text" },
-      { key: "roviq.competitors_body", label: "Competitive landscape body", type: "textarea" },
-      { key: "roviq.ask_heading", label: "The Ask heading", type: "text" },
-      { key: "roviq.ask_stats", label: "The Ask stat tiles (VALUE | label, one per line)", type: "textarea" },
-      { key: "roviq.ask_body", label: "The Ask intro body", type: "textarea" },
-      { key: "roviq.ask_funds", label: "Use of funds (Line item — $Amount, one per line)", type: "textarea" },
-      { key: "roviq.ask_milestones", label: "Milestones this unlocks (one per line)", type: "textarea" },
-      { key: "roviq.stack_heading", label: "Tech stack heading", type: "text" },
-      { key: "roviq.stack_body", label: "Tech stack list (Layer — Tool, one per line)", type: "textarea" },
-      { key: "roviq.dispatch_image", label: "Dispatch/map image", type: "image" }
+      { key: "qremyn.hero_eyebrow", label: "Hero eyebrow", type: "text" },
+      { key: "qremyn.hero_heading", label: "Hero heading", type: "text" },
+      { key: "qremyn.hero_sub", label: "Hero subheading", type: "text" },
+      { key: "qremyn.core_heading", label: "Core section heading", type: "text" },
+      { key: "qremyn.core_body", label: "Core section body", type: "textarea" },
+      { key: "qremyn.dispatch_heading", label: "Dispatch example heading", type: "text" },
+      { key: "qremyn.dispatch_body", label: "Dispatch example intro", type: "textarea" },
+      { key: "qremyn.dispatch_steps", label: "Dispatch steps (one per line)", type: "textarea" },
+      { key: "qremyn.frontend_customer_body", label: "Customer app body", type: "textarea" },
+      { key: "qremyn.frontend_diagnostic_body", label: "Diagnostic app body", type: "textarea" },
+      { key: "qremyn.frontend_shop_body", label: "Shop Partner app body", type: "textarea" },
+      { key: "qremyn.frontend_vendor_body", label: "Parts Vendor app body", type: "textarea" },
+      { key: "qremyn.frontend_tow_body", label: "Tow Truck app body", type: "textarea" },
+      { key: "qremyn.assetlight_heading", label: "Asset-light model heading", type: "text" },
+      { key: "qremyn.assetlight_body", label: "Asset-light model body", type: "textarea" },
+      { key: "qremyn.pullquote", label: "Pull quote", type: "text" },
+      { key: "qremyn.revenue_heading", label: "Revenue model heading", type: "text" },
+      { key: "qremyn.revenue_stats", label: "Revenue stat tiles (VALUE | label, one per line)", type: "textarea" },
+      { key: "qremyn.revenue_body", label: "Revenue model body", type: "textarea" },
+      { key: "qremyn.whynow_heading", label: "Why now heading", type: "text" },
+      { key: "qremyn.whynow_body", label: "Why now list (one per line)", type: "textarea" },
+      { key: "qremyn.market_heading", label: "Market opportunity heading", type: "text" },
+      { key: "qremyn.market_stats", label: "Market stat tiles (VALUE | label, one per line)", type: "textarea" },
+      { key: "qremyn.market_body", label: "Market opportunity body", type: "textarea" },
+      { key: "qremyn.dealership_heading", label: "Dealership partnerships heading", type: "text" },
+      { key: "qremyn.dealership_body", label: "Dealership partnerships body", type: "textarea" },
+      { key: "qremyn.playbook_heading", label: "Proven playbook heading", type: "text" },
+      { key: "qremyn.playbook_body", label: "Proven playbook list (Source — mechanic, one per line)", type: "textarea" },
+      { key: "qremyn.competitors_heading", label: "Competitive landscape heading", type: "text" },
+      { key: "qremyn.competitors_body", label: "Competitive landscape body", type: "textarea" },
+      { key: "qremyn.ask_heading", label: "The Ask heading", type: "text" },
+      { key: "qremyn.ask_stats", label: "The Ask stat tiles (VALUE | label, one per line)", type: "textarea" },
+      { key: "qremyn.ask_body", label: "The Ask intro body", type: "textarea" },
+      { key: "qremyn.ask_funds", label: "Use of funds (Line item — $Amount, one per line)", type: "textarea" },
+      { key: "qremyn.ask_milestones", label: "Milestones this unlocks (one per line)", type: "textarea" },
+      { key: "qremyn.stack_heading", label: "Tech stack heading", type: "text" },
+      { key: "qremyn.stack_body", label: "Tech stack list (Layer — Tool, one per line)", type: "textarea" },
+      { key: "qremyn.dispatch_image", label: "Dispatch/map image", type: "image" }
     ]
   },
   {
@@ -161,8 +161,8 @@ export const DEFAULT_CONTENT = {
   "home.subheadline": "One shared backend. Many ways in. One physical hub, built the same way.",
   "home.intro":
     "Qremyn is a dispatch platform for auto services, and Qremyn Station is a physical location built on the same idea. Both start from a single core system and branch into the specific experiences people actually need — digital front ends on one side, physical services on the other.",
-  "home.roviq_tagline": "A diagnostic-first dispatch and referral network for auto service.",
-  "home.roviq_body":
+  "home.qremyn_tagline": "A diagnostic-first dispatch and referral network for auto service.",
+  "home.qremyn_body":
     "One backend — Qremyn Core — sits behind a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner shops and independent technicians. Five role-based apps share it: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck.",
   "home.station_tagline": "A Luxury Experience, at an Affordable Price.",
   "home.station_body":
@@ -170,71 +170,71 @@ export const DEFAULT_CONTENT = {
   "home.throughline_heading": "Same architecture, applied twice.",
   "home.throughline_body":
     "Qremyn Core is one backend feeding many digital front ends. Qremyn Station is one physical location housing many services. Neither is a bundle bolted together after the fact — both were designed from the center outward, so every new front end or every new service line inherits the same routing logic, the same brand, and the same operating discipline.",
-  "home.image_roviq": "/photos/dispatch_app_mockup.jpg",
+  "home.image_qremyn": "/photos/dispatch_app_mockup.jpg",
   "home.image_station": "/photos/station_hero.jpg",
 
   // ---------- QREMYN ----------
-  "roviq.hero_eyebrow": "The platform",
-  "roviq.hero_heading": "Qremyn Core",
-  "roviq.hero_sub":
+  "qremyn.hero_eyebrow": "The platform",
+  "qremyn.hero_heading": "Qremyn Core",
+  "qremyn.hero_sub":
     "A dispatch and referral network for auto service in the Portland metro area — diagnostic-first, with five purpose-built apps sharing one backend and one database.",
-  "roviq.core_heading": "The coordination layer, not another repair shop",
-  "roviq.core_body":
+  "qremyn.core_heading": "The coordination layer, not another repair shop",
+  "qremyn.core_body":
     "Qremyn's objective isn't to become the largest repair shop in the market — it's to become the coordination layer that sits above every shop and independent technician: the single point of entry customers use, and the system that determines where their business flows. Think of it as Uber or Lyft, but for auto maintenance. The customer doesn't need to know or care which shop or technician handles their car, only that it gets fixed quickly and nearby. Qremyn owns the routing intelligence, the data, and the relationships that make the network valuable — at the center are a mobile diagnostic hub, a loaner vehicle pool, and a growing network of partner repair shops and independent mobile technicians.",
-  "roviq.dispatch_heading": "How a job actually moves through the network",
-  "roviq.dispatch_body":
+  "qremyn.dispatch_heading": "How a job actually moves through the network",
+  "qremyn.dispatch_body":
     "Every job passes through the same diagnostic-first sequence, moving across the five apps in order. Critically, once a job needs a shop, the customer — not an automated matching algorithm — sees the diagnostic findings and picks where the work gets done, from a short list of eligible partners.",
-  "roviq.dispatch_steps":
+  "qremyn.dispatch_steps":
     "Entry (Customer App): a customer submits a request with an urgency level — warning light, dead battery, tire trouble, and similar\nDiagnosis (Diagnostic App): a technician claims the request, diagnoses on-site, and logs findings\nTriage: simple jobs (battery, tire) are handled directly; jobs needing a shop move to the next step\nShop choice (Customer App): the customer sees the findings alongside a ranked shortlist of eligible shops — filtered by job-type match and distance, then ranked by current load, response time, on-time rate, and rating — and picks one\nAcceptance (Shop Partner App): the chosen shop accepts, and provides a loaner if the vehicle must stay\nParts, if needed (Parts Vendor App): additional parts are sourced through the vendor layer and added as their own line item\nTowing or valet, as an alternate path (Tow Truck App): a non-drivable vehicle or a premium-tier driven transfer routes through a separate, real-time layer instead",
-  "roviq.frontend_customer_body":
+  "qremyn.frontend_customer_body":
     "Booking, diagnostic intake, choosing a shop once diagnosis is complete, live status, and payment — optimized for speed and zero friction.",
-  "roviq.frontend_diagnostic_body":
+  "qremyn.frontend_diagnostic_body":
     "Shows a queue of new requests. The technician claims one, logs findings, and decides whether to handle it directly or send it to the customer for a shop choice.",
-  "roviq.frontend_shop_body":
+  "qremyn.frontend_shop_body":
     "Job acceptance, scheduling, and payout tracking — showing a shop only the jobs a customer actually chose them for, not an open pool every shop competes over.",
-  "roviq.frontend_vendor_body":
+  "qremyn.frontend_vendor_body":
     "Receives part orders tied to a specific job, confirms cost and delivery time, and updates fulfillment status — turning a documented industry cost center (wrong parts and delivery delays cost a mid-size shop an estimated $2,000–$6,000 a month) into tracked, actionable metrics.",
-  "roviq.frontend_tow_body":
+  "qremyn.frontend_tow_body":
     "A genuinely separate, real-time layer — because towing is GPS-tracked and urgent-by-definition, closer to a rideshare driver app than a shop dashboard. Covers both towing a non-drivable vehicle and valet (a driver takes the customer's own car to the shop instead), primarily for premium and luxury-tier customers.",
-  "roviq.assetlight_heading": "Asset-light, like Uber",
-  "roviq.assetlight_body":
+  "qremyn.assetlight_heading": "Asset-light, like Uber",
+  "qremyn.assetlight_body":
     "Uber — Never owned a single vehicle; legal name is Uber Technologies Inc., a technology company, not a transportation company.\nUber — Expansion required software and driver/rider acquisition, not fleet capital.\nQremyn — Owns zero repair bays, zero vehicles.\nQremyn — Loaner fleet sourced from shop, dealership, and fleet-partner inventory, tiered by economy, standard, and luxury, not purchased outright.\nQremyn — A coordination and technology layer connecting customers, shops, and mobile technicians.\nQremyn — Expansion into a new metro requires partner and customer acquisition, not owned real estate or payroll.",
-  "roviq.pullquote": "Uber didn't own a single car. We don't own a single repair bay.",
-  "roviq.revenue_heading": "Three revenue streams, not one referral fee",
-  "roviq.revenue_stats":
+  "qremyn.pullquote": "Uber didn't own a single car. We don't own a single repair bay.",
+  "qremyn.revenue_heading": "Three revenue streams, not one referral fee",
+  "qremyn.revenue_stats":
     "$89–$129 | Flat diagnostic visit fee, platform-set on every dispatch\n20–30% | Parts markup on Platform-Priced shop jobs\n$99–$499/mo | Self-Priced shop subscription tiers",
-  "roviq.revenue_body":
+  "qremyn.revenue_body":
     "Shops choose how they participate. Self-Priced shops keep full control of their own pricing and pay a flat monthly subscription for lead access instead of a per-job cut (Founding Shop free trial, then $99–$499/month by tier). Platform-Priced shops accept jobs at a Qremyn-calculated price once a firm diagnosis exists and keep 100% of the labor, while Qremyn's margin comes from a 20–30% markup on parts sourced through its vendor network. Underneath both sits the one standardized, high-frequency transaction in the system: a flat, platform-set diagnostic visit fee of $89–$129, paid at the point of dispatch regardless of what repair follows — the steady, predictable base the rest of the model builds on.",
-  "roviq.whynow_heading": "Why now",
-  "roviq.whynow_body":
+  "qremyn.whynow_heading": "Why now",
+  "qremyn.whynow_body":
     "Structural, not cyclical — the technician shortage is a multi-year trend, not a post-pandemic blip.\nPartners are motivated today — 59% of shops report the shortage is already hurting their business; they need a solution now.\nThe category is proven, the niche is open — mobile-first competitors validated the market, but no dominant hub-and-spoke player has captured it yet.",
-  "roviq.market_heading": "A structural, well-documented pain point",
-  "roviq.market_stats":
+  "qremyn.market_heading": "A structural, well-documented pain point",
+  "qremyn.market_stats":
     "2.27M | Portland metro population — the initial target market\n$435B | U.S. vehicle repair & maintenance spend this year\n$3.9B | North American mobile mechanic market (2025)\n12.8 yrs | Average U.S. vehicle age — oldest on record",
-  "roviq.market_body":
+  "qremyn.market_body":
     "Portland metro's population is approximately 2.27 million — the initial target market, the same sequencing Uber used in San Francisco before national and global expansion. U.S. consumers will spend an estimated $435 billion on vehicle repair and maintenance this year, within a North American mobile mechanic services market valued at roughly $3.9 billion in 2025. The average U.S. vehicle is now 12.8 years old — the oldest on record — and needs more frequent service. Industry-wide average appointment wait is 3.2 days, and some dealership backlogs run four weeks or more. Roughly 967,000 technicians serve 270,300 independent repair shops nationally, against a Bureau of Labor Statistics-projected shortfall of 68,000 technicians a year for the next decade. This isn't a cyclical gap — it's a multi-year structural trend, and shops already see it in their own booking calendars.",
-  "roviq.dealership_heading": "Extending dealership diagnostic capacity",
-  "roviq.dealership_body":
+  "qremyn.dealership_heading": "Extending dealership diagnostic capacity",
+  "qremyn.dealership_body":
     "Beyond repair-bay overflow, most dealerships face a distinct, often larger constraint: diagnostic throughput itself — a multi-day wait just to find out what's wrong, before repair even enters the picture. Qremyn's technicians function as an extension of a dealership's own diagnostic capacity, reaching into the customer's driveway on the dealership's behalf. Our technicians carry professional-grade diagnostic equipment, not OEM-certified factory tools — so any case needing certified warranty determination still routes straight back to the dealership, exactly like every other warranty and OEM job. Customers rotate through the network over time, not permanently to whichever partner handled one job: warranty and OEM work always comes back, and as a dealership's own capacity opens up, the network routes business their way too.",
-  "roviq.playbook_heading": "A proven playbook, recombined",
-  "roviq.playbook_body":
+  "qremyn.playbook_heading": "A proven playbook, recombined",
+  "qremyn.playbook_body":
     "Uber — Platform sets the price and takes a margin: the diagnostic visit fee (always platform-priced) and Platform-Priced shop mode use a fixed price and standardized labor payout, with Qremyn keeping the spread.\nUber Eats — Shelf-and-bin pickup guidance, no staff needed: a technician walks into the parts hub already knowing exactly which shelf and bin holds the part their job needs.\nAmazon — Consignment fulfillment, vendor-owned until sold: parts hub inventory stays the vendor's property until a technician marks a part used, no transaction and no capital cost until then.\nLyft — Reliability-based ranking feeds dispatch: partner performance and on-time rate directly drive the shop-ranking algorithm, so reliability is enforced by the matching logic, not just reported.\nHertz / Turo — A rental supply chain plugged into dispatch: Fleet Partners supply tiered loaner inventory at scale, the same rental-supply pattern, without Qremyn owning or buying a fleet.\nAmazon Prime — Same-day fetch or scheduled, promised-time delivery: loaner vehicles reuse the same driver-dispatch and promised-completion infrastructure as tow and valet.",
-  "roviq.competitors_heading": "A validated, well-capitalized category",
-  "roviq.competitors_body":
+  "qremyn.competitors_heading": "A validated, well-capitalized category",
+  "qremyn.competitors_body":
     "The \"Uber for car maintenance\" concept has already attracted real capital: YourMechanic and Wrench (mobile-first, contractor mechanics, $50.8M raised, acquired 2022), RepairSmith (mobile-first, employee technicians, acquired by Mercedes-Benz AG after a $42M round), and RepairPal (a directory connecting customers to 2,000+ certified shops, no diagnostic or dispatch layer, acquired by Yelp for roughly $80 million) have collectively raised well over $150 million. Every existing player has optimized for one half of the problem — the mobile-first players never offer a diagnostic-only first step, and RepairPal has no dispatch or diagnostic layer at all. Qremyn is the only model combining a doorstep diagnostic-first entry point with active routing into brick-and-mortar shops, plus a loaner-vehicle layer sourced from partner shops' and dealerships' unsold inventory — a pain point (idle, depreciating inventory) none of the researched competitors address at all.",
-  "roviq.ask_heading": "The ask",
-  "roviq.ask_stats":
+  "qremyn.ask_heading": "The ask",
+  "qremyn.ask_stats":
     "$150K | Current pre-seed ask\n~$1.0M | Illustrative Year 1 revenue\n~$2.6M | Illustrative Year 2 revenue",
-  "roviq.ask_body":
+  "qremyn.ask_body":
     "Qremyn is raising a $150,000 pre-seed round, funding the full project through Phase D2 — all five apps, AI diagnostic triage, the loaner fleet, marketing, founder runway, and a 12-month operating buffer, with the technical and business co-founders now leading execution alongside the founder.",
-  "roviq.ask_funds":
+  "qremyn.ask_funds":
     "Customer + Diagnostic apps (incl. AI triage) — $24,000\nPricing engine + Stripe Connect + technician payout — $16,000\nShop Partner app + matching — $12,000\nParts Vendor app + add-to-order — $11,000\nDiagnostic tool, equipment + labor-guide license — $5,000\nLoaner vehicle pool + insurance — $13,000\nMarketing & promotion — $9,000\nPartner & customer acquisition incentives — $5,000\nFounder runway (12 months) — $40,000\nLegal, cap table & operating buffer — $15,000\nTotal — $150,000",
-  "roviq.ask_milestones":
+  "qremyn.ask_milestones":
     "All five apps live in the Portland metro, AI diagnostic triage in production\n5+ active partner shops signed and referring\nParts vendor layer live and tracking wrong-part / delay metrics\nDefined referral and parts volume within 12 months",
-  "roviq.stack_heading": "Built on proven technology, not custom infrastructure",
-  "roviq.stack_body":
+  "qremyn.stack_heading": "Built on proven technology, not custom infrastructure",
+  "qremyn.stack_body":
     "Frontend — React (Next.js), one shared component library across all four customer-facing apps.\nBackend / API — Node.js (Express), built as a modular monolith rather than microservices — well-defined internal modules for assessment, AI triage, matching, and state, called directly by API handlers, simple to build and debug at this stage. Every app reads and writes through this one layer; no app ever talks to another app directly.\nDatabase — PostgreSQL, a single instance and the single source of truth for all five apps, with every state transition logged to an event table, not just overwritten.\nAuth — JWT (Passport.js / Auth.js): unauthenticated for the customer flow in MVP, login-gated for every partner and vendor app.\nNotifications — Twilio (SMS), Postmark / SendGrid (email).\nPayments — Stripe, invoicing first, Connect later.\nHosting — Vercel (frontend) plus Railway / Render (backend and database) — low-ops, appropriate to MVP scale, with event-driven infrastructure and a job queue treated as a real-time-dispatch-triggered upgrade, not a default.",
-  "roviq.dispatch_image": "/photos/dispatch_app_mockup.jpg",
+  "qremyn.dispatch_image": "/photos/dispatch_app_mockup.jpg",
 
   // ---------- STATION ----------
   "station.hero_eyebrow": "Qremyn Station",

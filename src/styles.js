@@ -98,7 +98,7 @@ nav.site-nav a:hover, nav.site-nav a.active { color: #fff; border-bottom-color: 
   transition: filter 0.2s ease;
 }
 .split-card:hover { filter: brightness(1.06); }
-.split-card--roviq { background: var(--navy); color: #fff; }
+.split-card--qremyn { background: var(--navy); color: #fff; }
 .split-card--station { background: var(--teal); color: #fff; }
 .split-card h2 { color: #fff; }
 .split-card .tag {

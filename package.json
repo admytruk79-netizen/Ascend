@@ -1,5 +1,5 @@
 {
-  "name": "roviq-station-site",
+  "name": "qremyn-station-site",
   "version": "1.0.0",
   "private": true,
   "description": "Qremyn + Qremyn Station marketing/investor site (Cloudflare Worker + KV)",

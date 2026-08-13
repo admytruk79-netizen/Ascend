@@ -2,7 +2,7 @@ import { CSS } from "./styles.js";
 import { escapeHtml, mediaBlock } from "./layout.js";
 import { CONTENT_SECTIONS, DEFAULT_CONTENT } from "./content.js";
 
-const COOKIE_NAME = "roviq_admin";
+const COOKIE_NAME = "qremyn_admin";
 const SESSION_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 function timingSafeEqual(a, b) {
