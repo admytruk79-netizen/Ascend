@@ -904,6 +904,10 @@ function renderHome(root) {
         </div>`;
 
     const alreadyRevealed = revealedSpreadKeys.has(s.key);
+    // One Card's row click draws directly (see the data-toggle handler
+    // below) -- expandedKey can never be 'one', so the expand section
+    // would only ever render collapsed. Skip it entirely rather than ship
+    // markup that can never be seen.
     return `
       <div class="spread-card ${expanded ? 'expanded' : ''} ${alreadyRevealed ? 'revealed' : ''}" data-key="${s.key}" style="--reveal-delay:${i * 70}ms">
         <div class="spread-row" data-toggle="${s.key}">
@@ -914,9 +918,10 @@ function renderHome(root) {
           </div>
           <div class="spread-tag" style="color:${tagColor}">${tag}</div>
         </div>
+        ${s.key === 'one' ? '' : `
         <div class="spread-expand ${expanded ? 'open' : ''}">
           <div class="spread-expand-inner">${expandContent}</div>
-        </div>
+        </div>`}
       </div>`;
   }).join('');
 
@@ -966,7 +971,12 @@ function renderHome(root) {
   document.getElementById('journalEntryBtn').addEventListener('click', goToJournalHistory);
   document.getElementById('aboutEntryBtn').addEventListener('click', openAboutModal);
   root.querySelectorAll('[data-toggle]').forEach(el => {
-    el.addEventListener('click', () => toggleSpread(el.getAttribute('data-toggle')));
+    const key = el.getAttribute('data-toggle');
+    // One Card is free and always unlocked -- there's nothing an expand
+    // step would ever reveal (no paywall, no season picker), so tapping
+    // the row draws directly instead of expanding to a second DRAW
+    // button. Every other spread still needs the expand step.
+    el.addEventListener('click', () => key === 'one' ? drawFor('one') : toggleSpread(key));
   });
   root.querySelectorAll('[id^="drawBtn-"]').forEach(el => {
     el.addEventListener('click', (e) => { e.stopPropagation(); drawFor(el.getAttribute('data-key')); });
