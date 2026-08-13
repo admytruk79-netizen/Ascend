@@ -19,7 +19,7 @@ export function roviqPage(c) {
         <p class="lead">${escapeHtml(c["roviq.hero_sub"])}</p>
       </div>
       <div style="text-align:center;">
-        <img src="/brand/roviq-lockup.png" alt="Qremyn — Auto repair, made simple." style="max-width:280px; width:100%; margin:0 auto; border-radius:12px;">
+        <img src="/brand/roviq-lockup.png" alt="Qremyn — Stations, Fleet, Parts, People." style="max-width:280px; width:100%; margin:0 auto; border-radius:12px;">
       </div>
     </div>
   </div>
