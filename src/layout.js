@@ -97,7 +97,7 @@ export function renderPage({ title, description, activePath, body }) {
 <body>
 <header class="site-header">
   <div class="container">
-    <a href="/" class="wordmark"><img src="/brand/roviq-icon.png" alt="" class="wordmark-icon">QREMY<span>N</span></a>
+    <a href="/" class="wordmark"><img src="/brand/roviq-icon.png" alt="" class="wordmark-icon">QREMYN</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">&#9776;</button>
     <nav class="site-nav" id="siteNav">
       ${NAV_LINKS.map(
