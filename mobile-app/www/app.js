@@ -29,6 +29,11 @@ const SPREADS = [
   { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false },
   { key: 'seasonal', count: 4, label: 'Seasonal Attunement', sub: 'A four-direction reading tuned to where you are in the yearly cycle.', free: false },
   { key: 'octave', count: 8, label: 'The Octave', sub: 'Do, re, mi... where a process actually completes, or quietly drifts.', free: false },
+  // Earned, not purchased: requiresDraws gates this on top of membership --
+  // see totalDrawSessions() and the locked-content branch in renderHome().
+  // holdToReveal extends the single-card hold ritual to a whole multi-card
+  // draw: one hold gates all 3 cards together, then they browse normally.
+  { key: 'wildcards', count: 3, label: 'The Wildcards', sub: 'Three cards, drawn only from the twelve outside the five phases.', free: false, holdToReveal: true, requiresDraws: 21 },
 ];
 const POSITIONS = {
   three: ['Grounded In', 'Moving Through', 'Opening Toward'],
@@ -40,6 +45,7 @@ const POSITIONS = {
   // original line. Positions 4 and 8 are that shock -- see pickOctave().
   octave: ['The Impulse', 'First Movement', 'Where It Starts to Waver', 'The Outside Force',
            'Renewed Momentum', 'Sustained Effort', 'The Threshold', 'The Higher Octave'],
+  wildcards: ['The Interruption', 'The Reckoning', 'The Opening'],
 };
 // The literal do-re-mi-fa-sol-la-ti-do steps, shown alongside the octave's
 // poetic position names so the Law of Seven structure is visible, not just
@@ -239,6 +245,14 @@ function recordDraw(cards) {
     const trimmed = history.slice(-DRAW_HISTORY_MAX);
     localStorage.setItem(DRAW_HISTORY_KEY, JSON.stringify(trimmed));
   } catch (e) {}
+}
+// History entries are per-card (one push per card in a draw), not per draw
+// action -- a Nine Card Draw alone adds 9 entries. Cards from the same
+// drawFor() call share the exact same recordDraw() timestamp, so the count
+// of *distinct* timestamps is the count of draw actions the person has
+// actually taken, which is what "unlocks after N draws" should mean.
+function totalDrawSessions() {
+  return new Set(loadDrawHistory().map(h => h.ts)).size;
 }
 
 // Weight 1 = neutral. A card drawn `d` draws ago (1 = last draw) is
@@ -514,11 +528,11 @@ let cardIndex = 0;
 let activeTab = 'grounded';
 let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
 let reviewingReading = false; // true when stepping back into a just-drawn reading from Synthesis
-let revealCard = null; // card pending a hold-to-reveal, single-card draws only
+let revealCards = null; // card(s) pending a hold-to-reveal — one card normally, or a whole small draw for holdToReveal spreads
 const REVEAL_HOLD_MS = 2000;
 
-function beginReveal(card) {
-  revealCard = card;
+function beginReveal(cards) {
+  revealCards = cards;
   screen = 'revealing';
   render();
 }
@@ -676,6 +690,9 @@ function drawFor(key) {
     // See orderTriad() — every card's supported/resisted pair already IS
     // that active/passive polarity, this just puts them in the right seats.
     picked = orderTriad(pickDiverseBuckets(3, history));
+  } else if (key === 'wildcards') {
+    // Drawn only from the 12-card wildcard deck, never the numbered 108.
+    picked = pickManyWeighted(WILDCARD_CARDS, s.count, history);
   } else if (s.count === 1) {
     picked = [pickSingleWeighted([...CARDS, ...WILDCARD_CARDS], history)];
   } else {
@@ -686,11 +703,13 @@ function drawFor(key) {
   recordDraw(picked);
   spreadKey = key; expandedKey = null; readingPreviewOnly = false; reviewingReading = false;
   currentJournalId = null; // fresh draw — Save Entry on Synthesis should create a new entry, not edit the last one
-  if (s.count === 1) {
-    // Single-card draws get the hold-to-reveal ritual; multi-card spreads
-    // stay instant — holding through 5-9 cards in a row would be pure
-    // friction, not ritual.
-    beginReveal(picked[0]);
+  if (s.count === 1 || s.holdToReveal) {
+    // Single-card draws get the hold-to-reveal ritual; most multi-card
+    // spreads stay instant — holding through 5-9 cards in a row would be
+    // pure friction, not ritual. holdToReveal is the deliberate exception
+    // (The Wildcards): one hold gates the whole small draw at once, then
+    // the cards browse normally like any other multi-card spread.
+    beginReveal(picked);
     return;
   }
   drawnCards = picked; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
@@ -749,12 +768,19 @@ function composeSynthesis(cards) {
   const headline = qualities.length === 1
     ? `Every card is testing the same thing: ${qualities[0]}.`
     : `The thread running through this draw: ${qualities.join(', ')}.`;
-  const sub = phaseNames.length > 1 ? `This reading moves through ${phaseNames.join(' → ')}.` : `This reading stays within ${phaseNames[0]}.`;
+  const allWildcards = phaseNames.length === 1 && phaseNames[0] === 'Wildcard';
+  const sub = allWildcards
+    ? 'This reading draws entirely from outside the five phases.'
+    : phaseNames.length > 1 ? `This reading moves through ${phaseNames.join(' → ')}.` : `This reading stays within ${phaseNames[0]}.`;
   const last = cards[cards.length - 1];
   return { headline, sub, takeaway: last.grounded_where_v2 || last.grounded_where };
 }
 
 // ── RENDER ───────────────────────────────────────────────────────────────
+// Tracked across calls so render() can tell a real screen/card transition
+// apart from an in-place re-render (e.g. toggleSpread expanding a Home row).
+let lastRenderedScreen = null;
+let lastRenderedCardIndex = null;
 function render() {
   // A full re-render always tears down and rebuilds the current screen's
   // DOM, including a running breath timer's circle element — stop it
@@ -765,6 +791,16 @@ function render() {
   applyPhaseTint();
   applyThemeMode();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
+  // Scroll to top on an actual screen change or a new card within a
+  // reading — otherwise a scrolled-down Home (e.g. reaching The Wildcards
+  // near the bottom) leaves the next screen rendered off-screen. Skipped
+  // for same-screen/same-card re-renders so expanding a Home row in place
+  // doesn't yank the user back to the top mid-interaction.
+  const screenChanged = screen !== lastRenderedScreen;
+  const cardChanged = screen === 'reading' && cardIndex !== lastRenderedCardIndex;
+  if (screenChanged || cardChanged) window.scrollTo(0, 0);
+  lastRenderedScreen = screen;
+  lastRenderedCardIndex = screen === 'reading' ? cardIndex : null;
   const root = document.getElementById('screen');
   if (screen === 'splash') return renderSplash(root);
   if (screen === 'intro') return renderIntro(root);
@@ -812,18 +848,26 @@ function renderHome(root) {
   const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
   const priceAmount = price.split('/')[0].trim();
 
+  const drawSessions = totalDrawSessions();
+
   const rows = SPREADS.map((s, i) => {
-    const locked = !s.free && !isSubscribed();
+    const needsMembership = !s.free && !isSubscribed();
+    // Earned, not purchased: gated on top of membership by practice alone
+    // (see totalDrawSessions()) — a member who hasn't drawn enough yet is
+    // a distinct state from "pay to unlock," so it gets its own tag,
+    // glyph, and copy below rather than reusing the membership paywall.
+    const needsMoreDraws = !!s.requiresDraws && drawSessions < s.requiresDraws;
+    const locked = needsMembership || needsMoreDraws;
     const expanded = expandedKey === s.key;
-    const tag = s.free ? 'FREE' : (isSubscribed() ? 'INCLUDED' : 'MEMBERSHIP');
-    // FREE stays gold; INCLUDED (already a member) gets its own teal so the
-    // three tag states -- free / included / membership-locked -- are each
-    // visually distinct rather than INCLUDED reading as a dimmer FREE.
-    const tagColor = s.free ? 'var(--gold)' : (isSubscribed() ? 'var(--teal)' : 'rgba(var(--text-rgb),.45)');
+    const tag = s.free ? 'FREE' : needsMembership ? 'MEMBERSHIP' : needsMoreDraws ? 'LOCKED' : 'INCLUDED';
+    // FREE stays gold; INCLUDED (already a member, fully unlocked) gets its
+    // own teal so free / included / membership-locked / earn-locked each
+    // read as distinct states rather than shades of the same gold.
+    const tagColor = s.free ? 'var(--gold)' : needsMembership ? 'rgba(var(--text-rgb),.45)' : needsMoreDraws ? 'rgba(var(--text-rgb),.45)' : 'var(--teal)';
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
     const plural = s.count > 1 ? 'S' : '';
 
-    const expandContent = locked ? `
+    const expandContent = needsMembership ? `
         <div class="spread-expand-content locked">
           <div class="spread-expand-rule"></div>
           <div class="locked-glyph">&#128274;</div>
@@ -831,6 +875,11 @@ function renderHome(root) {
           <div class="locked-price">${priceAmount}<small> / month, unlocks everything</small></div>
           <button class="btn-gold-block" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK MEMBERSHIP</button>
           <div class="locked-fineprint">via Google Play Billing</div>
+        </div>` : needsMoreDraws ? `
+        <div class="spread-expand-content locked">
+          <div class="spread-expand-rule"></div>
+          <div class="locked-glyph">&#10024;</div>
+          <div class="locked-body">Earned by practice, not purchase. Unlocks after ${s.requiresDraws} draws — you're at ${drawSessions} of ${s.requiresDraws}.</div>
         </div>` : `
         <div class="spread-expand-content">
           <div class="spread-expand-rule"></div>
@@ -1148,9 +1197,9 @@ function renderRevealing(root) {
   function completeReveal() {
     holdTimer = null;
     try { if (navigator.vibrate) navigator.vibrate(120); } catch (err) {}
-    const card = revealCard;
-    revealCard = null;
-    drawnCards = [card]; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
+    const cards = revealCards;
+    revealCards = null;
+    drawnCards = cards; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
     render();
   }
 
@@ -1158,7 +1207,7 @@ function renderRevealing(root) {
   wrap.addEventListener('pointerup', cancelHold);
   wrap.addEventListener('pointerleave', cancelHold);
   wrap.addEventListener('pointercancel', cancelHold);
-  document.getElementById('revealBackBtn').addEventListener('click', () => { revealCard = null; goHome(); });
+  document.getElementById('revealBackBtn').addEventListener('click', () => { revealCards = null; goHome(); });
 }
 
 function renderReading(root) {
@@ -1381,7 +1430,7 @@ try {
         return;
       }
       if (screen === 'reading') { readingPreviewOnly ? goToSavedCards() : prevCard(); return; }
-      if (screen === 'revealing' || screen === 'synthesis' || screen === 'saved' || screen === 'journal') { revealCard = null; goHome(); return; }
+      if (screen === 'revealing' || screen === 'synthesis' || screen === 'saved' || screen === 'journal') { revealCards = null; goHome(); return; }
       if (screen === 'home') { window.Capacitor.Plugins.App.exitApp(); return; }
       // 'intro' — no back target, let the hardware button do nothing.
     });
