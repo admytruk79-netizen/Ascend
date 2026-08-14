@@ -8,6 +8,14 @@ const FRONT_ENDS = [
   { key: "tow", title: "Tow Truck App", accent: "teal" }
 ];
 
+const PARTNER_TYPES = [
+  { key: "dealership", title: "Dealerships", accent: "navy", cta: "Explore Dealership Partnerships" },
+  { key: "diagnostic", title: "Diagnostic Partners", accent: "teal", cta: "Become a Diagnostic Partner" },
+  { key: "repair", title: "Repair & Service Providers", accent: "gold", cta: "Join as a Repair Partner" },
+  { key: "transport", title: "Vehicle Transport & Towing", accent: "navy", cta: "Partner for Transport" },
+  { key: "mobility", title: "Mobility Providers", accent: "teal", cta: "Explore Mobility Partnerships" }
+];
+
 export function roviqPage(c) {
   return `
 <section class="hero section--tight">
@@ -25,16 +33,25 @@ export function roviqPage(c) {
   </div>
 </section>
 
+<section class="section section--cream-alt">
+  <div class="container">
+    <span class="eyebrow">Get started</span>
+    <h2>${escapeHtml(c["roviq.howitworks_heading"])}</h2>
+    ${renderBullets(c["roviq.howitworks_steps"])}
+  </div>
+</section>
+
 <section class="section">
   <div class="container">
     <h2>${escapeHtml(c["roviq.core_heading"])}</h2>
     ${richText(c["roviq.core_body"])}
+    <p class="pullquote" style="font-size:1rem;">${escapeHtml(c["roviq.core_flow"])}</p>
   </div>
 </section>
 
 <section class="section section--cream-alt">
   <div class="container">
-    <span class="eyebrow">How it works</span>
+    <span class="eyebrow">Under the hood</span>
     <h2>${escapeHtml(c["roviq.dispatch_heading"])}</h2>
     <div class="grid grid--2" style="align-items:start;">
       <div>
@@ -97,10 +114,36 @@ export function roviqPage(c) {
     <span class="eyebrow">A distinct product line</span>
     <h2>${escapeHtml(c["roviq.dealership_heading"])}</h2>
     ${richText(c["roviq.dealership_body"])}
+    ${renderBullets(c["roviq.dealership_pillars"])}
   </div>
 </section>
 
 <section class="section">
+  <div class="container">
+    <span class="eyebrow">Diagnostics</span>
+    <h2>${escapeHtml(c["roviq.diagnostic_partners_heading"])}</h2>
+    ${richText(c["roviq.diagnostic_partners_body"])}
+    <p class="pullquote" style="font-size:1rem;">${escapeHtml(c["roviq.diagnostic_partners_flow"])}</p>
+  </div>
+</section>
+
+<section class="section section--cream-alt">
+  <div class="container">
+    <span class="eyebrow">Mobility</span>
+    <h2>${escapeHtml(c["roviq.mobility_heading"])}</h2>
+    ${richText(c["roviq.mobility_body"])}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">Capacity network</span>
+    <h2>${escapeHtml(c["roviq.capacity_heading"])}</h2>
+    ${richText(c["roviq.capacity_body"])}
+  </div>
+</section>
+
+<section class="section section--cream-alt">
   <div class="container">
     <span class="eyebrow">Not one borrowed model — six, recombined</span>
     <h2>${escapeHtml(c["roviq.playbook_heading"])}</h2>
@@ -120,7 +163,40 @@ export function roviqPage(c) {
   <div class="container">
     <span class="eyebrow">How it's actually built</span>
     <h2>${escapeHtml(c["roviq.stack_heading"])}</h2>
-    ${renderBullets(c["roviq.stack_body"])}
+    ${richText(c["roviq.stack_body"])}
+  </div>
+</section>
+
+<section class="section section--navy">
+  <div class="container">
+    <span class="eyebrow">The ecosystem</span>
+    <h2>${escapeHtml(c["roviq.station_teaser_heading"])}</h2>
+    ${richText(c["roviq.station_teaser_body"])}
+    <a href="/station" class="btn btn--outline" style="margin-top:1rem;">See Roviq Station &rarr;</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">Get involved</span>
+    <h2>${escapeHtml(c["roviq.partners_heading"])}</h2>
+    <div class="grid grid--3">
+      ${PARTNER_TYPES.map(
+        (p) => `<div class="card card--accent-${p.accent}">
+          <h3>${p.title}</h3>
+          <p>${escapeHtml(c[`roviq.partners_${p.key}_body`])}</p>
+          <a href="/about" class="btn btn--outline" style="margin-top:0.75rem; font-size:0.85rem; padding:0.5rem 0.9rem;">${p.cta} &rarr;</a>
+        </div>`
+      ).join("\n")}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">${escapeHtml(c["roviq.why_heading"])}</span>
+    <h2>Built to be trusted with the whole job</h2>
+    ${renderBullets(c["roviq.why_pillars"])}
   </div>
 </section>
 

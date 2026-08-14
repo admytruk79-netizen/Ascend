@@ -23,8 +23,8 @@ const PAGES = {
   },
   "/roviq": {
     render: roviqPage,
-    title: "Roviq — Real-time dispatch for auto services",
-    description: "Roviq Core routes tow, diagnostic, and parts jobs in real time across five role-based apps: Customer, Diagnostic, Shop Partner, Parts Vendor, and Tow Truck."
+    title: "Roviq — Maintenance. Anywhere.",
+    description: "Roviq Core is the coordination layer connecting diagnosis, repair capacity, dealerships, towing, and mobility into one connected automotive service experience."
   },
   "/station": {
     render: stationPage,
