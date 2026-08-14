@@ -29,11 +29,11 @@ const SPREADS = [
   { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false },
   { key: 'seasonal', count: 4, label: 'Seasonal Attunement', sub: 'A four-direction reading tuned to where you are in the yearly cycle.', free: false },
   { key: 'octave', count: 8, label: 'The Octave', sub: 'Do, re, mi... where a process actually completes, or quietly drifts.', free: false },
-  // Earned, not purchased: requiresDraws gates this on top of membership --
-  // see totalDrawSessions() and the locked-content branch in renderHome().
+  // Earned, not purchased: requiresDays gates this on top of membership --
+  // see totalUsageDays() and the locked-content branch in renderHome().
   // holdToReveal extends the single-card hold ritual to a whole multi-card
   // draw: one hold gates all 3 cards together, then they browse normally.
-  { key: 'wildcards', count: 3, label: 'The Wildcards', sub: 'Three cards, drawn only from the twelve outside the five phases.', free: false, holdToReveal: true, requiresDraws: 21 },
+  { key: 'wildcards', count: 3, label: 'The Wildcards', sub: 'Three cards, drawn only from the twelve outside the five phases.', free: false, holdToReveal: true, requiresDays: 14 },
 ];
 const POSITIONS = {
   three: ['Grounded In', 'Moving Through', 'Opening Toward'],
@@ -246,13 +246,34 @@ function recordDraw(cards) {
     localStorage.setItem(DRAW_HISTORY_KEY, JSON.stringify(trimmed));
   } catch (e) {}
 }
-// History entries are per-card (one push per card in a draw), not per draw
-// action -- a Nine Card Draw alone adds 9 entries. Cards from the same
-// drawFor() call share the exact same recordDraw() timestamp, so the count
-// of *distinct* timestamps is the count of draw actions the person has
-// actually taken, which is what "unlocks after N draws" should mean.
-function totalDrawSessions() {
-  return new Set(loadDrawHistory().map(h => h.ts)).size;
+// Tracks distinct calendar days (device-local date) the app has actually
+// been opened on -- what "unlocks after N days" should mean is days of
+// real practice, not raw elapsed time since install (someone could
+// install and not open the app for two weeks and still expect that to
+// count, which isn't the point).
+const USAGE_DAYS_KEY = 'ascend_usage_days';
+function todayDateString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function loadUsageDays() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(USAGE_DAYS_KEY) || '[]');
+    return Array.isArray(raw) ? raw : [];
+  } catch (e) { return []; }
+}
+function recordUsageDay() {
+  try {
+    const days = loadUsageDays();
+    const today = todayDateString();
+    if (!days.includes(today)) {
+      days.push(today);
+      localStorage.setItem(USAGE_DAYS_KEY, JSON.stringify(days));
+    }
+  } catch (e) {}
+}
+function totalUsageDays() {
+  return loadUsageDays().length;
 }
 
 // Weight 1 = neutral. A card drawn `d` draws ago (1 = last draw) is
@@ -516,6 +537,7 @@ function escapeHtml(str) {
 
 let journalEntries = loadJournalEntries();
 let currentJournalId = null; // ties Save-Entry on Synthesis to one entry per draw, not a new row per click
+recordUsageDay(); // runs once per app open, regardless of screen
 
 let savedCardNums = loadSavedCards();
 let subscribed = false;
@@ -857,22 +879,23 @@ function renderHome(root) {
   const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
   const priceAmount = price.split('/')[0].trim();
 
-  const drawSessions = totalDrawSessions();
+  const usageDays = totalUsageDays();
 
   const rows = SPREADS.map((s, i) => {
     const needsMembership = !s.free && !isSubscribed();
     // Earned, not purchased: gated on top of membership by practice alone
-    // (see totalDrawSessions()) — a member who hasn't drawn enough yet is
-    // a distinct state from "pay to unlock," so it gets its own tag,
-    // glyph, and copy below rather than reusing the membership paywall.
-    const needsMoreDraws = !!s.requiresDraws && drawSessions < s.requiresDraws;
-    const locked = needsMembership || needsMoreDraws;
+    // (see totalUsageDays()) — a member who hasn't used the app on enough
+    // distinct days yet is a distinct state from "pay to unlock," so it
+    // gets its own tag, glyph, and copy below rather than reusing the
+    // membership paywall.
+    const needsMoreDays = !!s.requiresDays && usageDays < s.requiresDays;
+    const locked = needsMembership || needsMoreDays;
     const expanded = expandedKey === s.key;
-    const tag = s.free ? 'FREE' : needsMembership ? 'MEMBERSHIP' : needsMoreDraws ? 'LOCKED' : 'INCLUDED';
+    const tag = s.free ? 'FREE' : needsMembership ? 'MEMBERSHIP' : needsMoreDays ? 'LOCKED' : 'INCLUDED';
     // FREE stays gold; INCLUDED (already a member, fully unlocked) gets its
     // own teal so free / included / membership-locked / earn-locked each
     // read as distinct states rather than shades of the same gold.
-    const tagColor = s.free ? 'var(--gold)' : needsMembership ? 'rgba(var(--text-rgb),.45)' : needsMoreDraws ? 'rgba(var(--text-rgb),.45)' : 'var(--teal)';
+    const tagColor = s.free ? 'var(--gold)' : needsMembership ? 'rgba(var(--text-rgb),.45)' : needsMoreDays ? 'rgba(var(--text-rgb),.45)' : 'var(--teal)';
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
     const plural = s.count > 1 ? 'S' : '';
 
@@ -884,11 +907,11 @@ function renderHome(root) {
           <div class="locked-price">${priceAmount}<small> / month, unlocks everything</small></div>
           <button class="btn-gold-block" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK MEMBERSHIP</button>
           <div class="locked-fineprint">via Google Play Billing</div>
-        </div>` : needsMoreDraws ? `
+        </div>` : needsMoreDays ? `
         <div class="spread-expand-content locked">
           <div class="spread-expand-rule"></div>
           <div class="locked-glyph">&#10024;</div>
-          <div class="locked-body">Earned by practice, not purchase. Unlocks after ${s.requiresDraws} draws — you're at ${drawSessions} of ${s.requiresDraws}.</div>
+          <div class="locked-body">Earned by practice, not purchase. Unlocks after ${s.requiresDays} days of use — you're at ${usageDays} of ${s.requiresDays}.</div>
         </div>` : `
         <div class="spread-expand-content">
           <div class="spread-expand-rule"></div>
