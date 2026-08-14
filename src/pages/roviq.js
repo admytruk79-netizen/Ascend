@@ -1,4 +1,4 @@
-import { richText, renderList, renderBullets, renderStats, mediaBlock, escapeHtml } from "../layout.js";
+import { richText, renderList, renderBullets, renderStats, mediaFull, escapeHtml } from "../layout.js";
 
 const FRONT_ENDS = [
   { key: "customer", title: "Customer App", accent: "navy" },
@@ -41,7 +41,7 @@ export function roviqPage(c) {
         ${richText(c["roviq.dispatch_body"])}
         ${renderList(c["roviq.dispatch_steps"])}
       </div>
-      ${mediaBlock(c["roviq.dispatch_image"], "Roviq dispatch flow", "Dispatch map / routing UI mockup")}
+      ${mediaFull(c["roviq.dispatch_image"], "Roviq dispatch flow")}
     </div>
   </div>
 </section>

@@ -1,4 +1,4 @@
-import { richText, mediaBlock, escapeHtml } from "../layout.js";
+import { richText, mediaFull, escapeHtml } from "../layout.js";
 
 export function homePage(c) {
   return `
@@ -39,8 +39,8 @@ export function homePage(c) {
         </div>
       </div>
       <div class="grid grid--2" style="gap:1rem;">
-        ${mediaBlock(c["home.image_roviq"], "Roviq platform", "Dispatch / app mockup photo")}
-        ${mediaBlock(c["home.image_station"], "Roviq Station", "Station forecourt photo")}
+        ${mediaFull(c["home.image_roviq"], "Roviq platform")}
+        ${mediaFull(c["home.image_station"], "Roviq Station")}
       </div>
     </div>
   </div>
