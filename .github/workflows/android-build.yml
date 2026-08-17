@@ -54,7 +54,11 @@ jobs:
           echo "code=$(grep -oP 'versionCode \K[0-9]+' build.gradle)" >> "$GITHUB_OUTPUT"
           echo "name=$(grep -oP 'versionName "\K[^"]+' build.gradle)" >> "$GITHUB_OUTPUT"
 
+      # Convenience only. The debug APK is already safely uploaded above as
+      # a workflow artifact, so a temporary GitHub Releases API outage must
+      # not turn a successful Android build into a failed job.
       - name: Create GitHub release with debug APK
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
           tag_name: debug-v${{ steps.version.outputs.code }}-run${{ github.run_number }}
@@ -129,7 +133,7 @@ jobs:
           echo "ANDROID_KEY_ALIAS value length: ${#KEY_ALIAS}"
           keytool -list -keystore release.keystore -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" \
             && echo "KEYTOOL CHECK: password and alias are valid for this keystore" \
-            || echo "KEYTOOL CHECK: FAILED - password/alias do not match this keystore"
+            || { echo "::error::Keystore password/alias check failed"; exit 1; }
 
       - name: Build signed release bundle
         working-directory: mobile-app/android
