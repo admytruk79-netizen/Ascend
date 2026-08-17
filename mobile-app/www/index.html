@@ -406,6 +406,21 @@
   .grounded-sublabel { font: 600 9px/1 'Inter', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 7px; }
   .grounded-supported-label { color: var(--supported); }
   .grounded-resisted-label { color: var(--resisted); }
+  /* Grounded keeps its warm/material identity, but the day-mode parchment
+     card (light bg, dark ink text) reads as broken in the dark theme --
+     night gets its own dark, gold-lit variant instead of inheriting it. */
+  [data-mode="night"] .grounded-panel {
+    color: var(--cream);
+    background-color: #171411;
+    background-image: radial-gradient(ellipse 260px 150px at 50% 0%, rgba(var(--gold-rgb),.09), transparent 72%);
+    background-blend-mode: normal;
+    border: 1px solid rgba(var(--gold-rgb),.22);
+    box-shadow: 0 14px 34px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  [data-mode="night"] .grounded-quality { color: var(--gold); }
+  [data-mode="night"] .grounded-rule { background: rgba(var(--cream-rgb),.10); }
+  [data-mode="night"] .grounded-supported-label { color: #91ad70; }
+  [data-mode="night"] .grounded-resisted-label { color: #d07a61; }
   .marker-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
   .marker-dot-supported { background: var(--supported); }
   .marker-dot-resisted { background: var(--resisted); }
