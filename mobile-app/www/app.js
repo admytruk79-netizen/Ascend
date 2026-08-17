@@ -23,17 +23,17 @@ try {
 // else requires membership.
 const SPREADS = [
   { key: 'one', count: 1, label: 'One Card', sub: 'A single key, drawn plain.', free: true },
-  { key: 'stand', count: 1, label: 'Where You Stand', sub: 'A focused single-card check-in.', free: false },
-  { key: 'three', count: 3, label: 'Three Card Draw', sub: 'Grounded in / moving through / opening toward', free: false },
-  { key: 'five', count: 5, label: 'Five Card Draw', sub: 'A fuller arc across the phases.', free: false },
-  { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false },
-  { key: 'seasonal', count: 4, label: 'Seasonal Attunement', sub: 'A four-direction reading tuned to where you are in the yearly cycle.', free: false },
-  { key: 'octave', count: 8, label: 'The Octave', sub: 'Do, re, mi... where a process actually completes, or quietly drifts.', free: false },
+  { key: 'stand', count: 1, label: 'Where You Stand', sub: 'A focused single-card check-in.', free: false, tier: 'basic' },
+  { key: 'three', count: 3, label: 'Three Card Draw', sub: 'Grounded in / moving through / opening toward', free: false, tier: 'basic' },
+  { key: 'five', count: 5, label: 'Five Card Draw', sub: 'A fuller arc across the phases.', free: false, tier: 'basic' },
+  { key: 'nine', count: 9, label: 'Nine Card Draw', sub: 'The full ascent, phase by phase.', free: false, tier: 'basic' },
+  { key: 'seasonal', count: 4, label: 'Seasonal Attunement', sub: 'A four-direction reading tuned to where you are in the yearly cycle.', free: false, tier: 'basic' },
+  { key: 'octave', count: 8, label: 'The Octave', sub: 'Do, re, mi... where a process actually completes, or quietly drifts.', free: false, tier: 'premium' },
   // Earned, not purchased: requiresDays gates this on top of membership --
   // see totalUsageDays() and the locked-content branch in renderHome().
   // holdToReveal extends the single-card hold ritual to a whole multi-card
   // draw: one hold gates all 3 cards together, then they browse normally.
-  { key: 'wildcards', count: 3, label: 'The Wildcards', sub: 'Three cards, drawn only from the twelve outside the five phases.', free: false, holdToReveal: true, requiresDays: 14 },
+  { key: 'wildcards', count: 3, label: 'The Wildcards', sub: 'Three cards, drawn only from the twelve outside the five phases.', free: false, tier: 'premium', holdToReveal: true, requiresDays: 14 },
 ];
 const POSITIONS = {
   three: ['Grounded In', 'Moving Through', 'Opening Toward'],
@@ -540,7 +540,8 @@ let currentJournalId = null; // ties Save-Entry on Synthesis to one entry per dr
 recordUsageDay(); // runs once per app open, regardless of screen
 
 let savedCardNums = loadSavedCards();
-let subscribed = false;
+let basicSubscribed = false;
+let premiumSubscribed = false;
 let screen = 'splash'; // splash | intro | home | reading | synthesis | saved | journal — always opens on splash
 let expandedKey = null; // which spread row is expanded inline on Home
 let pendingUnlockKey = null; // spread waiting on a verified purchase before drawing
@@ -564,7 +565,7 @@ let selectedSeason = currentSeasonKey(); // Seasonal Attunement — user-overrid
 // A hidden way for internal testers to access every spread without going
 // through a real Google Play purchase. Tap the "ASCEND KEYS" wordmark 5
 // times within 3 seconds to bring up a code prompt. Purely a local flag —
-// never touches AscendBilling/`subscribed`, so it can't be confused with a
+// never touches AscendBilling/`basicSubscribed`/`premiumSubscribed`, so it can't be confused with a
 // real purchase.
 const TESTER_ACCESS_CODE = 'ASCEND2026';
 const TESTER_UNLOCK_KEY = 'ascend_tester_unlock';
@@ -592,7 +593,15 @@ function handleWordmarkTap() {
   }
 }
 
-function isSubscribed() { return subscribed || testerUnlocked; }
+// Premium always subsumes Basic: a Premium member sees every spread as
+// already included, never asked to buy Basic on top.
+function isSubscribed() { return basicSubscribed || premiumSubscribed || testerUnlocked; }
+function hasPremium() { return premiumSubscribed || testerUnlocked; }
+function hasBasic() { return basicSubscribed || hasPremium(); }
+function spreadUnlocked(s) {
+  if (s.free) return true;
+  return s.tier === 'premium' ? hasPremium() : hasBasic();
+}
 
 function goHome() {
   screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false; reviewingReading = false;
@@ -738,16 +747,18 @@ function drawFor(key) {
   render();
 }
 
-// Unlocking is a single membership covering every spread, not a per-spread
-// purchase. Never flip `subscribed` optimistically on tap — only the
-// verified onStatusChange(true) callback below does that, then this resumes
-// straight into the spread the user was trying to unlock.
+// Unlocking buys the tier a spread actually requires (Basic or Premium),
+// not a fixed single membership. Never flip `basicSubscribed`/
+// `premiumSubscribed` optimistically on tap — only the verified
+// onStatusChange callback below does that, then this resumes straight into
+// the spread the user was trying to unlock.
 function requestUnlock(key) {
+  const spread = spreadByKey(key);
   pendingUnlockKey = key;
   const btn = document.getElementById('unlockBtn-' + key);
   const original = btn ? btn.textContent : null;
   if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
-  window.AscendBilling.subscribe()
+  window.AscendBilling.subscribe(spread.tier)
     .catch(err => {
       pendingUnlockKey = null;
       alert(err && err.message ? err.message : 'Purchase could not be started. Please try again.');
@@ -876,13 +887,10 @@ function renderIntro(root) {
 const revealedSpreadKeys = new Set();
 
 function renderHome(root) {
-  const price = (window.AscendBilling && window.AscendBilling.getPriceString()) || '$5.99/month';
-  const priceAmount = price.split('/')[0].trim();
-
   const usageDays = totalUsageDays();
 
   const rows = SPREADS.map((s, i) => {
-    const needsMembership = !s.free && !isSubscribed();
+    const needsMembership = !s.free && !spreadUnlocked(s);
     // Earned, not purchased: gated on top of membership by practice alone
     // (see totalUsageDays()) — a member who hasn't used the app on enough
     // distinct days yet is a distinct state from "pay to unlock," so it
@@ -891,7 +899,8 @@ function renderHome(root) {
     const needsMoreDays = !!s.requiresDays && usageDays < s.requiresDays;
     const locked = needsMembership || needsMoreDays;
     const expanded = expandedKey === s.key;
-    const tag = s.free ? 'FREE' : needsMembership ? 'MEMBERSHIP' : needsMoreDays ? 'LOCKED' : 'INCLUDED';
+    const tierLabel = s.tier === 'premium' ? 'PREMIUM' : 'BASIC';
+    const tag = s.free ? 'FREE' : needsMembership ? tierLabel : needsMoreDays ? 'LOCKED' : 'INCLUDED';
     // FREE stays gold; INCLUDED (already a member, fully unlocked) gets its
     // own teal so free / included / membership-locked / earn-locked each
     // read as distinct states rather than shades of the same gold.
@@ -899,13 +908,16 @@ function renderHome(root) {
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
     const plural = s.count > 1 ? 'S' : '';
 
+    const price = (window.AscendBilling && window.AscendBilling.getPriceString(s.tier)) || (s.tier === 'premium' ? '$5.99/month' : '$4.99/month');
+    const priceAmount = price.split('/')[0].trim();
+
     const expandContent = needsMembership ? `
         <div class="spread-expand-content locked">
           <div class="spread-expand-rule"></div>
           <div class="locked-glyph">&#128274;</div>
-          <div class="locked-body">Part of ASCEND Keys membership.</div>
-          <div class="locked-price">${priceAmount}<small> / month, unlocks everything</small></div>
-          <button class="btn-gold-block" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK MEMBERSHIP</button>
+          <div class="locked-body">Part of ASCEND Keys ${tierLabel === 'PREMIUM' ? 'Premium' : 'Basic'} membership.</div>
+          <div class="locked-price">${priceAmount}<small> / month${s.tier === 'premium' ? ', unlocks everything' : ''}</small></div>
+          <button class="btn-gold-block" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK ${tierLabel}</button>
           <div class="locked-fineprint">via Google Play Billing</div>
         </div>` : needsMoreDays ? `
         <div class="spread-expand-content locked">
@@ -1440,13 +1452,16 @@ applyThemeMode();
 // throws for any reason (plugin bridge not ready, script load failure),
 // it must never block card data or rendering above.
 try {
-  window.AscendBilling.onStatusChange(val => {
-    const wasSubscribed = subscribed;
-    subscribed = val;
-    if (val && !wasSubscribed && pendingUnlockKey) {
-      // A purchase just completed (or was restored) — resume straight into
-      // the spread the user was trying to unlock. Never flip `subscribed`
-      // optimistically on button tap; only this verified callback does.
+  window.AscendBilling.onStatusChange(status => {
+    basicSubscribed = status.basic;
+    premiumSubscribed = status.premium;
+    // A purchase just completed (or was restored) — resume straight into
+    // the spread the user was trying to unlock, but only once that spread's
+    // own tier requirement is actually satisfied. Never flip
+    // `basicSubscribed`/`premiumSubscribed` optimistically on button tap;
+    // only this verified callback does.
+    const pendingSpread = pendingUnlockKey && spreadByKey(pendingUnlockKey);
+    if (pendingSpread && spreadUnlocked(pendingSpread)) {
       const key = pendingUnlockKey;
       pendingUnlockKey = null;
       drawFor(key);
