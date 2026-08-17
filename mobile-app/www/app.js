@@ -824,6 +824,12 @@ function render() {
   applyPhaseTint();
   applyThemeMode();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
+  // The splash is meant to be a brief, wordless cold-open -- just the mark,
+  // centered. The persistent wordmark/theme-toggle header duplicated that
+  // same "ASCEND KEYS" text right above it and let the theme be changed
+  // before Intro even establishes context, so it's hidden for this one
+  // screen only and fades back in with Intro.
+  document.querySelector('.header').style.display = screen === 'splash' ? 'none' : 'flex';
   // Scroll to top on an actual screen change or a new card within a
   // reading — otherwise a scrolled-down Home (e.g. reaching The Wildcards
   // near the bottom) leaves the next screen rendered off-screen. Skipped
@@ -903,8 +909,14 @@ function renderHome(root) {
     const tag = s.free ? 'FREE' : needsMembership ? tierLabel : needsMoreDays ? 'LOCKED' : 'INCLUDED';
     // FREE stays gold; INCLUDED (already a member, fully unlocked) gets its
     // own teal so free / included / membership-locked / earn-locked each
-    // read as distinct states rather than shades of the same gold.
-    const tagColor = s.free ? 'var(--gold)' : needsMembership ? 'rgba(var(--text-rgb),.45)' : needsMoreDays ? 'rgba(var(--text-rgb),.45)' : 'var(--teal)';
+    // read as distinct states rather than shades of the same gold. A
+    // membership-locked row also leans toward its own tier's color (dimmed
+    // gold for Premium, dimmed teal for Basic) so which tier a spread needs
+    // is legible from the row alone, before it's even expanded.
+    const tagColor = s.free ? 'var(--gold)'
+      : needsMembership ? (s.tier === 'premium' ? 'rgba(var(--gold-rgb),.55)' : 'rgba(var(--teal-rgb),.55)')
+      : needsMoreDays ? 'rgba(var(--text-rgb),.45)'
+      : 'var(--teal)';
     const dots = Array.from({ length: s.count }).map(() => '<span></span>').join('');
     const plural = s.count > 1 ? 'S' : '';
 
@@ -916,8 +928,8 @@ function renderHome(root) {
           <div class="spread-expand-rule"></div>
           <div class="locked-glyph">&#128274;</div>
           <div class="locked-body">Part of ASCEND Keys ${tierLabel === 'PREMIUM' ? 'Premium' : 'Basic'} membership.</div>
-          <div class="locked-price">${priceAmount}<small> / month${s.tier === 'premium' ? ', unlocks everything' : ''}</small></div>
-          <button class="btn-gold-block" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK ${tierLabel}</button>
+          <div class="locked-price" style="color:${s.tier === 'premium' ? 'var(--gold)' : 'var(--teal)'}">${priceAmount}<small> / month${s.tier === 'premium' ? ', unlocks everything' : ''}</small></div>
+          <button class="${s.tier === 'premium' ? 'btn-gold-block' : 'btn-teal-block'}" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK ${tierLabel}</button>
           <div class="locked-fineprint">via Google Play Billing</div>
         </div>` : needsMoreDays ? `
         <div class="spread-expand-content locked">

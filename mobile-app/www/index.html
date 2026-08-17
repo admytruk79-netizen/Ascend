@@ -290,6 +290,15 @@
     box-shadow: 0 0 30px rgba(var(--gold-rgb),calc(.38 * var(--glow)));
   }
   .btn-gold-block:disabled { opacity: .55; cursor: default; box-shadow: none; }
+  /* Basic's unlock CTA gets a teal variant of the same button so the two
+     membership tiers read as distinct at a glance -- Premium stays gold
+     (it always has), Basic borrows the teal already used for "included". */
+  .btn-teal-block {
+    width: 100%; padding: 13px; border-radius: 20px; border: none; background: var(--teal); color: var(--cream);
+    font: 600 12px/1 'Inter', sans-serif; letter-spacing: 1.5px; cursor: pointer;
+    box-shadow: 0 0 30px rgba(var(--teal-rgb),calc(.38 * var(--glow)));
+  }
+  .btn-teal-block:disabled { opacity: .55; cursor: default; box-shadow: none; }
   .btn-gold {
     padding: 14px 36px; border-radius: 24px; border: none; background: var(--gold); color: #12160D;
     font: 600 12px/1 'Inter', sans-serif; letter-spacing: 1.5px; cursor: pointer;
