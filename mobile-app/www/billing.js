@@ -55,6 +55,14 @@
     }
   }
 
+  function rejectStoreError(result, fallbackMessage) {
+    if (!result) return;
+    const error = new Error(result.message || fallbackMessage);
+    error.code = result.code;
+    error.productId = result.productId;
+    throw error;
+  }
+
   function init() {
     owned.basic = loadCached('basic');
     owned.premium = loadCached('premium');
@@ -120,14 +128,18 @@
     if (!offer) {
       return Promise.reject(new Error('No purchasable offer found for this product.'));
     }
-    return store.order(offer);
+    return Promise.resolve()
+      .then(() => store.order(offer))
+      .then(result => rejectStoreError(result, 'Purchase could not be completed.'));
   }
 
   function restore() {
     if (!available) {
       return Promise.reject(new Error('Billing unavailable in this preview. Install the Android app to restore.'));
     }
-    return CdvPurchase.store.restorePurchases();
+    return Promise.resolve()
+      .then(() => CdvPurchase.store.restorePurchases())
+      .then(result => rejectStoreError(result, 'Purchases could not be restored.'));
   }
 
   function onStatusChange(fn) {

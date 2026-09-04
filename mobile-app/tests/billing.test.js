@@ -44,6 +44,8 @@ async function main() {
   let initializedPlatform;
   let orderedOffer;
   let restoreCalls = 0;
+  let orderResult;
+  let restoreResult;
 
   const when = {};
   for (const event of ['approved', 'verified', 'receiptUpdated', 'productUpdated', 'receiptsReady']) {
@@ -78,8 +80,8 @@ async function main() {
     },
     get: id => products[id],
     owned: id => ownership[id],
-    order: async offer => { orderedOffer = offer; },
-    restorePurchases: async () => { restoreCalls += 1; },
+    order: async offer => { orderedOffer = offer; return orderResult; },
+    restorePurchases: async () => { restoreCalls += 1; return restoreResult; },
   };
 
   const nativeBilling = loadBilling({
@@ -118,6 +120,30 @@ async function main() {
   assert.equal(orderedOffer.id, 'premium-offer');
   await nativeBilling.restore();
   assert.equal(restoreCalls, 1);
+
+  orderResult = { code: 6, message: 'Purchase cancelled.', productId: 'ascend_keys_premium_monthly' };
+  await assert.rejects(
+    nativeBilling.subscribe('premium'),
+    error => error.message === 'Purchase cancelled.' && error.code === 6,
+  );
+
+  orderResult = { code: 1, message: 'Billing setup failed.', productId: 'ascend_keys_basic_monthly' };
+  await assert.rejects(
+    nativeBilling.subscribe('basic'),
+    error => error.message === 'Billing setup failed.' && error.code === 1,
+  );
+
+  delete products.ascend_keys_basic_monthly;
+  await assert.rejects(
+    nativeBilling.subscribe('basic'),
+    /Subscription product not loaded yet/,
+  );
+
+  restoreResult = { code: 1, message: 'Restore failed.' };
+  await assert.rejects(
+    nativeBilling.restore(),
+    error => error.message === 'Restore failed.' && error.code === 1,
+  );
 }
 
 main().then(() => {
