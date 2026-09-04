@@ -34,9 +34,25 @@
   }
 
   function setOwned(tier, val) {
+    if (owned[tier] === val) return;
     owned[tier] = val;
     saveCached(tier, val);
     notify();
+  }
+
+  function syncOwnership(store) {
+    Object.keys(PRODUCTS).forEach(tier => {
+      setOwned(tier, store.owned(PRODUCTS[tier].id));
+    });
+  }
+
+  function updateProduct(product) {
+    const tier = Object.keys(PRODUCTS).find(key => PRODUCTS[key].id === product.id);
+    if (!tier) return;
+    const offer = product.getOffer ? product.getOffer() : (product.offers && product.offers[0]);
+    if (offer && offer.pricingPhases && offer.pricingPhases[0]) {
+      priceStrings[tier] = offer.pricingPhases[0].price + '/month';
+    }
   }
 
   function init() {
@@ -54,13 +70,23 @@
     Object.keys(PRODUCTS).forEach(tier => {
       const id = PRODUCTS[tier].id;
       store.register({ id, type: ProductType.PAID_SUBSCRIPTION, platform: Platform.GOOGLE_PLAY });
-      store.when(id).approved(transaction => transaction.verify());
-      store.when(id).verified(receipt => receipt.finish());
-      store.when(id).owned(() => setOwned(tier, true));
-      store.when(id).updated(product => {
-        if (product && product.owned === false) setOwned(tier, false);
-      });
     });
+
+    // cordova-plugin-purchase v13 exposes ownership through store.owned().
+    // There is no `store.when(id).owned(...)` event; attempting to register
+    // one throws before store.initialize() and disables billing entirely.
+    store.when()
+      .approved(transaction => transaction.verify())
+      .verified(receipt => {
+        syncOwnership(store);
+        receipt.finish();
+      })
+      .receiptUpdated(() => syncOwnership(store))
+      .productUpdated(product => {
+        updateProduct(product);
+        syncOwnership(store);
+      })
+      .receiptsReady(() => syncOwnership(store));
 
     store.error(err => {
       console.error('[AscendBilling] store error', err);
@@ -70,12 +96,9 @@
       ready = true;
       Object.keys(PRODUCTS).forEach(tier => {
         const product = store.get(PRODUCTS[tier].id);
-        if (product && product.owned) setOwned(tier, true);
-        const offer = product && product.getOffer ? product.getOffer() : null;
-        if (offer && offer.pricingPhases && offer.pricingPhases[0]) {
-          priceStrings[tier] = offer.pricingPhases[0].price + '/month';
-        }
+        if (product) updateProduct(product);
       });
+      syncOwnership(store);
     });
 
     store.initialize([Platform.GOOGLE_PLAY]);

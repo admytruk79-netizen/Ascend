@@ -4,6 +4,7 @@
   "private": true,
   "description": "ASCEND Keys reading tool — Android app (Capacitor + Google Play Billing)",
   "scripts": {
+    "test": "node tests/billing.test.js",
     "sync": "cap sync android",
     "open:android": "cap open android",
     "build:android": "cd android && ./gradlew bundleRelease"
