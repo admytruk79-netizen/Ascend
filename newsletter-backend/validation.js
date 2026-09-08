@@ -7,6 +7,10 @@ export class BodyTooLargeError extends Error {
   }
 }
 
+export function isJsonObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 export async function readJsonBody(request, maxBytes = 4096) {
   const declaredLength = Number(request.headers.get('content-length'));
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {

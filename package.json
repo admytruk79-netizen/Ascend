@@ -1,0 +1,15 @@
+{
+  "name": "roviq-station-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Roviq + Roviq Station marketing/investor site (Cloudflare Worker + KV)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "secret:admin": "wrangler secret put ADMIN_PASSWORD",
+    "secret:session": "wrangler secret put SESSION_SECRET"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

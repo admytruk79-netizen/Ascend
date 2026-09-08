@@ -553,7 +553,15 @@ let activeTab = 'grounded';
 let readingPreviewOnly = false; // true when opened from Saved Cards, not a live draw
 let reviewingReading = false; // true when stepping back into a just-drawn reading from Synthesis
 let revealCards = null; // card(s) pending a hold-to-reveal — one card normally, or a whole small draw for holdToReveal spreads
+let revealCleanup = null; // cancels the active hold whenever its screen is torn down
 const REVEAL_HOLD_MS = 2000;
+
+function stopRevealGesture() {
+  if (!revealCleanup) return;
+  const cleanup = revealCleanup;
+  revealCleanup = null;
+  cleanup();
+}
 
 function beginReveal(cards) {
   revealCards = cards;
@@ -605,7 +613,8 @@ function spreadUnlocked(s) {
 }
 
 function goHome() {
-  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false; reviewingReading = false;
+  stopRevealGesture();
+  screen = 'home'; spreadKey = null; drawnCards = []; cardIndex = 0; expandedKey = null; readingPreviewOnly = false; reviewingReading = false; revealCards = null;
   render();
 }
 
@@ -822,6 +831,9 @@ function render() {
   // nodes. renderReading() below starts a fresh one if the new screen is
   // still 'reading' (e.g. moving to the next card).
   stopBreathTimer();
+  // Rendering replaces the screen DOM. Cancel any hold timer that still
+  // points at the old reveal controls before those nodes are detached.
+  stopRevealGesture();
   applyPhaseTint();
   applyThemeMode();
   document.getElementById('memberPill').style.display = isSubscribed() ? 'block' : 'none';
@@ -1245,6 +1257,17 @@ function renderRevealing(root) {
 
   let holdTimer = null;
 
+  function resetGesture() {
+    if (holdTimer) clearTimeout(holdTimer);
+    holdTimer = null;
+    circle.classList.remove('pressed');
+    shimmer.classList.remove('active');
+    label.textContent = 'HOLD · 2S';
+    ring.style.transition = 'stroke-dashoffset .25s ease';
+    ring.style.strokeDashoffset = String(circumference);
+  }
+  revealCleanup = resetGesture;
+
   function startHold(e) {
     if (e.cancelable) e.preventDefault();
     if (holdTimer) return;
@@ -1258,17 +1281,19 @@ function renderRevealing(root) {
   }
   function cancelHold() {
     if (!holdTimer) return;
-    clearTimeout(holdTimer); holdTimer = null;
-    circle.classList.remove('pressed');
-    shimmer.classList.remove('active');
-    label.textContent = 'HOLD · 2S';
-    ring.style.transition = 'stroke-dashoffset .25s ease';
-    ring.style.strokeDashoffset = String(circumference);
+    resetGesture();
   }
   function completeReveal() {
     holdTimer = null;
+    // A hardware/visible Back action may have abandoned this screen during
+    // the hold. Never open a reading unless this is still the active reveal.
+    if (screen !== 'revealing' || !Array.isArray(revealCards) || revealCards.length === 0) {
+      stopRevealGesture();
+      return;
+    }
     try { if (navigator.vibrate) navigator.vibrate(120); } catch (err) {}
     const cards = revealCards;
+    revealCleanup = null;
     revealCards = null;
     drawnCards = cards; screen = 'reading'; cardIndex = 0; activeTab = 'grounded';
     render();
@@ -1278,7 +1303,7 @@ function renderRevealing(root) {
   wrap.addEventListener('pointerup', cancelHold);
   wrap.addEventListener('pointerleave', cancelHold);
   wrap.addEventListener('pointercancel', cancelHold);
-  document.getElementById('revealBackBtn').addEventListener('click', () => { revealCards = null; goHome(); });
+  document.getElementById('revealBackBtn').addEventListener('click', goHome);
 }
 
 function renderReading(root) {
@@ -1504,7 +1529,7 @@ try {
         return;
       }
       if (screen === 'reading') { readingPreviewOnly ? goToSavedCards() : prevCard(); return; }
-      if (screen === 'revealing' || screen === 'synthesis' || screen === 'saved' || screen === 'journal') { revealCards = null; goHome(); return; }
+      if (screen === 'revealing' || screen === 'synthesis' || screen === 'saved' || screen === 'journal') { goHome(); return; }
       if (screen === 'home') { window.Capacitor.Plugins.App.exitApp(); return; }
       // 'intro' — no back target, let the hardware button do nothing.
     });

@@ -3,10 +3,18 @@ import assert from 'node:assert/strict';
 import {
   allowedOrigin,
   BodyTooLargeError,
+  isJsonObject,
   normalizeEmail,
   readJsonBody,
   validEmail,
 } from '../validation.js';
+
+test('accepts only JSON objects as signup bodies', () => {
+  assert.equal(isJsonObject({ email: 'person@example.com' }), true);
+  assert.equal(isJsonObject(null), false);
+  assert.equal(isJsonObject([]), false);
+  assert.equal(isJsonObject('person@example.com'), false);
+});
 
 test('normalizes and validates subscriber email addresses', () => {
   assert.equal(normalizeEmail('  Person@Example.COM '), 'person@example.com');

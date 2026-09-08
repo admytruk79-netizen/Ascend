@@ -5,10 +5,10 @@ function hashKey(scope, value) {
 }
 
 export function clientAddress(request) {
-  return request.headers.get('cf-connecting-ip')
-    || request.headers.get('x-real-ip')
-    || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || 'unknown';
+  // Neon terminates public traffic behind Cloudflare. Only trust the header
+  // written by that ingress; x-real-ip/x-forwarded-for are caller-controlled
+  // when the function is invoked directly and must not become rate-limit keys.
+  return request.headers.get('cf-connecting-ip') || 'unknown';
 }
 
 export async function consumeRateLimit(pool, { scope, value, limit, windowSeconds }) {

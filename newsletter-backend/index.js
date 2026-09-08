@@ -8,6 +8,7 @@ import { syncResendContact } from './resend.js';
 import {
   allowedOrigin,
   BodyTooLargeError,
+  isJsonObject,
   normalizeEmail,
   readJsonBody,
   validEmail,
@@ -70,6 +71,10 @@ export default {
       if (error instanceof BodyTooLargeError) {
         return json(origin, { error: 'request_too_large' }, 413);
       }
+      return json(origin, { error: 'invalid_json' }, 400);
+    }
+
+    if (!isJsonObject(body)) {
       return json(origin, { error: 'invalid_json' }, 400);
     }
 

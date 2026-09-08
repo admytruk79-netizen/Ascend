@@ -1,0 +1,26 @@
+name: Reset stale admin content overrides
+
+# One-off manual tool: deletes every content:* key in the CONTENT KV
+# namespace so the live site falls back to the code defaults in
+# src/content.js instead of whatever was last saved via /admin. This is
+# the same effect as clicking "Reset to default" on every field in
+# /admin, just done in bulk via the API since it doesn't require the
+# admin password. Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID
+# as repo secrets (same ones the deploy workflow uses).
+on:
+  workflow_dispatch: {}
+
+jobs:
+  reset-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Delete stale content:* KV overrides
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/reset-content-kv.mjs

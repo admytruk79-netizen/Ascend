@@ -1,9 +1,25 @@
-name = "ascend"
-compatibility_date = "2024-01-01"
+name = "roviq-site"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
 
-# Static landing page — no build step. index.html/docs are served directly;
-# mobile-app/ (the Android project) and .github/ are excluded via
-# .assetsignore since they aren't part of the deployed site.
+kv_namespaces = [
+  { binding = "CONTENT", id = "0a3a91e8fa63462eae8cf3f2e77e8a22" }
+]
+
+# The "Upload image" button in /admin uses an R2 bucket bound as UPLOADS.
+# R2 isn't enabled on this Cloudflare account yet, so the binding below is
+# commented out — declaring it while the bucket doesn't exist fails Worker
+# deploys outright. Once R2 is enabled and the "roviq-uploads" bucket is
+# created (see README), uncomment this block and redeploy.
+# [[r2_buckets]]
+# binding = "UPLOADS"
+# bucket_name = "roviq-uploads"
+
+# Static assets (diagram PNGs, future photos) served alongside the Worker —
+# a single deployable unit, no separate Pages project needed.
 [assets]
-directory = "."
-not_found_handling = "404-page"
+directory = "./public"
+binding = "ASSETS"
+
+# Set with: wrangler secret put ADMIN_PASSWORD
+# Set with: wrangler secret put SESSION_SECRET

@@ -2,11 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { clientAddress, consumeRateLimit } from '../rate-limit.js';
 
-test('prefers proxy-provided client addresses', () => {
+test('uses only the trusted ingress address', () => {
   const request = new Request('https://localhost', {
-    headers: { 'x-real-ip': '203.0.113.7', 'x-forwarded-for': '198.51.100.2' },
+    headers: {
+      'cf-connecting-ip': '203.0.113.7',
+      'x-real-ip': '198.51.100.2',
+      'x-forwarded-for': '192.0.2.5',
+    },
   });
   assert.equal(clientAddress(request), '203.0.113.7');
+});
+
+test('does not trust caller-controlled forwarding headers', () => {
+  const request = new Request('https://localhost', {
+    headers: { 'x-real-ip': '198.51.100.2', 'x-forwarded-for': '192.0.2.5' },
+  });
+  assert.equal(clientAddress(request), 'unknown');
 });
 
 test('enforces the configured atomic request count', async () => {
