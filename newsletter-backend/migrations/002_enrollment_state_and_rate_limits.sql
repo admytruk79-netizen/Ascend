@@ -1,9 +1,6 @@
 alter table newsletter_subscribers
-  drop constraint if exists newsletter_subscribers_status_check;
-
-alter table newsletter_subscribers
-  add constraint newsletter_subscribers_status_check
-  check (status in ('pending', 'subscribed', 'failed', 'unsubscribed'));
+  add column if not exists sync_status text not null default 'synced'
+  check (sync_status in ('pending', 'synced', 'failed'));
 
 create table if not exists newsletter_rate_limits (
   scope text not null,
