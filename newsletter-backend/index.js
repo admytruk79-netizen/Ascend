@@ -2,6 +2,7 @@ import { attachDatabasePool } from '@neon/functions';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
 import pg from 'pg';
+import { syncResendContact } from './resend.js';
 import {
   allowedOrigin,
   BodyTooLargeError,
@@ -67,6 +68,17 @@ export default {
           consent_at = now(),
           updated_at = now()
     `);
+
+    try {
+      await syncResendContact(email);
+    } catch (error) {
+      console.error('[newsletter] Resend sync failed', {
+        name: error.name,
+        status: error.status,
+        message: error.message,
+      });
+      return json(origin, { error: 'subscription_service_unavailable' }, 502);
+    }
 
     return json(origin, { subscribed: true });
   },
