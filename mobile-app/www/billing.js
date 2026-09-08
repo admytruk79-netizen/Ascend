@@ -66,10 +66,13 @@
   function init() {
     owned.basic = loadCached('basic');
     owned.premium = loadCached('premium');
+    // Publish cached ownership immediately. A returning subscriber's Play
+    // receipt can match the cache, in which case setOwned() intentionally
+    // emits nothing when the store finishes loading.
+    notify();
 
     if (!available) {
       // No native billing plugin present (browser preview / not yet built).
-      notify();
       return;
     }
 
