@@ -93,12 +93,13 @@ export default {
       await completeEnrollment(email, {
         begin: async address => {
           const result = await db.execute(sql`
-            insert into newsletter_subscribers (email, status, source, consent_at, updated_at)
-            values (${address}, 'pending', 'ascend-keys-app', now(), now())
+            insert into newsletter_subscribers
+              (email, status, sync_status, source, consent_at, updated_at)
+            values (${address}, 'unsubscribed', 'pending', 'ascend-keys-app', now(), now())
             on conflict (email_normalized) do update
             set email = excluded.email,
-                status = case
-                  when newsletter_subscribers.status = 'subscribed' then 'subscribed'
+                sync_status = case
+                  when newsletter_subscribers.status = 'subscribed' then 'synced'
                   else 'pending'
                 end,
                 consent_at = now(),
@@ -110,12 +111,12 @@ export default {
         sync: syncResendContact,
         markSubscribed: address => db.execute(sql`
           update newsletter_subscribers
-          set status = 'subscribed', updated_at = now()
+          set status = 'subscribed', sync_status = 'synced', updated_at = now()
           where email_normalized = ${address}
         `),
         markFailed: address => db.execute(sql`
           update newsletter_subscribers
-          set status = 'failed', updated_at = now()
+          set status = 'unsubscribed', sync_status = 'failed', updated_at = now()
           where email_normalized = ${address}
         `),
       });
