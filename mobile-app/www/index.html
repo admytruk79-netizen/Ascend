@@ -389,6 +389,12 @@
   .modal-body.scrollable { max-height: 46vh; overflow-y: auto; padding-right: 4px; }
   .modal-subhead { font: 600 10.5px/1 'Inter', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-fixed); margin: 18px 0 8px; }
   .modal-subhead:first-child { margin-top: 0; }
+  .about-news-link {
+    display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; padding: 10px 16px;
+    border: 1px solid rgba(var(--gold-fixed-rgb),.45); border-radius: 999px; color: var(--gold-fixed);
+    font: 600 10px/1 'Inter', sans-serif; letter-spacing: 1.25px; text-decoration: none; text-transform: uppercase;
+  }
+  .about-news-link:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
   .tab-switch {
     display: flex; gap: 4px; margin-bottom: 16px; background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 4px;
@@ -586,6 +592,9 @@
       <div>Alongside the 108 keys sits a set of 12 Wildcard cards — unnumbered, and outside the five-phase structure. They appear only in free-draw spreads, offering a broader or more unexpected angle when a reading calls for one. Drawing the same Wildcard more than once isn't a glitch; it's the deck pointing at something worth sitting with.</div>
       <div class="modal-subhead">The Resonance Engine</div>
       <div>No AI reads your cards or your journal — everything here is arithmetic, not a model. A card drawn recently is weighted down until it cycles back around; phases you've seen less often are weighted up, based only on your own draw history on this device. Five and Nine Card Draws guarantee every phase is actually represented, in order, instead of leaving it to chance. Nothing is sent anywhere — the engine only ever looks at draws you've already made.</div>
+      <div class="modal-subhead">News &amp; Updates</div>
+      <div>Receive occasional news about ASCEND Keys, new practices, and future releases.</div>
+      <a class="about-news-link" href="mailto:admytruk79@gmail.com?subject=ASCEND%20Keys%20news%20signup&amp;body=Please%20add%20me%20to%20the%20ASCEND%20Keys%20news%20list.">Sign up for news</a>
     </div>
     <button class="btn-outline-gold" id="aboutCloseBtn">CLOSE</button>
   </div>
