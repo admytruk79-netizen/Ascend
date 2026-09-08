@@ -298,10 +298,11 @@ function recencyWeight(num, history) {
 function phaseFairnessWeight(bucketKey, history) {
   const recent = history.slice(-FAIRNESS_WINDOW);
   if (recent.length < 6) return 1;
+  const fullPoolSize = CARDS.length + WILDCARD_CARDS.length;
   const naturalShare = bucketKey === 'wildcard'
-    ? WILDCARD_CARDS.length / (CARDS.length + WILDCARD_CARDS.length)
+    ? WILDCARD_CARDS.length / fullPoolSize
     : (PHASES.find(p => p.num === bucketKey)?.range
-        ? (PHASES.find(p => p.num === bucketKey).range[1] - PHASES.find(p => p.num === bucketKey).range[0] + 1) / CARDS.length
+        ? (PHASES.find(p => p.num === bucketKey).range[1] - PHASES.find(p => p.num === bucketKey).range[0] + 1) / fullPoolSize
         : 1 / 5);
   const matches = bucketKey === 'wildcard'
     ? recent.filter(e => e.phase == null).length
