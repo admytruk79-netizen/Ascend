@@ -163,7 +163,7 @@ async function main() {
   ownership.ascend_keys_basic_monthly = false;
   ownership.ascend_keys_premium_monthly = false;
   handlers.receiptUpdated({});
-  handlers.productUpdated(products.ascend_keys_premium_monthly);
+  // A receipt update alone must refresh offer-derived display data.
   assert.equal(nativeBilling.getTrialString('premium'), '7 days free');
   await nativeBilling.subscribe('premium');
   assert.equal(orderedOffer.id, 'premium-trial-offer');
@@ -171,13 +171,22 @@ async function main() {
 
   ownership.ascend_keys_basic_monthly = true;
   handlers.receiptUpdated({});
-  handlers.productUpdated(products.ascend_keys_premium_monthly);
   assert.equal(nativeBilling.getTrialString('premium'), '');
   await nativeBilling.subscribe('premium');
   assert.equal(orderedOffer.id, 'premium-base-plan');
   assert.deepEqual({ ...orderedAdditionalData.googlePlay }, {
     replacementMode: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE',
   });
+
+  // Never fall back to a trial offer for an upgrade. If Play does not return
+  // a paid base-plan offer, stop before opening an invalid billing flow.
+  const premiumOffers = products.ascend_keys_premium_monthly.offers;
+  products.ascend_keys_premium_monthly.offers = [premiumOffers[0]];
+  await assert.rejects(
+    nativeBilling.subscribe('premium'),
+    /No purchasable offer found/,
+  );
+  products.ascend_keys_premium_monthly.offers = premiumOffers;
   await nativeBilling.restore();
   assert.equal(restoreCalls, 1);
 

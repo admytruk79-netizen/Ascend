@@ -35,17 +35,25 @@
     statusListeners.forEach(fn => fn(status));
   }
 
-  function setOwned(tier, val) {
-    if (owned[tier] === val) return;
-    owned[tier] = val;
-    saveCached(tier, val);
-    notify();
-  }
-
   function syncOwnership(store) {
+    let statusChanged = false;
     Object.keys(PRODUCTS).forEach(tier => {
-      setOwned(tier, store.owned(PRODUCTS[tier].id));
+      const value = store.owned(PRODUCTS[tier].id);
+      if (owned[tier] === value) return;
+      owned[tier] = value;
+      saveCached(tier, value);
+      statusChanged = true;
     });
+    // Offer eligibility depends on current ownership. Refresh display data
+    // after both tiers are synchronized so Premium never keeps a stale trial
+    // label when Basic becomes owned (or becomes available again when Basic
+    // expires).
+    let offerChanged = false;
+    Object.keys(PRODUCTS).forEach(tier => {
+      const product = store.get(PRODUCTS[tier].id);
+      if (product && updateProduct(product)) offerChanged = true;
+    });
+    if (statusChanged || offerChanged) notify();
   }
 
   function isFreeTrialPhase(phase) {
@@ -63,8 +71,9 @@
     // second trial.
     const trialOffer = offers.find(offer => (offer.pricingPhases || []).some(isFreeTrialPhase));
     const basePlanOffer = offers.find(offer => !(offer.pricingPhases || []).some(isFreeTrialPhase));
-    return (allowTrial ? trialOffer : basePlanOffer)
-      || (product && product.getOffer ? product.getOffer() : offers[0]);
+    return allowTrial
+      ? (trialOffer || (product && product.getOffer ? product.getOffer() : offers[0]))
+      : basePlanOffer;
   }
 
   function formatTrialPeriod(period) {
@@ -85,8 +94,12 @@
     // A trial is the first $0 phase. The customer-facing recurring price is
     // the final paid phase, not the trial phase.
     const recurringPhase = [...phases].reverse().find(phase => !isFreeTrialPhase(phase) && phase.price);
-    if (recurringPhase) priceStrings[tier] = recurringPhase.price + '/month';
-    trialStrings[tier] = trialPhase ? formatTrialPeriod(trialPhase.billingPeriod) : '';
+    const nextPrice = recurringPhase ? recurringPhase.price + '/month' : priceStrings[tier];
+    const nextTrial = trialPhase ? formatTrialPeriod(trialPhase.billingPeriod) : '';
+    const changed = priceStrings[tier] !== nextPrice || trialStrings[tier] !== nextTrial;
+    priceStrings[tier] = nextPrice;
+    trialStrings[tier] = nextTrial;
+    return changed;
   }
 
   function rejectStoreError(result, fallbackMessage) {
@@ -101,8 +114,8 @@
     owned.basic = loadCached('basic');
     owned.premium = loadCached('premium');
     // Publish cached ownership immediately. A returning subscriber's Play
-    // receipt can match the cache, in which case setOwned() intentionally
-    // emits nothing when the store finishes loading.
+    // receipt can match the cache, so publish it before the store finishes
+    // loading instead of waiting for an ownership transition.
     notify();
 
     if (!available) {
@@ -134,10 +147,9 @@
         receipt.finish();
       })
       .receiptUpdated(() => syncOwnership(store))
-      .productUpdated(product => {
-        updateProduct(product);
-        syncOwnership(store);
-      })
+      // Synchronize ownership before deriving offer display data; whether a
+      // Premium trial may be shown depends on whether Basic is already owned.
+      .productUpdated(() => syncOwnership(store))
       .receiptsReady(() => syncOwnership(store));
 
     store.error(err => {
@@ -146,10 +158,6 @@
 
     store.ready(() => {
       ready = true;
-      Object.keys(PRODUCTS).forEach(tier => {
-        const product = store.get(PRODUCTS[tier].id);
-        if (product) updateProduct(product);
-      });
       syncOwnership(store);
     });
 
