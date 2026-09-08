@@ -13,6 +13,7 @@
     basic: { id: 'ascend_keys_basic_monthly', cacheKey: 'ascend_keys_basic_cached', defaultPrice: '$4.99/month' },
     premium: { id: 'ascend_keys_premium_monthly', cacheKey: 'ascend_keys_sub_cached', defaultPrice: '$5.99/month' },
   };
+  const MEMBERSHIP_GROUP = 'ascend_keys_membership';
 
   let statusListeners = [];
   let ready = false;
@@ -80,7 +81,14 @@
 
     Object.keys(PRODUCTS).forEach(tier => {
       const id = PRODUCTS[tier].id;
-      store.register({ id, type: ProductType.PAID_SUBSCRIPTION, platform: Platform.GOOGLE_PLAY });
+      store.register({
+        id,
+        type: ProductType.PAID_SUBSCRIPTION,
+        platform: Platform.GOOGLE_PLAY,
+        // cordova-plugin-purchase uses a shared group to locate the currently
+        // owned purchase token when replacing one Android subscription.
+        group: MEMBERSHIP_GROUP,
+      });
     });
 
     // cordova-plugin-purchase v13 exposes ownership through store.owned().
@@ -131,8 +139,20 @@
     if (!offer) {
       return Promise.reject(new Error('No purchasable offer found for this product.'));
     }
+    const isPremiumUpgrade = tier === 'premium' && owned.basic && !owned.premium;
+    if (isPremiumUpgrade && !ready) {
+      return Promise.reject(new Error('Billing is still confirming your Basic membership — try again in a moment.'));
+    }
+    const additionalData = isPremiumUpgrade ? {
+      googlePlay: {
+        // The shared registration group lets the plugin add the Basic
+        // purchase token. This mode upgrades immediately and charges only the
+        // prorated difference instead of creating a second subscription.
+        replacementMode: CdvPurchase.GooglePlay.ReplacementMode.CHARGE_PRORATED_PRICE,
+      },
+    } : undefined;
     return Promise.resolve()
-      .then(() => store.order(offer))
+      .then(() => store.order(offer, additionalData))
       .then(result => rejectStoreError(result, 'Purchase could not be completed.'));
   }
 
