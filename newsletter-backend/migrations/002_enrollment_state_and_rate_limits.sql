@@ -2,6 +2,9 @@ alter table newsletter_subscribers
   add column if not exists sync_status text not null default 'synced'
   check (sync_status in ('pending', 'synced', 'failed'));
 
+alter table newsletter_subscribers
+  add column if not exists sync_attempt_id text;
+
 create table if not exists newsletter_rate_limits (
   scope text not null,
   key_hash text not null,
