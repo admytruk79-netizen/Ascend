@@ -23,5 +23,6 @@ test('enforces the configured atomic request count', async () => {
   assert.equal(calls[0].values[0], 'ip-15m');
   assert.equal(calls[0].values[1].length, 64);
   assert.equal(calls[0].values[2], 900);
+  assert.equal(calls[0].query.includes("interval '2 days'"), true);
   assert.equal(calls[0].query.includes('returning request_count'), true);
 });
