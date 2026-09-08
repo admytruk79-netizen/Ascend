@@ -91,16 +91,20 @@ export default {
       }
 
       await completeEnrollment(email, {
-        begin: async address => {
+        begin: async (address, attemptId) => {
           const result = await db.execute(sql`
             insert into newsletter_subscribers
-              (email, status, sync_status, source, consent_at, updated_at)
-            values (${address}, 'unsubscribed', 'pending', 'ascend-keys-app', now(), now())
+              (email, status, sync_status, sync_attempt_id, source, consent_at, updated_at)
+            values (${address}, 'unsubscribed', 'pending', ${attemptId}, 'ascend-keys-app', now(), now())
             on conflict (email_normalized) do update
             set email = excluded.email,
                 sync_status = case
                   when newsletter_subscribers.status = 'subscribed' then 'synced'
                   else 'pending'
+                end,
+                sync_attempt_id = case
+                  when newsletter_subscribers.status = 'subscribed' then null
+                  else excluded.sync_attempt_id
                 end,
                 consent_at = now(),
                 updated_at = now()
@@ -111,13 +115,22 @@ export default {
         sync: syncResendContact,
         markSubscribed: address => db.execute(sql`
           update newsletter_subscribers
-          set status = 'subscribed', sync_status = 'synced', updated_at = now()
+          set status = 'subscribed',
+              sync_status = 'synced',
+              sync_attempt_id = null,
+              updated_at = now()
           where email_normalized = ${address}
         `),
-        markFailed: address => db.execute(sql`
+        markFailed: (address, attemptId) => db.execute(sql`
           update newsletter_subscribers
-          set status = 'unsubscribed', sync_status = 'failed', updated_at = now()
+          set status = 'unsubscribed',
+              sync_status = 'failed',
+              sync_attempt_id = null,
+              updated_at = now()
           where email_normalized = ${address}
+            and sync_attempt_id = ${attemptId}
+            and status <> 'subscribed'
+            and sync_status = 'pending'
         `),
       });
     } catch (error) {
