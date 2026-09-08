@@ -13,13 +13,19 @@ export function clientAddress(request) {
 
 export async function consumeRateLimit(pool, { scope, value, limit, windowSeconds }) {
   const result = await pool.query(
-    `insert into newsletter_rate_limits
+    `with cleanup as (
+       delete from newsletter_rate_limits
+       where updated_at < now() - interval '2 days'
+     ), current_window as (
+       insert into newsletter_rate_limits
        (scope, key_hash, window_started_at, request_count, updated_at)
-     values ($1, $2, to_timestamp(floor(extract(epoch from now()) / $3) * $3), 1, now())
-     on conflict (scope, key_hash, window_started_at) do update
-       set request_count = newsletter_rate_limits.request_count + 1,
-           updated_at = now()
-     returning request_count`,
+       values ($1, $2, to_timestamp(floor(extract(epoch from now()) / $3) * $3), 1, now())
+       on conflict (scope, key_hash, window_started_at) do update
+         set request_count = newsletter_rate_limits.request_count + 1,
+             updated_at = now()
+       returning request_count
+     )
+     select request_count from current_window`,
     [scope, hashKey(scope, value), windowSeconds],
   );
   return Number(result.rows[0].request_count) <= limit;
