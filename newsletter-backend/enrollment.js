@@ -1,13 +1,17 @@
+import { randomUUID } from 'node:crypto';
+
 export async function completeEnrollment(email, operations) {
-  const priorStatus = await operations.begin(email);
+  const attemptId = operations.createAttemptId?.() ?? randomUUID();
+  await operations.begin(email, attemptId);
   try {
-    await operations.sync(email);
-    await operations.markSubscribed(email);
+    await operations.sync(email, attemptId);
+    // A successful provider sync always wins, even if another retry began
+    // while it was in flight.
+    await operations.markSubscribed(email, attemptId);
   } catch (error) {
-    // A previously completed enrollment stays valid when a later re-consent
-    // attempt cannot reach Resend. New and incomplete attempts are marked
-    // failed so the database never claims that an unsuccessful signup worked.
-    if (priorStatus !== 'subscribed') await operations.markFailed(email);
+    // The database update is conditional on this attempt still being the
+    // active pending one, so a stale failure cannot erase another success.
+    await operations.markFailed(email, attemptId);
     throw error;
   }
 }
