@@ -43,6 +43,7 @@ async function main() {
   };
   let initializedPlatform;
   let orderedOffer;
+  let orderedAdditionalData;
   let restoreCalls = 0;
   let orderResult;
   let restoreResult;
@@ -80,7 +81,11 @@ async function main() {
     },
     get: id => products[id],
     owned: id => ownership[id],
-    order: async offer => { orderedOffer = offer; return orderResult; },
+    order: async (offer, additionalData) => {
+      orderedOffer = offer;
+      orderedAdditionalData = additionalData;
+      return orderResult;
+    },
     restorePurchases: async () => { restoreCalls += 1; return restoreResult; },
   };
 
@@ -89,6 +94,9 @@ async function main() {
       store,
       ProductType: { PAID_SUBSCRIPTION: 'paid-subscription' },
       Platform: { GOOGLE_PLAY: 'google-play' },
+      GooglePlay: {
+        ReplacementMode: { CHARGE_PRORATED_PRICE: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE' },
+      },
     },
     initialStorage: { ascend_keys_basic_cached: 'true' },
   });
@@ -100,6 +108,10 @@ async function main() {
   assert.deepEqual(registered.map(product => product.id), [
     'ascend_keys_basic_monthly',
     'ascend_keys_premium_monthly',
+  ]);
+  assert.deepEqual(registered.map(product => product.group), [
+    'ascend_keys_membership',
+    'ascend_keys_membership',
   ]);
   assert.deepEqual(Array.from(initializedPlatform), ['google-play']);
   assert.equal(nativeBilling.isReady(), true);
@@ -121,8 +133,19 @@ async function main() {
   assert.equal(finishCalls, 1);
   assert.deepEqual(statuses.at(-1), { basic: true, premium: true });
 
+  ownership.ascend_keys_basic_monthly = false;
+  ownership.ascend_keys_premium_monthly = false;
+  handlers.receiptUpdated({});
   await nativeBilling.subscribe('premium');
   assert.equal(orderedOffer.id, 'premium-offer');
+  assert.equal(orderedAdditionalData, undefined);
+
+  ownership.ascend_keys_basic_monthly = true;
+  handlers.receiptUpdated({});
+  await nativeBilling.subscribe('premium');
+  assert.deepEqual({ ...orderedAdditionalData.googlePlay }, {
+    replacementMode: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE',
+  });
   await nativeBilling.restore();
   assert.equal(restoreCalls, 1);
 
