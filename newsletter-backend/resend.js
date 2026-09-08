@@ -15,28 +15,53 @@ async function requireSuccess(response, operation, acceptedStatuses = []) {
 
 async function findContactId(email, headers, fetchImpl) {
   // Never put an email address in a request URL. Resend's contacts list is
-  // returned in one response, so resolve the provider ID locally and use that
-  // opaque identifier for every subsequent operation.
-  const response = await fetchImpl(`${RESEND_API_URL}/contacts`, {
-    method: 'GET',
-    headers,
-  });
-  await requireSuccess(response, 'contact lookup');
+  // pages locally, using only opaque provider IDs as cursors and later paths.
+  const seenCursors = new Set();
+  let after = null;
 
-  let payload;
-  try {
-    payload = await response.json();
-  } catch {
-    throw new ResendSyncError('Resend contact lookup returned invalid JSON.', response.status);
+  while (true) {
+    const url = new URL(`${RESEND_API_URL}/contacts`);
+    url.searchParams.set('limit', '100');
+    if (after) url.searchParams.set('after', after);
+
+    const response = await fetchImpl(url.toString(), {
+      method: 'GET',
+      headers,
+    });
+    await requireSuccess(response, 'contact lookup');
+
+    let payload;
+    try {
+      payload = await response.json();
+    } catch {
+      throw new ResendSyncError('Resend contact lookup returned invalid JSON.', response.status);
+    }
+    if (payload?.object !== 'list'
+      || typeof payload.has_more !== 'boolean'
+      || !Array.isArray(payload.data)) {
+      throw new ResendSyncError('Resend contact lookup returned an invalid page.', response.status);
+    }
+
+    const contact = payload.data.find(item => (
+      typeof item?.email === 'string' && item.email.toLowerCase() === email.toLowerCase()
+    ));
+    if (contact) {
+      if (typeof contact.id !== 'string' || !contact.id) {
+        throw new ResendSyncError('Resend contact lookup returned an invalid contact.', response.status);
+      }
+      return contact.id;
+    }
+    if (!payload.has_more) break;
+
+    const nextCursor = payload.data.at(-1)?.id;
+    if (typeof nextCursor !== 'string' || !nextCursor || seenCursors.has(nextCursor)) {
+      throw new ResendSyncError('Resend contact lookup returned an invalid cursor.', response.status);
+    }
+    seenCursors.add(nextCursor);
+    after = nextCursor;
   }
-  const contacts = Array.isArray(payload?.data) ? payload.data : [];
-  const contact = contacts.find(item => (
-    typeof item?.email === 'string' && item.email.toLowerCase() === email.toLowerCase()
-  ));
-  if (!contact || typeof contact.id !== 'string' || !contact.id) {
-    throw new ResendSyncError('Resend contact lookup did not find the existing contact.', 409);
-  }
-  return contact.id;
+
+  throw new ResendSyncError('Resend contact lookup did not find the existing contact.', 409);
 }
 
 export async function syncResendContact(email, options = {}) {
