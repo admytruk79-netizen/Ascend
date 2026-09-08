@@ -34,7 +34,7 @@ test('resubscribes an existing contact and assigns the segment idempotently', as
   const responses = [
     new Response('{}', { status: 409 }),
     new Response(JSON.stringify({
-      object: 'list',
+      object: 'list', has_more: false,
       data: [{ id: 'contact-456', email: 'person+news@example.com' }],
     }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
     new Response('{}', { status: 200 }),
@@ -52,7 +52,7 @@ test('resubscribes an existing contact and assigns the segment idempotently', as
   const contactPath = 'https://api.resend.com/contacts/contact-456';
   assert.deepEqual(calls.map(call => [call.init.method, call.url]), [
     ['POST', 'https://api.resend.com/contacts'],
-    ['GET', 'https://api.resend.com/contacts'],
+    ['GET', 'https://api.resend.com/contacts?limit=100'],
     ['PATCH', contactPath],
     ['PATCH', `${contactPath}/topics`],
     ['POST', `${contactPath}/segments/segment-123`],
@@ -60,10 +60,47 @@ test('resubscribes an existing contact and assigns the segment idempotently', as
   assert.equal(calls.some(call => call.url.includes('person')), false);
 });
 
+test('finds an existing contact on a later Resend page', async () => {
+  const calls = [];
+  const responses = [
+    new Response('{}', { status: 409 }),
+    new Response(JSON.stringify({
+      object: 'list',
+      has_more: true,
+      data: [{ id: 'cursor-contact', email: 'other@example.com' }],
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+    new Response(JSON.stringify({
+      object: 'list',
+      has_more: false,
+      data: [{ id: 'contact-page-two', email: 'person@example.com' }],
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+    new Response('{}', { status: 200 }),
+    new Response('{}', { status: 200 }),
+    new Response('{}', { status: 200 }),
+  ];
+
+  await syncResendContact('person@example.com', {
+    ...options,
+    fetchImpl: async (url, init) => {
+      calls.push({ url, init });
+      return responses.shift();
+    },
+  });
+
+  assert.equal(calls[1].url, 'https://api.resend.com/contacts?limit=100');
+  assert.equal(calls[2].url, 'https://api.resend.com/contacts?limit=100&after=cursor-contact');
+  assert.deepEqual(calls.slice(3).map(call => call.url), [
+    'https://api.resend.com/contacts/contact-page-two',
+    'https://api.resend.com/contacts/contact-page-two/topics',
+    'https://api.resend.com/contacts/contact-page-two/segments/segment-123',
+  ]);
+  assert.equal(calls.some(call => call.url.includes('person%40example.com')), false);
+});
+
 test('rejects a duplicate contact when its provider ID cannot be resolved', async () => {
   const responses = [
     new Response('{}', { status: 409 }),
-    new Response(JSON.stringify({ object: 'list', data: [] }), {
+    new Response(JSON.stringify({ object: 'list', has_more: false, data: [] }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     }),
