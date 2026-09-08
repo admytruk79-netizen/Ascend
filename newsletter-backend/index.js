@@ -2,7 +2,13 @@ import { attachDatabasePool } from '@neon/functions';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
 import pg from 'pg';
-import { allowedOrigin, normalizeEmail, validEmail } from './validation.js';
+import {
+  allowedOrigin,
+  BodyTooLargeError,
+  normalizeEmail,
+  readJsonBody,
+  validEmail,
+} from './validation.js';
 
 const { Pool } = pg;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
@@ -36,13 +42,13 @@ export default {
     if (request.method !== 'POST') return json(origin, { error: 'not_found' }, 404);
     if (!allowed) return json(origin, { error: 'origin_not_allowed' }, 403);
 
-    const contentLength = Number(request.headers.get('content-length') || 0);
-    if (contentLength > 4096) return json(origin, { error: 'request_too_large' }, 413);
-
     let body;
     try {
-      body = await request.json();
-    } catch {
+      body = await readJsonBody(request);
+    } catch (error) {
+      if (error instanceof BodyTooLargeError) {
+        return json(origin, { error: 'request_too_large' }, 413);
+      }
       return json(origin, { error: 'invalid_json' }, 400);
     }
 
