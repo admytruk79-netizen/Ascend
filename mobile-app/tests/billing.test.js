@@ -1,0 +1,223 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+
+const billingSource = fs.readFileSync(path.join(__dirname, '..', 'www', 'billing.js'), 'utf8');
+
+function makeLocalStorage(initial = {}) {
+  const values = new Map(Object.entries(initial));
+  return {
+    getItem: key => values.has(key) ? values.get(key) : null,
+    setItem: (key, value) => values.set(key, String(value)),
+  };
+}
+
+function loadBilling({ purchase, initialStorage } = {}) {
+  const window = {};
+  const context = {
+    window,
+    localStorage: makeLocalStorage(initialStorage),
+    console,
+  };
+  if (purchase) context.CdvPurchase = purchase;
+  vm.runInNewContext(billingSource, context, { filename: 'billing.js' });
+  return window.AscendBilling;
+}
+
+async function main() {
+  const browserBilling = loadBilling({
+    initialStorage: { ascend_keys_basic_cached: 'true' },
+  });
+  let browserStatus;
+  browserBilling.onStatusChange(status => { browserStatus = status; });
+  assert.doesNotThrow(() => browserBilling.init());
+  assert.deepEqual({ ...browserStatus }, { basic: true, premium: false });
+  assert.equal(browserBilling.isAvailable(), false);
+
+  const handlers = {};
+  const registered = [];
+  const ownership = {
+    ascend_keys_basic_monthly: false,
+    ascend_keys_premium_monthly: false,
+  };
+  let initializedPlatform;
+  let orderedOffer;
+  let orderedAdditionalData;
+  let restoreCalls = 0;
+  let orderResult;
+  let restoreResult;
+
+  const when = {};
+  for (const event of ['approved', 'verified', 'receiptUpdated', 'productUpdated', 'receiptsReady']) {
+    when[event] = callback => {
+      handlers[event] = callback;
+      return when;
+    };
+  }
+
+  const products = {
+    ascend_keys_basic_monthly: {
+      id: 'ascend_keys_basic_monthly',
+      offers: [{
+        id: 'basic-trial-offer',
+        pricingPhases: [
+          { price: '$0.00', billingPeriod: 'P7D', paymentMode: 'FreeTrial' },
+          { price: '$4.99', billingPeriod: 'P1M', paymentMode: 'PayAsYouGo', recurrenceMode: 'InfiniteRecurring' },
+        ],
+      }],
+      getOffer() { return this.offers[0]; },
+    },
+    ascend_keys_premium_monthly: {
+      id: 'ascend_keys_premium_monthly',
+      offers: [
+        {
+          id: 'premium-trial-offer',
+          pricingPhases: [
+            { price: '$0.00', billingPeriod: 'P7D', paymentMode: 'FreeTrial' },
+            { price: '$5.99', billingPeriod: 'P1M', paymentMode: 'PayAsYouGo', recurrenceMode: 'InfiniteRecurring' },
+          ],
+        },
+        {
+          id: 'premium-base-plan',
+          pricingPhases: [
+            { price: '$5.99', billingPeriod: 'P1M', paymentMode: 'PayAsYouGo', recurrenceMode: 'InfiniteRecurring' },
+          ],
+        },
+      ],
+      getOffer() { return this.offers[0]; },
+    },
+  };
+
+  const store = {
+    register: product => registered.push(product),
+    when: () => when,
+    error: callback => { handlers.error = callback; },
+    ready: callback => { handlers.ready = callback; },
+    initialize: platforms => {
+      initializedPlatform = platforms;
+      handlers.productUpdated(products.ascend_keys_basic_monthly);
+      handlers.productUpdated(products.ascend_keys_premium_monthly);
+      handlers.receiptsReady();
+      handlers.ready();
+    },
+    get: id => products[id],
+    owned: id => ownership[id],
+    order: async (offer, additionalData) => {
+      orderedOffer = offer;
+      orderedAdditionalData = additionalData;
+      return orderResult;
+    },
+    restorePurchases: async () => { restoreCalls += 1; return restoreResult; },
+  };
+
+  const nativeBilling = loadBilling({
+    purchase: {
+      store,
+      ProductType: { PAID_SUBSCRIPTION: 'paid-subscription' },
+      Platform: { GOOGLE_PLAY: 'google-play' },
+      GooglePlay: {
+        ReplacementMode: { CHARGE_PRORATED_PRICE: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE' },
+      },
+      PaymentMode: { FREE_TRIAL: 'FreeTrial' },
+    },
+    initialStorage: { ascend_keys_basic_cached: 'true' },
+  });
+  const statuses = [];
+  ownership.ascend_keys_basic_monthly = true;
+  nativeBilling.onStatusChange(status => statuses.push({ ...status }));
+  assert.doesNotThrow(() => nativeBilling.init());
+  assert.deepEqual(statuses[0], { basic: true, premium: false });
+  assert.deepEqual(registered.map(product => product.id), [
+    'ascend_keys_basic_monthly',
+    'ascend_keys_premium_monthly',
+  ]);
+  assert.deepEqual(registered.map(product => product.group), [
+    'ascend_keys_membership',
+    'ascend_keys_membership',
+  ]);
+  assert.deepEqual(Array.from(initializedPlatform), ['google-play']);
+  assert.equal(nativeBilling.isReady(), true);
+  assert.equal(nativeBilling.getPriceString('basic'), '$4.99/month');
+  assert.equal(nativeBilling.getPriceString('premium'), '$5.99/month');
+  assert.equal(nativeBilling.getTrialString('basic'), '7 days free');
+  // This account already owns Basic, so Premium is presented as an upgrade,
+  // not as another free trial.
+  assert.equal(nativeBilling.getTrialString('premium'), '');
+
+  ownership.ascend_keys_basic_monthly = false;
+  handlers.receiptUpdated({});
+  ownership.ascend_keys_basic_monthly = true;
+  handlers.receiptUpdated({});
+  assert.deepEqual(statuses.at(-1), { basic: true, premium: false });
+
+  ownership.ascend_keys_premium_monthly = true;
+  let verifyCalls = 0;
+  handlers.approved({ verify: () => { verifyCalls += 1; } });
+  assert.equal(verifyCalls, 1);
+  let finishCalls = 0;
+  handlers.verified({ finish: () => { finishCalls += 1; } });
+  assert.equal(finishCalls, 1);
+  assert.deepEqual(statuses.at(-1), { basic: true, premium: true });
+
+  ownership.ascend_keys_basic_monthly = false;
+  ownership.ascend_keys_premium_monthly = false;
+  handlers.receiptUpdated({});
+  // A receipt update alone must refresh offer-derived display data.
+  assert.equal(nativeBilling.getTrialString('premium'), '7 days free');
+  await nativeBilling.subscribe('premium');
+  assert.equal(orderedOffer.id, 'premium-trial-offer');
+  assert.equal(orderedAdditionalData, undefined);
+
+  ownership.ascend_keys_basic_monthly = true;
+  handlers.receiptUpdated({});
+  assert.equal(nativeBilling.getTrialString('premium'), '');
+  await nativeBilling.subscribe('premium');
+  assert.equal(orderedOffer.id, 'premium-base-plan');
+  assert.deepEqual({ ...orderedAdditionalData.googlePlay }, {
+    replacementMode: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE',
+  });
+
+  // Never fall back to a trial offer for an upgrade. If Play does not return
+  // a paid base-plan offer, stop before opening an invalid billing flow.
+  const premiumOffers = products.ascend_keys_premium_monthly.offers;
+  products.ascend_keys_premium_monthly.offers = [premiumOffers[0]];
+  await assert.rejects(
+    nativeBilling.subscribe('premium'),
+    /No purchasable offer found/,
+  );
+  products.ascend_keys_premium_monthly.offers = premiumOffers;
+  await nativeBilling.restore();
+  assert.equal(restoreCalls, 1);
+
+  orderResult = { code: 6, message: 'Purchase cancelled.', productId: 'ascend_keys_premium_monthly' };
+  await assert.rejects(
+    nativeBilling.subscribe('premium'),
+    error => error.message === 'Purchase cancelled.' && error.code === 6,
+  );
+
+  orderResult = { code: 1, message: 'Billing setup failed.', productId: 'ascend_keys_basic_monthly' };
+  await assert.rejects(
+    nativeBilling.subscribe('basic'),
+    error => error.message === 'Billing setup failed.' && error.code === 1,
+  );
+
+  delete products.ascend_keys_basic_monthly;
+  await assert.rejects(
+    nativeBilling.subscribe('basic'),
+    /Subscription product not loaded yet/,
+  );
+
+  restoreResult = { code: 1, message: 'Restore failed.' };
+  await assert.rejects(
+    nativeBilling.restore(),
+    error => error.message === 'Restore failed.' && error.code === 1,
+  );
+}
+
+main().then(() => {
+  console.log('Google Play Billing wrapper tests passed.');
+}).catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

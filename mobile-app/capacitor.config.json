@@ -1,0 +1,8 @@
+{
+  "appId": "com.ascend.keys26",
+  "appName": "ASCEND Keys",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}
