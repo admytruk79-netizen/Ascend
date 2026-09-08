@@ -33,6 +33,10 @@ test('resubscribes an existing contact and assigns the segment idempotently', as
   const calls = [];
   const responses = [
     new Response('{}', { status: 409 }),
+    new Response(JSON.stringify({
+      object: 'list',
+      data: [{ id: 'contact-456', email: 'person+news@example.com' }],
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }),
     new Response('{}', { status: 200 }),
     new Response('{}', { status: 200 }),
     new Response('{}', { status: 409 }),
@@ -45,13 +49,33 @@ test('resubscribes an existing contact and assigns the segment idempotently', as
     },
   });
 
-  const contactPath = 'https://api.resend.com/contacts/person%2Bnews%40example.com';
+  const contactPath = 'https://api.resend.com/contacts/contact-456';
   assert.deepEqual(calls.map(call => [call.init.method, call.url]), [
     ['POST', 'https://api.resend.com/contacts'],
+    ['GET', 'https://api.resend.com/contacts'],
     ['PATCH', contactPath],
     ['PATCH', `${contactPath}/topics`],
     ['POST', `${contactPath}/segments/segment-123`],
   ]);
+  assert.equal(calls.some(call => call.url.includes('person')), false);
+});
+
+test('rejects a duplicate contact when its provider ID cannot be resolved', async () => {
+  const responses = [
+    new Response('{}', { status: 409 }),
+    new Response(JSON.stringify({ object: 'list', data: [] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  ];
+
+  await assert.rejects(
+    syncResendContact('missing@example.com', {
+      ...options,
+      fetchImpl: async () => responses.shift(),
+    }),
+    error => error instanceof ResendSyncError && error.status === 409,
+  );
 });
 
 test('rejects provider failures without exposing the API key', async () => {
