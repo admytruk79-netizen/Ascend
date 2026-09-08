@@ -389,12 +389,21 @@
   .modal-body.scrollable { max-height: 46vh; overflow-y: auto; padding-right: 4px; }
   .modal-subhead { font: 600 10.5px/1 'Inter', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-fixed); margin: 18px 0 8px; }
   .modal-subhead:first-child { margin-top: 0; }
-  .about-news-link {
-    display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; padding: 10px 16px;
-    border: 1px solid rgba(var(--gold-fixed-rgb),.45); border-radius: 999px; color: var(--gold-fixed);
-    font: 600 10px/1 'Inter', sans-serif; letter-spacing: 1.25px; text-decoration: none; text-transform: uppercase;
+  .newsletter-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 12px; }
+  .newsletter-input {
+    min-width: 0; border: 1px solid rgba(var(--cream-rgb),.22); border-radius: 999px; padding: 10px 13px;
+    background: rgba(255,255,255,.045); color: var(--cream); font: 12px/1.2 'Inter', sans-serif;
   }
-  .about-news-link:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+  .newsletter-input::placeholder { color: rgba(var(--cream-rgb),.42); }
+  .newsletter-input:focus { outline: 2px solid rgba(var(--gold-fixed-rgb),.7); outline-offset: 1px; }
+  .newsletter-submit {
+    border: 1px solid rgba(var(--gold-fixed-rgb),.45); border-radius: 999px; padding: 10px 14px;
+    background: transparent; color: var(--gold-fixed); cursor: pointer;
+    font: 600 9.5px/1 'Inter', sans-serif; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .newsletter-submit:disabled { cursor: wait; opacity: .55; }
+  .newsletter-status { grid-column: 1 / -1; min-height: 18px; color: rgba(var(--cream-rgb),.62); font: 11px/1.45 'Inter', sans-serif; }
+  .newsletter-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
   .tab-switch {
     display: flex; gap: 4px; margin-bottom: 16px; background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 4px;
@@ -594,7 +603,12 @@
       <div>No AI reads your cards or your journal — everything here is arithmetic, not a model. A card drawn recently is weighted down until it cycles back around; phases you've seen less often are weighted up, based only on your own draw history on this device. Five and Nine Card Draws guarantee every phase is actually represented, in order, instead of leaving it to chance. Nothing is sent anywhere — the engine only ever looks at draws you've already made.</div>
       <div class="modal-subhead">News &amp; Updates</div>
       <div>Receive occasional news about ASCEND Keys, new practices, and future releases.</div>
-      <a class="about-news-link" href="mailto:admytruk79@gmail.com?subject=ASCEND%20Keys%20news%20signup&amp;body=Please%20add%20me%20to%20the%20ASCEND%20Keys%20news%20list.">Sign up for news</a>
+      <form class="newsletter-form" id="newsletterForm" novalidate>
+        <input class="newsletter-input" id="newsletterEmail" type="email" inputmode="email" autocomplete="email" maxlength="254" aria-label="Email address" placeholder="Email address" required>
+        <input class="newsletter-honeypot" id="newsletterCompany" type="text" autocomplete="off" tabindex="-1" aria-hidden="true">
+        <button class="newsletter-submit" id="newsletterSubmit" type="submit">Sign up</button>
+        <div class="newsletter-status" id="newsletterStatus" role="status" aria-live="polite"></div>
+      </form>
     </div>
     <button class="btn-outline-gold" id="aboutCloseBtn">CLOSE</button>
   </div>
@@ -603,6 +617,7 @@
 <script src="startup-animation.js"></script>
 <script src="cards_data.js"></script>
 <script src="billing.js"></script>
+<script src="newsletter.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
