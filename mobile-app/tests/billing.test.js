@@ -90,10 +90,13 @@ async function main() {
       ProductType: { PAID_SUBSCRIPTION: 'paid-subscription' },
       Platform: { GOOGLE_PLAY: 'google-play' },
     },
+    initialStorage: { ascend_keys_basic_cached: 'true' },
   });
   const statuses = [];
+  ownership.ascend_keys_basic_monthly = true;
   nativeBilling.onStatusChange(status => statuses.push({ ...status }));
   assert.doesNotThrow(() => nativeBilling.init());
+  assert.deepEqual(statuses[0], { basic: true, premium: false });
   assert.deepEqual(registered.map(product => product.id), [
     'ascend_keys_basic_monthly',
     'ascend_keys_premium_monthly',
@@ -103,6 +106,8 @@ async function main() {
   assert.equal(nativeBilling.getPriceString('basic'), '$4.99/month');
   assert.equal(nativeBilling.getPriceString('premium'), '$5.99/month');
 
+  ownership.ascend_keys_basic_monthly = false;
+  handlers.receiptUpdated({});
   ownership.ascend_keys_basic_monthly = true;
   handlers.receiptUpdated({});
   assert.deepEqual(statuses.at(-1), { basic: true, premium: false });
