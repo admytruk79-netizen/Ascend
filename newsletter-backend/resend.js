@@ -13,6 +13,32 @@ async function requireSuccess(response, operation, acceptedStatuses = []) {
   throw new ResendSyncError(`Resend ${operation} failed.`, response.status);
 }
 
+async function findContactId(email, headers, fetchImpl) {
+  // Never put an email address in a request URL. Resend's contacts list is
+  // returned in one response, so resolve the provider ID locally and use that
+  // opaque identifier for every subsequent operation.
+  const response = await fetchImpl(`${RESEND_API_URL}/contacts`, {
+    method: 'GET',
+    headers,
+  });
+  await requireSuccess(response, 'contact lookup');
+
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new ResendSyncError('Resend contact lookup returned invalid JSON.', response.status);
+  }
+  const contacts = Array.isArray(payload?.data) ? payload.data : [];
+  const contact = contacts.find(item => (
+    typeof item?.email === 'string' && item.email.toLowerCase() === email.toLowerCase()
+  ));
+  if (!contact || typeof contact.id !== 'string' || !contact.id) {
+    throw new ResendSyncError('Resend contact lookup did not find the existing contact.', 409);
+  }
+  return contact.id;
+}
+
 export async function syncResendContact(email, options = {}) {
   const apiKey = options.apiKey ?? process.env.RESEND_API_KEY;
   const segmentId = options.segmentId ?? process.env.RESEND_SEGMENT_ID;
@@ -44,9 +70,10 @@ export async function syncResendContact(email, options = {}) {
     await requireSuccess(createResponse, 'contact creation');
   }
 
-  // A global contact with this address already exists. A fresh form submission
-  // is explicit consent to resubscribe it and include it in this app's segment.
-  const contactPath = `${RESEND_API_URL}/contacts/${encodeURIComponent(email)}`;
+  // A global contact with this address already exists. Resolve its opaque ID
+  // without putting the email into a request URL, then resubscribe it.
+  const contactId = await findContactId(email, headers, fetchImpl);
+  const contactPath = `${RESEND_API_URL}/contacts/${encodeURIComponent(contactId)}`;
   const updateResponse = await fetchImpl(contactPath, {
     method: 'PATCH',
     headers,
