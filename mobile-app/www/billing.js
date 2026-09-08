@@ -20,6 +20,7 @@
   let available = typeof CdvPurchase !== 'undefined';
   let owned = { basic: false, premium: false };
   let priceStrings = { basic: PRODUCTS.basic.defaultPrice, premium: PRODUCTS.premium.defaultPrice };
+  let trialStrings = { basic: '', premium: '' };
 
   function loadCached(tier) {
     try { return localStorage.getItem(PRODUCTS[tier].cacheKey) === 'true'; } catch (e) { return false; }
@@ -47,13 +48,45 @@
     });
   }
 
+  function isFreeTrialPhase(phase) {
+    const freeTrialMode = typeof CdvPurchase !== 'undefined' && CdvPurchase.PaymentMode
+      ? CdvPurchase.PaymentMode.FREE_TRIAL
+      : 'FreeTrial';
+    return phase && phase.paymentMode === freeTrialMode;
+  }
+
+  function selectOffer(product, allowTrial = true) {
+    const offers = product && product.offers ? product.offers : [];
+    // Google Play only returns offers the current account is eligible for.
+    // Prefer an eligible free-trial offer; returning subscribers normally see
+    // only the base-plan offer and therefore cannot accidentally receive a
+    // second trial.
+    const trialOffer = offers.find(offer => (offer.pricingPhases || []).some(isFreeTrialPhase));
+    const basePlanOffer = offers.find(offer => !(offer.pricingPhases || []).some(isFreeTrialPhase));
+    return (allowTrial ? trialOffer : basePlanOffer)
+      || (product && product.getOffer ? product.getOffer() : offers[0]);
+  }
+
+  function formatTrialPeriod(period) {
+    const match = /^P(\d+)([DWM])$/.exec(period || '');
+    if (!match) return 'Free trial';
+    const amount = Number(match[1]);
+    const units = { D: 'day', W: 'week', M: 'month' };
+    return `${amount} ${units[match[2]]}${amount === 1 ? '' : 's'} free`;
+  }
+
   function updateProduct(product) {
     const tier = Object.keys(PRODUCTS).find(key => PRODUCTS[key].id === product.id);
     if (!tier) return;
-    const offer = product.getOffer ? product.getOffer() : (product.offers && product.offers[0]);
-    if (offer && offer.pricingPhases && offer.pricingPhases[0]) {
-      priceStrings[tier] = offer.pricingPhases[0].price + '/month';
-    }
+    const isPremiumUpgrade = tier === 'premium' && owned.basic && !owned.premium;
+    const offer = selectOffer(product, !isPremiumUpgrade);
+    const phases = offer && offer.pricingPhases ? offer.pricingPhases : [];
+    const trialPhase = phases.find(isFreeTrialPhase);
+    // A trial is the first $0 phase. The customer-facing recurring price is
+    // the final paid phase, not the trial phase.
+    const recurringPhase = [...phases].reverse().find(phase => !isFreeTrialPhase(phase) && phase.price);
+    if (recurringPhase) priceStrings[tier] = recurringPhase.price + '/month';
+    trialStrings[tier] = trialPhase ? formatTrialPeriod(trialPhase.billingPeriod) : '';
   }
 
   function rejectStoreError(result, fallbackMessage) {
@@ -135,13 +168,13 @@
     if (!product) {
       return Promise.reject(new Error('Subscription product not loaded yet — try again in a moment.'));
     }
-    const offer = product.getOffer ? product.getOffer() : (product.offers && product.offers[0]);
-    if (!offer) {
-      return Promise.reject(new Error('No purchasable offer found for this product.'));
-    }
     const isPremiumUpgrade = tier === 'premium' && owned.basic && !owned.premium;
     if (isPremiumUpgrade && !ready) {
       return Promise.reject(new Error('Billing is still confirming your Basic membership — try again in a moment.'));
+    }
+    const offer = selectOffer(product, !isPremiumUpgrade);
+    if (!offer) {
+      return Promise.reject(new Error('No purchasable offer found for this product.'));
     }
     const additionalData = isPremiumUpgrade ? {
       googlePlay: {
@@ -177,6 +210,7 @@
     isAvailable: () => available,
     isReady: () => ready,
     getPriceString: (tier) => priceStrings[tier] || (PRODUCTS[tier] && PRODUCTS[tier].defaultPrice) || '',
+    getTrialString: (tier) => trialStrings[tier] || '',
     isSubscribedCached: (tier) => loadCached(tier),
   };
 })(window);

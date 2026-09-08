@@ -935,13 +935,19 @@ function renderHome(root) {
 
     const price = (window.AscendBilling && window.AscendBilling.getPriceString(s.tier)) || (s.tier === 'premium' ? '$5.99/month' : '$4.99/month');
     const priceAmount = price.split('/')[0].trim();
+    const trial = (window.AscendBilling && window.AscendBilling.getTrialString)
+      ? window.AscendBilling.getTrialString(s.tier)
+      : '';
+    const membershipPrice = trial
+      ? `${trial}<small> then ${priceAmount} / month${s.tier === 'premium' ? ', unlocks everything' : ''}</small>`
+      : `${priceAmount}<small> / month${s.tier === 'premium' ? ', unlocks everything' : ''}</small>`;
 
     const expandContent = needsMembership ? `
         <div class="spread-expand-content locked">
           <div class="spread-expand-rule"></div>
           <div class="locked-glyph">&#128274;</div>
           <div class="locked-body">Part of ASCEND Keys ${tierLabel === 'PREMIUM' ? 'Premium' : 'Basic'} membership.</div>
-          <div class="locked-price" style="color:${s.tier === 'premium' ? 'var(--gold)' : 'var(--teal)'}">${priceAmount}<small> / month${s.tier === 'premium' ? ', unlocks everything' : ''}</small></div>
+          <div class="locked-price" style="color:${s.tier === 'premium' ? 'var(--gold)' : 'var(--teal)'}">${membershipPrice}</div>
           <button class="${s.tier === 'premium' ? 'btn-gold-block' : 'btn-teal-block'}" id="unlockBtn-${s.key}" data-key="${s.key}">UNLOCK ${tierLabel}</button>
           <div class="locked-fineprint">via Google Play Billing</div>
         </div>` : needsMoreDays ? `

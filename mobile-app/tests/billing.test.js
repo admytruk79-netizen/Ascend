@@ -59,11 +59,33 @@ async function main() {
   const products = {
     ascend_keys_basic_monthly: {
       id: 'ascend_keys_basic_monthly',
-      getOffer: () => ({ id: 'basic-offer', pricingPhases: [{ price: '$4.99' }] }),
+      offers: [{
+        id: 'basic-trial-offer',
+        pricingPhases: [
+          { price: '$0.00', billingPeriod: 'P7D', paymentMode: 'FreeTrial' },
+          { price: '$4.99', billingPeriod: 'P1M', paymentMode: 'PayAsYouGo', recurrenceMode: 'InfiniteRecurring' },
+        ],
+      }],
+      getOffer() { return this.offers[0]; },
     },
     ascend_keys_premium_monthly: {
       id: 'ascend_keys_premium_monthly',
-      getOffer: () => ({ id: 'premium-offer', pricingPhases: [{ price: '$5.99' }] }),
+      offers: [
+        {
+          id: 'premium-trial-offer',
+          pricingPhases: [
+            { price: '$0.00', billingPeriod: 'P7D', paymentMode: 'FreeTrial' },
+            { price: '$5.99', billingPeriod: 'P1M', paymentMode: 'PayAsYouGo', recurrenceMode: 'InfiniteRecurring' },
+          ],
+        },
+        {
+          id: 'premium-base-plan',
+          pricingPhases: [
+            { price: '$5.99', billingPeriod: 'P1M', paymentMode: 'PayAsYouGo', recurrenceMode: 'InfiniteRecurring' },
+          ],
+        },
+      ],
+      getOffer() { return this.offers[0]; },
     },
   };
 
@@ -97,6 +119,7 @@ async function main() {
       GooglePlay: {
         ReplacementMode: { CHARGE_PRORATED_PRICE: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE' },
       },
+      PaymentMode: { FREE_TRIAL: 'FreeTrial' },
     },
     initialStorage: { ascend_keys_basic_cached: 'true' },
   });
@@ -117,6 +140,10 @@ async function main() {
   assert.equal(nativeBilling.isReady(), true);
   assert.equal(nativeBilling.getPriceString('basic'), '$4.99/month');
   assert.equal(nativeBilling.getPriceString('premium'), '$5.99/month');
+  assert.equal(nativeBilling.getTrialString('basic'), '7 days free');
+  // This account already owns Basic, so Premium is presented as an upgrade,
+  // not as another free trial.
+  assert.equal(nativeBilling.getTrialString('premium'), '');
 
   ownership.ascend_keys_basic_monthly = false;
   handlers.receiptUpdated({});
@@ -136,13 +163,18 @@ async function main() {
   ownership.ascend_keys_basic_monthly = false;
   ownership.ascend_keys_premium_monthly = false;
   handlers.receiptUpdated({});
+  handlers.productUpdated(products.ascend_keys_premium_monthly);
+  assert.equal(nativeBilling.getTrialString('premium'), '7 days free');
   await nativeBilling.subscribe('premium');
-  assert.equal(orderedOffer.id, 'premium-offer');
+  assert.equal(orderedOffer.id, 'premium-trial-offer');
   assert.equal(orderedAdditionalData, undefined);
 
   ownership.ascend_keys_basic_monthly = true;
   handlers.receiptUpdated({});
+  handlers.productUpdated(products.ascend_keys_premium_monthly);
+  assert.equal(nativeBilling.getTrialString('premium'), '');
   await nativeBilling.subscribe('premium');
+  assert.equal(orderedOffer.id, 'premium-base-plan');
   assert.deepEqual({ ...orderedAdditionalData.googlePlay }, {
     replacementMode: 'IMMEDIATE_AND_CHARGE_PRORATED_PRICE',
   });
